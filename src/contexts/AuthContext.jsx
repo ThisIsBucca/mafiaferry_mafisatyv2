@@ -1,55 +1,46 @@
-import { createContext, useContext, useState, useEffect } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
+import { supabase } from "@/lib/supabase"
 
-const AuthContext = createContext(null)
+const AuthContext = createContext({})
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem("authToken")
-    if (token) {
-      setIsAuthenticated(true)
-    }
-    setIsLoading(false)
+    // Check active sessions and sets the user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    // Listen for changes on auth state (sign in, sign out, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  const login = async (email, password) => {
-    try {
-      // Here you would typically make an API call to verify credentials
-      // For now, we'll use a simple check
-      if (email === "admin@example.com" && password === "admin123") {
-        localStorage.setItem("authToken", "dummy-token")
-        setIsAuthenticated(true)
-        return true
-      }
-      return false
-    } catch (error) {
-      console.error("Login error:", error)
-      return false
-    }
-  }
-
-  const logout = () => {
-    localStorage.removeItem("authToken")
-    setIsAuthenticated(false)
-  }
-
-  if (isLoading) {
-    return <div>Loading...</div>
+  const value = {
+    signUp: (data) => supabase.auth.signUp(data),
+    signIn: (data) => supabase.auth.signInWithPassword(data),
+    signOut: () => supabase.auth.signOut(),
+    user,
+    loading
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   )
 }
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider")
   }
   return context

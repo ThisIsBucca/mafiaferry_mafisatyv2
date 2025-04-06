@@ -1,96 +1,77 @@
-import { Link } from "react-router-dom"
+import { useArticles } from "../hooks/useArticles"
+import { format } from "date-fns"
+import { Calendar, Clock, Newspaper } from "lucide-react"
 
 export function NewsUpdates() {
-  // Sample news data
-  const news = [
-    {
-      id: 1,
-      title: "New Ferry Service to Pemba Island",
-      excerpt: "We are excited to announce our new route to Pemba Island starting next month.",
-      date: "2024-04-01",
-      image: "/news-1.jpg",
-    },
-    {
-      id: 2,
-      title: "Special Discount for Students",
-      excerpt: "Students can now enjoy 20% discount on all ferry tickets with valid ID.",
-      date: "2024-03-28",
-      image: "/news-2.jpg",
-    },
-    {
-      id: 3,
-      title: "Improved Safety Measures",
-      excerpt: "We have implemented new safety protocols to ensure a safe journey for all passengers.",
-      date: "2024-03-25",
-      image: "/news-3.jpg",
-    },
-  ]
+  const { articles, isLoading } = useArticles()
 
-  return (
-    <section className="py-12 bg-card">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">
-            Latest News & Updates
-          </h2>
-          <p className="mt-3 max-w-2xl mx-auto text-xl text-muted-foreground sm:mt-4">
-            Stay informed about our latest services and announcements
-          </p>
-        </div>
-
-        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {news.map((item) => (
-            <article
-              key={item.id}
-              className="flex flex-col overflow-hidden rounded-lg shadow-lg bg-background"
-            >
-              <div className="flex-shrink-0">
-                <img
-                  className="h-48 w-full object-cover"
-                  src={item.image}
-                  alt={item.title}
-                />
+  if (isLoading) {
+    return (
+      <div className="container py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="rounded-lg border bg-card animate-pulse">
+              <div className="h-48 bg-muted rounded-t-lg" />
+              <div className="p-4 space-y-3">
+                <div className="h-4 bg-muted rounded w-3/4" />
+                <div className="h-4 bg-muted rounded w-1/2" />
+                <div className="h-4 bg-muted rounded w-2/3" />
               </div>
-              <div className="flex-1 p-6 flex flex-col justify-between">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-primary">
-                    {new Date(item.date).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                  <Link to={`/news/${item.id}`} className="block mt-2">
-                    <h3 className="text-xl font-semibold text-foreground">
-                      {item.title}
-                    </h3>
-                    <p className="mt-3 text-base text-muted-foreground">
-                      {item.excerpt}
-                    </p>
-                  </Link>
-                </div>
-                <div className="mt-6">
-                  <Link
-                    to={`/news/${item.id}`}
-                    className="text-sm font-medium text-primary hover:text-primary/80"
-                  >
-                    Read more →
-                  </Link>
-                </div>
-              </div>
-            </article>
+            </div>
           ))}
         </div>
+      </div>
+    )
+  }
 
-        <div className="mt-12 text-center">
-          <Link
-            to="/blog"
-            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90"
-          >
-            View All News
-          </Link>
+  if (!articles || articles.length === 0) {
+    return (
+      <div className="container py-12">
+        <div className="flex flex-col items-center justify-center text-center space-y-4">
+          <Newspaper className="w-12 h-12 text-muted-foreground" />
+          <h3 className="text-lg font-medium">No News Available</h3>
+          <p className="text-sm text-muted-foreground max-w-md">
+            There are currently no news articles available. Please check back later for updates.
+          </p>
         </div>
       </div>
-    </section>
+    )
+  }
+
+  return (
+    <div className="container py-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {articles.map((article) => (
+          <article key={article.id} className="rounded-lg border bg-card overflow-hidden">
+            <div className="relative h-48">
+              <img
+                src={article.image_url}
+                alt={article.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = "https://placehold.co/600x400?text=No+Image"
+                }}
+              />
+            </div>
+            <div className="p-4 space-y-4">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>{format(new Date(article.created_at), "MMM d, yyyy")}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  <span>{format(new Date(article.created_at), "h:mm a")}</span>
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold">{article.title}</h3>
+              <p className="text-sm text-muted-foreground line-clamp-3">
+                {article.content}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
   )
 } 
