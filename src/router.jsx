@@ -7,7 +7,7 @@ import BlogPost from "./pages/blog-post"
 import { ArticlePage } from "./pages/news/article"
 import { AdminLayout } from "./components/admin/AdminLayout"
 import Dashboard from "./pages/admin/dashboard"
-import { SchedulesAdmin } from "./pages/admin/schedules"
+import SchedulesAdmin from "./pages/admin/schedules"
 import { ArticlesAdmin } from "./pages/admin/articles"
 import { LoginPage } from "./pages/admin/login"
 import { ProtectedRoute } from './components/ProtectedRoute'
