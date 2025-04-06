@@ -1,24 +1,31 @@
-import { Phone, Mail } from "lucide-react"
+import { Coffee, Heart, Lock } from "lucide-react"
+import { Link } from "react-router-dom"
 
 export function SupportBanner() {
   return (
-    <div className="bg-primary text-primary-foreground py-2">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-wrap items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <a href="tel:+233244444444" className="flex items-center hover:text-primary-foreground/80">
-              <Phone className="h-4 w-4 mr-2" />
-              <span>+233 24 444 4444</span>
-            </a>
-            <a href="mailto:info@mafiaferry.com" className="flex items-center hover:text-primary-foreground/80">
-              <Mail className="h-4 w-4 mr-2" />
-              <span>info@mafiaferry.com</span>
-            </a>
-          </div>
-          <div className="text-sm">
-            <span>Operating Hours: 6:00 AM - 10:00 PM</span>
-          </div>
-        </div>
+    <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b">
+      <div className="container px-4 py-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs sm:text-sm">
+        <span className="text-muted-foreground">Developed with</span>
+        <Heart className="w-3 h-3 sm:w-4 sm:h-4 text-red-500 animate-pulse" />
+        <span className="text-muted-foreground">by Bucca</span>
+        <span className="hidden sm:inline text-muted-foreground mx-1">•</span>
+        <a 
+          href="https://buccaprofil.carrd.co" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-primary hover:text-primary/80 font-medium transition-colors"
+        >
+          <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
+          Support my work
+        </a>
+        <span className="hidden sm:inline text-muted-foreground mx-1">•</span>
+        <Link 
+          to="/admin/login" 
+          className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
+        >
+          <Lock className="w-3 h-3 sm:w-4 sm:h-4" />
+          Admin
+        </Link>
       </div>
     </div>
   )
