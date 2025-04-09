@@ -39,32 +39,32 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-8">Admin Dashboard</h1>
+    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-8">Admin Dashboard</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {stats.map((stat, index) => (
           <Link
             key={index}
             to={stat.title === "Settings" ? "/admin/settings" : "#"}
-            className="bg-card rounded-lg shadow p-6 hover:shadow-md transition-shadow"
+            className="bg-card rounded-lg shadow p-4 sm:p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">{stat.title}</p>
-                <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                <p className="text-xl sm:text-2xl font-bold mt-1">{stat.value}</p>
               </div>
-              <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              <div className={`p-2 sm:p-3 rounded-full ${stat.bgColor}`}>
+                <stat.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.color}`} />
               </div>
             </div>
           </Link>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card rounded-lg shadow p-6">
-          <h2 className="text-xl font-bold mb-4">Recent Bookings</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Recent Bookings</h2>
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map((booking) => (
               <div
@@ -72,8 +72,8 @@ export default function Dashboard() {
                 className="flex items-center justify-between py-2 border-b last:border-0"
               >
                 <div>
-                  <p className="font-medium">Booking #{booking}</p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="font-medium text-sm sm:text-base">Booking #{booking}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
                     Mafia Island - Dar es Salaam
                   </p>
                 </div>
@@ -85,49 +85,49 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-card rounded-lg shadow p-6">
-          <h2 className="text-xl font-bold mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-4">
+        <div className="bg-card rounded-lg shadow p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-bold mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <Link
               to="/admin/schedules"
-              className="p-4 border rounded-lg hover:bg-muted transition-colors"
+              className="p-3 sm:p-4 border rounded-lg hover:bg-muted transition-colors"
             >
-              <Calendar className="h-6 w-6 mb-2" />
-              <p className="font-medium">Manage Schedules</p>
+              <Calendar className="h-5 w-5 sm:h-6 sm:w-6 mb-2" />
+              <p className="font-medium text-sm sm:text-base">Manage Schedules</p>
             </Link>
             <Link
               to="/admin/users"
-              className="p-4 border rounded-lg hover:bg-muted transition-colors"
+              className="p-3 sm:p-4 border rounded-lg hover:bg-muted transition-colors"
             >
-              <Users className="h-6 w-6 mb-2" />
-              <p className="font-medium">Manage Users</p>
+              <Users className="h-5 w-5 sm:h-6 sm:w-6 mb-2" />
+              <p className="font-medium text-sm sm:text-base">Manage Users</p>
             </Link>
             <Link
               to="/admin/news"
-              className="p-4 border rounded-lg hover:bg-muted transition-colors"
+              className="p-3 sm:p-4 border rounded-lg hover:bg-muted transition-colors"
             >
-              <FileText className="h-6 w-6 mb-2" />
-              <p className="font-medium">Manage News</p>
+              <FileText className="h-5 w-5 sm:h-6 sm:w-6 mb-2" />
+              <p className="font-medium text-sm sm:text-base">Manage News</p>
             </Link>
             <Link
               to="/admin/settings"
-              className="p-4 border rounded-lg hover:bg-muted transition-colors"
+              className="p-3 sm:p-4 border rounded-lg hover:bg-muted transition-colors"
             >
-              <Settings className="h-6 w-6 mb-2" />
-              <p className="font-medium">Settings</p>
+              <Settings className="h-5 w-5 sm:h-6 sm:w-6 mb-2" />
+              <p className="font-medium text-sm sm:text-base">Settings</p>
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 mt-6">
+      <div className="grid gap-4 sm:gap-6 md:grid-cols-3 mt-6">
         {/* Schedules Card */}
-        <div className="p-6 rounded-xl border bg-card">
-          <div className="flex items-center gap-4">
-            <Calendar className="w-8 h-8 text-primary" />
+        <div className="p-4 sm:p-6 rounded-xl border bg-card">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             <div>
-              <h2 className="font-semibold">Total Schedules</h2>
-              <p className="text-2xl font-bold">
+              <h2 className="font-semibold text-sm sm:text-base">Total Schedules</h2>
+              <p className="text-xl sm:text-2xl font-bold">
                 {schedulesLoading ? "..." : schedules?.length || 0}
               </p>
             </div>
@@ -135,12 +135,12 @@ export default function Dashboard() {
         </div>
 
         {/* Articles Card */}
-        <div className="p-6 rounded-xl border bg-card">
-          <div className="flex items-center gap-4">
-            <FileText className="w-8 h-8 text-primary" />
+        <div className="p-4 sm:p-6 rounded-xl border bg-card">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             <div>
-              <h2 className="font-semibold">Published Articles</h2>
-              <p className="text-2xl font-bold">
+              <h2 className="font-semibold text-sm sm:text-base">Published Articles</h2>
+              <p className="text-xl sm:text-2xl font-bold">
                 {articlesLoading ? "..." : articles?.length || 0}
               </p>
             </div>
@@ -148,12 +148,12 @@ export default function Dashboard() {
         </div>
 
         {/* Alerts Card */}
-        <div className="p-6 rounded-xl border bg-card">
-          <div className="flex items-center gap-4">
-            <AlertTriangle className="w-8 h-8 text-yellow-500" />
+        <div className="p-4 sm:p-6 rounded-xl border bg-card">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
             <div>
-              <h2 className="font-semibold">Active Alerts</h2>
-              <p className="text-2xl font-bold">0</p>
+              <h2 className="font-semibold text-sm sm:text-base">Active Alerts</h2>
+              <p className="text-xl sm:text-2xl font-bold">0</p>
             </div>
           </div>
         </div>
@@ -161,16 +161,16 @@ export default function Dashboard() {
 
       {/* Recent Activity */}
       <div className="space-y-4 mt-6">
-        <h2 className="text-xl font-semibold">Recent Activity</h2>
+        <h2 className="text-lg sm:text-xl font-semibold">Recent Activity</h2>
         <div className="rounded-xl border bg-card overflow-hidden">
-          <div className="p-4 border-b">
-            <h3 className="font-medium">Latest Updates</h3>
+          <div className="p-3 sm:p-4 border-b">
+            <h3 className="font-medium text-sm sm:text-base">Latest Updates</h3>
           </div>
           <div className="divide-y">
             {schedules?.slice(0, 5).map(schedule => (
-              <div key={schedule.id} className="p-4">
-                <p className="font-medium">{schedule.ship_name}</p>
-                <p className="text-sm text-muted-foreground">{schedule.route}</p>
+              <div key={schedule.id} className="p-3 sm:p-4">
+                <p className="font-medium text-sm sm:text-base">{schedule.ship_name}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{schedule.route}</p>
               </div>
             ))}
           </div>

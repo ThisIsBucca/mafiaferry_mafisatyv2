@@ -1,12 +1,29 @@
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import { Calendar, Clock, MapPin, Ship } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export function Hero() {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+  const images = [
+    'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//ferrydaw.jpg',
+    'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//Runway%202025-02-12T17_59_48.795Z%20Erase%20and%20Replace%20remove%20this%20icons.png',
+    'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//mvkilindoni.jpg'
+  ]
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length)
+    }, 5000) // Change image every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -32,9 +49,23 @@ export function Hero() {
   }
 
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10" />
+    <section className="relative min-h-[80vh] w-full flex items-center justify-center overflow-hidden pt-16 sm:pt-0 pb-8 sm:pb-0">
+      {/* Background images with fade transition */}
+      {images.map((image, index) => (
+        <div
+          key={index}
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ${
+            index === currentImageIndex ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{
+            backgroundImage: `url('${image}')`,
+            filter: 'brightness(0.6)'
+          }}
+        />
+      ))}
+      
+      {/* Overlay gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background/90 via-background/60 to-background/90" />
       
       {/* Animated circles */}
       <div className="absolute inset-0 overflow-hidden">
@@ -64,55 +95,46 @@ export function Hero() {
         />
       </div>
 
-      <div className="container relative px-4 sm:px-6 lg:px-8">
+      {/* Content */}
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div
           ref={ref}
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="text-center max-w-4xl mx-auto"
+          className="text-center max-w-3xl mx-auto"
         >
-          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-primary/10 text-primary mb-6 sm:mb-8">
-            <Ship className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="text-xs sm:text-sm font-medium">Mafia Island Ferry</span>
-          </motion.div>
-
-          <motion.h1
+          <motion.h1 
             variants={itemVariants}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6"
+            className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 text-white"
           >
-            <span className="text-foreground">
-              Your Gateway to Mafia Island
-            </span>
+            Welcome to Mafia Island
           </motion.h1>
-
-          <motion.p
+          <motion.p 
             variants={itemVariants}
-            className="text-base sm:text-lg text-muted-foreground mb-8 sm:mb-12 max-w-2xl mx-auto"
+            className="text-lg sm:text-xl text-white/90 mb-8"
           >
-            Experience seamless travel between Mafia Island and Nyamisati with our reliable ferry services. Book your journey today and discover the beauty of Tanzania's hidden gem.
+            Experience the beauty of Tanzania's hidden gem with our reliable ferry services
           </motion.p>
-
-          <motion.div
+          <motion.div 
             variants={itemVariants}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4"
           >
-            <div className="flex flex-col items-center p-4 sm:p-6 rounded-xl border border-border bg-card/50 backdrop-blur-sm hover:bg-card/70 transition-colors">
-              <Calendar className="w-6 h-6 text-primary mb-2" />
-              <h3 className="text-sm sm:text-base font-medium mb-1">Daily Schedules</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground text-center">Regular departures throughout the week</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <Ship className="w-8 h-8 mx-auto mb-2 text-white" />
+              <p className="text-white text-sm">Modern Ferries</p>
             </div>
-
-            <div className="flex flex-col items-center p-4 sm:p-6 rounded-xl border border-border bg-card/50 backdrop-blur-sm hover:bg-card/70 transition-colors">
-              <Clock className="w-6 h-6 text-primary mb-2" />
-              <h3 className="text-sm sm:text-base font-medium mb-1">On-Time Service</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground text-center">Reliable and punctual departures</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <Calendar className="w-8 h-8 mx-auto mb-2 text-white" />
+              <p className="text-white text-sm">Daily Schedules</p>
             </div>
-
-            <div className="flex flex-col items-center p-4 sm:p-6 rounded-xl border border-border bg-card/50 backdrop-blur-sm hover:bg-card/70 transition-colors">
-              <MapPin className="w-6 h-6 text-primary mb-2" />
-              <h3 className="text-sm sm:text-base font-medium mb-1">Convenient Routes</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground text-center">Direct connections to key destinations</p>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <Clock className="w-8 h-8 mx-auto mb-2 text-white" />
+              <p className="text-white text-sm">On Time Service</p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+              <MapPin className="w-8 h-8 mx-auto mb-2 text-white" />
+              <p className="text-white text-sm">Multiple Routes</p>
             </div>
           </motion.div>
         </motion.div>
