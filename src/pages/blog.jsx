@@ -123,6 +123,14 @@ export function Blog() {
         <div className="grid lg:grid-cols-12 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-8">
+            {/* News and Updates Header */}
+            <div className="mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4">News & Updates</h2>
+              <p className="text-muted-foreground">
+                Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas.
+              </p>
+            </div>
+
             {/* Featured Post */}
             <motion.div
               ref={ref}

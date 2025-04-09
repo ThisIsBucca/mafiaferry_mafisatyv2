@@ -11,10 +11,16 @@ import { Contact } from "./components/contact"
 import { Footer } from "./components/footer"
 import { ScrollToTop } from "./components/scroll-to-top"
 import { SupportBanner } from "./components/support-banner"
+import { initializeDatabase } from "./lib/initDb"
+import { useEffect } from "react"
 
 const queryClient = new QueryClient()
 
 export default function App() {
+  useEffect(() => {
+    initializeDatabase()
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

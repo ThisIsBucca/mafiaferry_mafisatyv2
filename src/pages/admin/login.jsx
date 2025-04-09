@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useMutation } from "@tanstack/react-query"
 import { supabase } from "../../lib/supabase"
@@ -14,19 +14,54 @@ export function LoginPage() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials) => {
-      const { data, error } = await supabase.auth.signInWithPassword(credentials)
+      const { data, error } = await supabase.auth.signInWithPassword({
+        ...credentials,
+        options: {
+          persistSession: true
+        }
+      })
       if (error) throw error
       return data
     },
     onSuccess: (data) => {
       localStorage.setItem('session', JSON.stringify(data.session))
+      
+      if (rememberMe) {
+        const session = data.session
+        const expiresAt = new Date()
+        expiresAt.setDate(expiresAt.getDate() + 30)
+        localStorage.setItem('session_expires_at', expiresAt.toISOString())
+      }
+
       toast.success('Welcome back!')
-      navigate("/admin")
+      navigate("/admin", { replace: true })
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to sign in')
     }
   })
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const storedSession = localStorage.getItem('session')
+      const expiresAt = localStorage.getItem('session_expires_at')
+      
+      if (storedSession && expiresAt) {
+        const expirationDate = new Date(expiresAt)
+        if (expirationDate > new Date()) {
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session) {
+            navigate("/admin", { replace: true })
+          }
+        } else {
+          localStorage.removeItem('session')
+          localStorage.removeItem('session_expires_at')
+        }
+      }
+    }
+
+    checkSession()
+  }, [navigate])
 
   const handleLogin = (e) => {
     e.preventDefault()
@@ -115,20 +150,19 @@ export function LoginPage() {
             <button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full py-3 px-4 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors duration-200 font-medium flex items-center justify-center gap-2 group relative overflow-hidden"
+              className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loginMutation.isPending ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Signing in...
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Signing in...</span>
                 </>
               ) : (
                 <>
-                  <Lock className="w-5 h-5" />
-                  Sign In
+                  <Lock className="w-4 h-4" />
+                  <span>Sign In</span>
                 </>
               )}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-foreground/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             </button>
           </form>
 

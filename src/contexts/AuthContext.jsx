@@ -9,14 +9,45 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
+    const initializeAuth = async () => {
+      try {
+        // First check localStorage for a stored session
+        const storedSession = localStorage.getItem('session')
+        if (storedSession) {
+          const { data: { session } } = await supabase.auth.getSession()
+          if (session) {
+            setUser(session.user)
+            setLoading(false)
+            return
+          }
+        }
+
+        // If no stored session, try to refresh
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          localStorage.setItem('session', JSON.stringify(session))
+          setUser(session.user)
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    initializeAuth()
 
     // Listen for changes on auth state (sign in, sign out, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN') {
+        localStorage.setItem('session', JSON.stringify(session))
+        setUser(session.user)
+      } else if (event === 'SIGNED_OUT') {
+        localStorage.removeItem('session')
+        setUser(null)
+      } else if (event === 'INITIAL_SESSION') {
+        setUser(session?.user ?? null)
+      }
       setLoading(false)
     })
 
@@ -26,14 +57,17 @@ export function AuthProvider({ children }) {
   const value = {
     signUp: (data) => supabase.auth.signUp(data),
     signIn: (data) => supabase.auth.signInWithPassword(data),
-    signOut: () => supabase.auth.signOut(),
+    signOut: async () => {
+      await supabase.auth.signOut()
+      localStorage.removeItem('session')
+    },
     user,
     loading
   }
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   )
 }
