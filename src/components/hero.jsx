@@ -18,12 +18,16 @@ export function Hero() {
       caption: 'Utende Beach'
     },
     {
+      url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//openart-image_qq2r6JCc_1743214522482_raw.jpg',
+      caption: 'River Rufiji'
+    },
+    {
       url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//Runway%202025-02-12T17_59_48.795Z%20Erase%20and%20Replace%20remove%20this%20icons.png',
       caption: 'Bucca the CEO 😎'
     },
     {
-      url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//mvkilindoni.jpg',
-      caption: 'MV. Kilindoni'
+      url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//image%20(6).jpg',
+      caption: 'Ship on way to Mafia Island'
     }
   ]
 
