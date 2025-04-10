@@ -1,275 +1,380 @@
 import { motion } from "framer-motion"
-import { useInView } from "react-intersection-observer"
-import { Calendar, Clock, ArrowRight, Mail, ChevronLeft, ChevronRight } from "lucide-react"
-import { Link, useNavigate } from 'react-router-dom'
+import { useParams, Link, useLocation } from 'react-router-dom'
+import { useArticles } from '../hooks/useArticles'
+import { Calendar, Clock, ChevronLeft, Search, Rss, Home } from "lucide-react"
+import { useEffect, useState } from 'react'
+import { Helmet } from 'react-helmet'
 
-export function Blog() {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  })
+export default function Blog() {
+  const { slug } = useParams()
+  const location = useLocation()
+  const { 
+    articles, 
+    isLoading, 
+    isError, 
+    error 
+  } = useArticles()
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const featuredPost = {
-    title: "New Express Ferry Service Launches Between Mafia and Nyamisati",
-    category: "⛴️ Transportation",
-    date: "2024-03-15",
-    excerpt: "We're excited to announce the launch of our new express ferry service, reducing travel time between Mafia Island and Nyamisati by 30%. This development marks a significant improvement in our transportation network.",
-    author: "John Mwangi",
-    readingTime: "5 min read",
-    image: "/images/blog/blog2.jpg",
-    link: "/blog/new-express-ferry-service",
-  }
+  // Scroll to top when navigating to an article
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [location.pathname])
 
-  const blogPosts = [
-    {
-      title: "Port Upgrade Project: What to Expect",
-      category: "🏗️ Infrastructure",
-      date: "2024-03-10",
-      excerpt: "Major port expansion project to improve passenger experience and cargo handling capacity. Learn about the planned improvements and timeline.",
-      readingTime: "4 min read",
-      icon: "🏗️",
-      link: "/blog/port-upgrade-project",
-    },
-    {
-      title: "Weather Advisory: Monsoon Season Guide",
-      category: "🌤️ Travel Alert",
-      date: "2024-03-08",
-      excerpt: "Heavy monsoon season expected - travelers advised to check schedules before departure. Essential tips for safe travel during monsoon season.",
-      readingTime: "3 min read",
-      icon: "🌤️",
-      link: "/blog/monsoon-season-guide",
-    },
-    {
-      title: "Coral Reef Protection Initiative",
-      category: "🐠 Conservation",
-      date: "2024-03-12",
-      excerpt: "New marine protected area established to preserve Mafia Island's coral reefs. How this affects local tourism and marine life.",
-      readingTime: "6 min read",
-      icon: "🐠",
-      link: "/blog/coral-reef-protection",
-    },
-    {
-      title: "Cultural Festival 2024",
-      category: "🎉 Events",
-      date: "2024-03-05",
-      excerpt: "Annual Mafia Island Cultural Festival celebrates local traditions and heritage. Complete guide to this year's festivities.",
-      readingTime: "4 min read",
-      icon: "🎉",
-      link: "/blog/cultural-festival-2024",
-    },
-    {
-      title: "Eco-Tourism: Sustainable Travel Guide",
-      category: "🌴 Tourism",
-      date: "2024-03-01",
-      excerpt: "New sustainable tourism program promotes responsible travel practices. Tips for eco-friendly island exploration.",
-      readingTime: "5 min read",
-      icon: "🌴",
-      link: "/blog/eco-tourism-guide",
-    },
-    {
-      title: "Local Fishing Communities",
-      category: "🐟 Community",
-      date: "2024-02-28",
-      excerpt: "Meet the local fishing communities of Mafia Island and learn about their traditional practices and modern challenges.",
-      readingTime: "7 min read",
-      icon: "🐟",
-      link: "/blog/fishing-communities",
-    },
-  ]
+  // Debug logging
+  useEffect(() => {
+    console.log('=== Blog Component Debug ===')
+    console.log('Current slug:', slug)
+    console.log('Loading state:', isLoading)
+    console.log('Error state:', isError)
+    console.log('Articles:', articles)
+  }, [slug, isLoading, isError, articles])
 
-  const categories = [
-    { name: "Transportation", icon: "⛴️", count: 12 },
-    { name: "Infrastructure", icon: "🏗️", count: 8 },
-    { name: "Travel Tips", icon: "🌤️", count: 15 },
-    { name: "Conservation", icon: "🐠", count: 10 },
-    { name: "Events", icon: "🎉", count: 6 },
-    { name: "Tourism", icon: "🌴", count: 9 },
-    { name: "Community", icon: "🐟", count: 7 },
-  ]
+  const filteredArticles = articles?.filter(article => 
+    article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    article.content.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center">
-        <div className="absolute inset-0">
-          <img
-            src="/images/blog/blog1.jpg"
-            alt="Mafia Island Transport"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/80 to-background/60" />
-        </div>
-        <div className="relative container px-4 sm:px-6 lg:px-8 text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
+  // Common header component
+  const BlogHeader = () => (
+    <div className="border-b">
+      <div className="container px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-end mb-4">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
           >
-            Mafia Island Transport & Travel Blog
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto"
-          >
-            News, updates and travel tips for routes between Mafia, Nyamisati and beyond
-          </motion.p>
+            <Home className="h-5 w-5" />
+            <span>Return Home</span>
+          </Link>
         </div>
-      </section>
+        <div className="flex flex-col items-center text-center space-y-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
+            Mafia Island Blog
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl">
+            Discover stories, travel tips, and updates about Mafia Island's transportation and community
+          </p>
+          <div className="relative w-full max-w-xl mt-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <input
+              type="text"
+              placeholder="Search articles..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-full border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 
-      <div className="container px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="grid lg:grid-cols-12 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-8">
-            {/* News and Updates Header */}
-            <div className="mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-4">News & Updates</h2>
-              <p className="text-muted-foreground">
-                Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas.
-              </p>
-            </div>
-
-            {/* Featured Post */}
-            <motion.div
-              ref={ref}
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8 }}
-              className="mb-12"
-            >
-              <div className="relative rounded-2xl overflow-hidden group">
-                <img
-                  src={`${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/blog/${featuredPost.image}`}
-                  alt={featuredPost.title}
-                  className="w-full h-[400px] object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    e.target.src = '/placeholder-image.jpg'
-                    console.error('Failed to load image:', featuredPost.image)
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-background/50" />
-                <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-2xl">{featuredPost.category}</span>
-                    <span className="text-sm font-medium text-primary">{featuredPost.category}</span>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold mb-4 group-hover:text-primary transition-colors">
-                    {featuredPost.title}
-                  </h2>
-                  <p className="text-muted-foreground mb-6 line-clamp-3">{featuredPost.excerpt}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(featuredPost.date).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4" />
-                        <span>{featuredPost.readingTime}</span>
-                      </div>
-                    </div>
-                    <Link
-                      to={featuredPost.link}
-                      className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
-                    >
-                      Read More
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
+  // Common blog footer component
+  const BlogFooter = () => (
+    <div className="border-t">
+      <div className="container px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 className="font-semibold text-lg text-foreground mb-4">About Our Blog</h3>
+            <p className="text-muted-foreground">
+              Your source for the latest updates, travel information, and stories about Mafia Island's transportation services.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg text-foreground mb-4">Categories</h3>
+            <div className="space-y-2">
+              {Array.from(new Set(articles?.map(a => a.category) || [])).map(category => (
+                <div key={category} className="text-muted-foreground hover:text-primary cursor-pointer">
+                  {category || 'General'}
                 </div>
-              </div>
-            </motion.div>
-
-            {/* Blog Grid */}
-            <div className="grid gap-6 md:grid-cols-2">
-              {blogPosts.map((post, index) => (
-                <motion.article
-                  key={post.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={inView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-                  <div className="relative rounded-2xl border bg-card/50 backdrop-blur-sm p-6 shadow-lg hover:shadow-xl transition-all">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-2xl">{post.icon}</span>
-                      <span className="text-sm font-medium text-primary">{post.category}</span>
-                    </div>
-                    <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors">
-                      {post.title}
-                    </h3>
-                    <p className="text-muted-foreground mb-4 line-clamp-2">{post.excerpt}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(post.date).toLocaleDateString()}</span>
-                      </div>
-                      <Link
-                        to={post.link}
-                        className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
-                      >
-                        Read More
-                        <ArrowRight className="w-4 h-4" />
-                      </Link>
-                    </div>
-                  </div>
-                </motion.article>
               ))}
             </div>
           </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-4 space-y-8">
-            {/* Categories */}
-            <div className="rounded-2xl border bg-card p-6">
-              <h3 className="text-xl font-semibold mb-4">Categories</h3>
-              <div className="space-y-2">
-                {categories.map((category) => (
-                  <button
-                    key={category.name}
-                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-primary/5 transition-colors"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{category.icon}</span>
-                      <span>{category.name}</span>
-                    </div>
-                    <span className="text-sm text-muted-foreground">{category.count}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Newsletter */}
-            <div className="rounded-2xl border bg-card p-6">
-              <h3 className="text-xl font-semibold mb-4">Newsletter</h3>
-              <p className="text-muted-foreground mb-4">
-                Subscribe to our newsletter for the latest updates and travel tips.
-              </p>
-              <form className="space-y-4">
-                <div>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <input
-                      type="email"
-                      placeholder="Enter your email"
-                      className="w-full pl-10 pr-4 py-2 rounded-lg border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-2 rounded-lg transition-colors"
-                >
-                  Subscribe
-                </button>
-              </form>
+          <div>
+            <h3 className="font-semibold text-lg text-foreground mb-4">Subscribe</h3>
+            <p className="text-muted-foreground mb-4">
+              Stay updated with our latest posts and announcements.
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1 px-3 py-2 rounded-md border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+              <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+                <Rss className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
+  )
+
+  // Common SEO component
+  const CommonSEO = () => (
+    <Helmet>
+      <html lang="en" />
+      <meta charSet="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="canonical" href={window.location.href} />
+      <meta name="robots" content="index, follow" />
+      <meta name="author" content="Mafia Ferry" />
+      <meta name="keywords" content="Mafia Island, ferry service, transportation, travel updates, Tanzania tourism, boat schedule" />
+    </Helmet>
+  )
+
+  if (isLoading) {
+    return (
+      <>
+        <CommonSEO />
+        <Helmet>
+          <title>Loading... | Mafia Island Blog</title>
+          <meta name="description" content="Loading the latest news and updates about Mafia Island's transportation services." />
+        </Helmet>
+        <BlogHeader />
+        <div className="container px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center text-foreground">Loading...</div>
+        </div>
+        <BlogFooter />
+      </>
+    )
+  }
+
+  if (isError) {
+    return (
+      <>
+        <CommonSEO />
+        <Helmet>
+          <title>Error | Mafia Island Blog</title>
+          <meta name="description" content="An error occurred while loading the blog content." />
+        </Helmet>
+        <BlogHeader />
+        <div className="container px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center text-destructive">
+            Error: {error.message}
+          </div>
+        </div>
+        <BlogFooter />
+      </>
+    )
+  }
+
+  // If we have a slug, show the single article view
+  if (slug) {
+    console.log('Looking for article with slug:', slug)
+    const article = articles.find(a => a.slug === slug)
+    console.log('Found article:', article)
+
+    if (!article) {
+      return (
+        <>
+          <CommonSEO />
+          <Helmet>
+            <title>Article Not Found | Mafia Island Blog</title>
+            <meta name="description" content="The requested article could not be found." />
+          </Helmet>
+          <BlogHeader />
+          <div className="container px-4 sm:px-6 lg:px-8 py-12">
+            <Link 
+              to="/blog"
+              className="inline-flex items-center text-primary hover:text-primary/80 mb-8"
+            >
+              <ChevronLeft className="w-4 h-4 mr-2" />
+              Back to Blog
+            </Link>
+            <div className="text-center text-foreground">Article not found</div>
+          </div>
+          <BlogFooter />
+        </>
+      )
+    }
+
+    const articleStructuredData = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": article.title,
+      "description": article.excerpt || article.content.substring(0, 160),
+      "image": article.image_url,
+      "datePublished": article.created_at,
+      "dateModified": article.updated_at || article.created_at,
+      "author": {
+        "@type": "Organization",
+        "name": "Mafia Ferry"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Mafia Ferry",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "/images/logo.png"
+        }
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": window.location.href
+      }
+    }
+
+    return (
+      <>
+        <CommonSEO />
+        <Helmet>
+          <title>{article.title} | Mafia Island Blog</title>
+          <meta name="description" content={article.excerpt || article.content.substring(0, 160)} />
+          <meta property="og:title" content={article.title} />
+          <meta property="og:description" content={article.excerpt || article.content.substring(0, 160)} />
+          <meta property="og:url" content={window.location.href} />
+          {article.image_url && <meta property="og:image" content={article.image_url} />}
+          <meta property="og:type" content="article" />
+          <meta property="og:site_name" content="Mafia Island Blog" />
+          <meta property="article:published_time" content={article.created_at} />
+          <meta property="article:modified_time" content={article.updated_at || article.created_at} />
+          <meta property="article:section" content={article.category || 'General'} />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={article.title} />
+          <meta name="twitter:description" content={article.excerpt || article.content.substring(0, 160)} />
+          {article.image_url && <meta name="twitter:image" content={article.image_url} />}
+          <script type="application/ld+json">
+            {JSON.stringify(articleStructuredData)}
+          </script>
+        </Helmet>
+        <BlogHeader />
+        <div className="container px-4 sm:px-6 lg:px-8 py-12">
+          <Link 
+            to="/blog"
+            className="inline-flex items-center text-primary hover:text-primary/80 mb-8"
+          >
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Back to Blog
+          </Link>
+          
+          <article className="prose prose-lg dark:prose-invert max-w-none">
+            <header className="mb-8">
+              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                <span className="inline-flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  {new Date(article.created_at).toLocaleDateString()}
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  {article.read_time || '5 min read'}
+                </span>
+              </div>
+              <h1 className="text-4xl font-bold mb-4 text-foreground">{article.title}</h1>
+              {article.category && (
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
+                  {article.category}
+                </div>
+              )}
+            </header>
+
+            {article.image_url && (
+              <img 
+                src={article.image_url} 
+                alt={article.title}
+                className="w-full h-64 object-cover rounded-lg mb-8"
+              />
+            )}
+            
+            <div className="text-foreground" dangerouslySetInnerHTML={{ __html: article.content }} />
+          </article>
+        </div>
+        <BlogFooter />
+      </>
+    )
+  }
+
+  // Blog listing view
+  const blogStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Mafia Island Blog",
+    "description": "Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas.",
+    "url": window.location.href,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Mafia Ferry",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "/images/logo.png"
+      }
+    },
+    "blogPost": filteredArticles.map(article => ({
+      "@type": "BlogPosting",
+      "headline": article.title,
+      "description": article.excerpt || article.content.substring(0, 160),
+      "datePublished": article.created_at,
+      "dateModified": article.updated_at || article.created_at,
+      "url": `${window.location.origin}/blog/${article.slug}`
+    }))
+  }
+
+  return (
+    <>
+      <CommonSEO />
+      <Helmet>
+        <title>News & Updates | Mafia Island Blog</title>
+        <meta name="description" content="Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas." />
+        <meta property="og:title" content="News & Updates | Mafia Island Blog" />
+        <meta property="og:description" content="Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas." />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Mafia Island Blog" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="News & Updates | Mafia Island Blog" />
+        <meta name="twitter:description" content="Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas." />
+        <script type="application/ld+json">
+          {JSON.stringify(blogStructuredData)}
+        </script>
+      </Helmet>
+      <BlogHeader />
+      <div className="container px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-4 text-foreground">Latest Articles</h2>
+          <p className="text-muted-foreground">
+            Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredArticles.map((article) => (
+            <motion.article
+              key={article.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card rounded-lg shadow-md overflow-hidden border"
+            >
+              {article.image_url && (
+                <img 
+                  src={article.image_url} 
+                  alt={article.title}
+                  className="w-full h-48 object-cover"
+                />
+              )}
+              <div className="p-6">
+                <h2 className="text-xl font-semibold mb-2 text-foreground">{article.title}</h2>
+                {article.excerpt && (
+                  <p className="text-muted-foreground mb-4">{article.excerpt}</p>
+                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    {article.read_time || '5 min read'}
+                  </span>
+                  <Link 
+                    to={`/blog/${article.slug}`}
+                    className="text-primary hover:text-primary/80"
+                  >
+                    Read more
+                  </Link>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </div>
+      <BlogFooter />
+    </>
   )
 } 

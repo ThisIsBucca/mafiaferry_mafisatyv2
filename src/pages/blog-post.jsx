@@ -4,6 +4,7 @@ import { Calendar, Clock } from "lucide-react"
 
 export default function BlogPost() {
   const { id } = useParams()
+  console.log("this is the",id);
   const navigate = useNavigate()
 
   // This would typically come from an API or database

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 
 export default function NewsArticle() {
   const { id } = useParams()
+  console.log("this is the",slug);
   
   // In a real app, this would be fetched from an API
   const article = {
