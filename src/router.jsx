@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom"
-import { Blog } from "./pages/blog"
+import Blog from "./pages/blog"
 import { Navbar } from "./components/navbar"
 import { Footer } from "./components/footer"
 import BlogPost from "./pages/blog-post"
@@ -20,21 +20,27 @@ export const router = createBrowserRouter(
     },
     {
       path: "/blog",
-      element: <Blog />,
+      element: (
+        <div className="min-h-screen bg-background font-sans antialiased">
+          <Navbar />
+          <Blog />
+          <Footer />
+        </div>
+      ),
+    },
+    {
+      path: "/blog/:slug",
+      element: (
+        <div className="min-h-screen bg-background font-sans antialiased">
+          <Navbar />
+          <Blog />
+          <Footer />
+        </div>
+      ),
     },
     {
       path: "/news/:id",
       element: <ArticlePage />,
-    },
-    {
-      path: "/blog/:id",
-      element: (
-        <div className="min-h-screen bg-background font-sans antialiased">
-          <Navbar />
-          <BlogPost />
-          <Footer />
-        </div>
-      ),
     },
     {
       path: "/admin/login",

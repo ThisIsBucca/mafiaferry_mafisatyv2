@@ -4,11 +4,23 @@ import { supabase } from "../../lib/supabase"
 import { toast } from "react-hot-toast"
 import { Plus, Pencil, Trash2, Loader2, Image } from "lucide-react"
 import { uploadImage, deleteImage } from "../../lib/storage"
+import { useAuth } from "../../contexts/AuthContext"
 
 export function ArticlesAdmin() {
   const [editingArticle, setEditingArticle] = useState(null)
   const [imageFile, setImageFile] = useState(null)
   const queryClient = useQueryClient()
+  const { user } = useAuth()
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      console.log('Current session:', session)
+      console.log('Auth error:', error)
+    }
+    checkAuth()
+  }, [])
 
   const { data: articles, isLoading } = useQuery({
     queryKey: ['articles'],
@@ -18,7 +30,10 @@ export function ArticlesAdmin() {
         .select('*')
         .order('created_at', { ascending: false })
       
-      if (error) throw error
+      if (error) {
+        console.error('Articles query error:', error)
+        throw error
+      }
       return data
     }
   })
@@ -113,44 +128,77 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
 
   const addUpdateMutation = useMutation({
     mutationFn: async (article) => {
-      let imageUrl = article.image_url
+      try {
+        // Check authentication status
+        const { data: { session }, error: authError } = await supabase.auth.getSession()
+        if (authError) throw authError
+        if (!session) throw new Error('No active session')
 
-      // Upload new image if provided
-      if (imageFile) {
-        // Delete old image if exists
-        if (article.image_url) {
-          try {
-            await deleteImage(article.image_url)
-          } catch (error) {
-            console.error('Error deleting old image:', error)
+        console.log('Current user:', session.user)
+        console.log('Article data:', article)
+
+        let imageUrl = article.image_url
+
+        // Upload new image if provided
+        if (imageFile) {
+          // Delete old image if exists
+          if (article.image_url) {
+            try {
+              await deleteImage(article.image_url)
+            } catch (error) {
+              console.error('Error deleting old image:', error)
+            }
           }
+
+          // Upload new image
+          imageUrl = await uploadImage(imageFile)
         }
 
-        // Upload new image
-        imageUrl = await uploadImage(imageFile)
-      }
+        const articleData = {
+          ...article,
+          image_url: imageUrl,
+          // Ensure slug is generated if not provided
+          slug: article.slug || article.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/(^-|-$)/g, ''),
+          // Add user_id to track ownership
+          user_id: session.user.id
+        }
 
-      const articleData = {
-        ...article,
-        image_url: imageUrl
-      }
+        console.log('Saving article with data:', articleData)
 
-      if (article.id) {
-        const { error } = await supabase
-          .from('articles')
-          .update(articleData)
-          .eq('id', article.id)
-        
-        if (error) throw error
-      } else {
-        const { error } = await supabase
-          .from('articles')
-          .insert(articleData)
-        
-        if (error) throw error
+        if (article.id) {
+          const { data, error } = await supabase
+            .from('articles')
+            .update(articleData)
+            .eq('id', article.id)
+            .select()
+          
+          if (error) {
+            console.error('Update error:', error)
+            throw error
+          }
+          return data
+        } else {
+          const { data, error } = await supabase
+            .from('articles')
+            .insert(articleData)
+            .select()
+          
+          if (error) {
+            console.error('Insert error:', error)
+            throw error
+          }
+          return data
+        }
+      } catch (error) {
+        console.error('Mutation error:', error)
+        throw error
       }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Article saved successfully:', data)
       queryClient.invalidateQueries({ queryKey: ['articles'] })
       setEditingArticle(null)
       setImageFile(null)
@@ -167,9 +215,10 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
       })
     },
     onError: (error) => {
-      toast.error('Failed to save article', {
+      console.error('Save error details:', error)
+      toast.error(`Failed to save article: ${error.message}`, {
         position: 'top-center',
-        duration: 3000,
+        duration: 5000,
         style: {
           background: '#ef4444',
           color: '#fff',
@@ -178,7 +227,6 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
           boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         },
       })
-      console.error('Save error:', error)
     }
   })
 
@@ -193,7 +241,12 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
       author: formData.get('author'),
       read_time: formData.get('read_time'),
       image_url: editingArticle?.image_url,
-      is_default: formData.get('is_default') === 'on'
+      is_default: formData.get('is_default') === 'on',
+      // Generate slug from title
+      slug: formData.get('title')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '')
     }
 
     if (editingArticle) {

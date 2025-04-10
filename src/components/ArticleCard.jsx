@@ -51,7 +51,7 @@ export function ArticleCard({ article }) {
           </div>
 
           <Link
-            to={`/blog/${article.id}`}
+            to={`/blog/${article.slug}`}
             className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:gap-2 transition-all"
           >
             Read More
