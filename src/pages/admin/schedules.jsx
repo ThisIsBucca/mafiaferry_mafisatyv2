@@ -10,17 +10,29 @@ export default function SchedulesAdmin() {
 
   // Predefined options for form fields
   const shipOptions = [
-    { value: "MV Kilimanjaro", label: "MV Kilimanjaro" },
-    { value: "MV Mafia", label: "MV Mafia" },
-    { value: "MV Pemba", label: "MV Pemba" },
-    { value: "MV Zanzibar", label: "MV Zanzibar" }
+    { value: "MV Kilindoni", label: "MV Kilindoni" },
+    { value: "MV Songosongo", label: "MV Songosongo" },
+    { value: "MV Bucca,mashua", label: "MV Bucca,mashua" },
+    { value: "MV Amana,tukutuku", label: "MV Amana,tukutuku" },
+    { value: "MV bwejuu", label: "MV bwejuu" }
   ]
 
   const routeOptions = [
-    { value: "Mafia Island - Dar es Salaam", label: "Mafia Island - Dar es Salaam" },
-    { value: "Dar es Salaam - Mafia Island", label: "Dar es Salaam - Mafia Island" },
+    { value: "Mafia Island - Nyamisati", label: "Mafia Island - Nyamisati" },
+    { value: "Nyamisati - Mafia Island", label: "Nyamisati - Mafia Island" },
+
+    { value: "Mafia Island - Dar es salaam", label: "Mafia Island - Dar es salaam" },
+    { value: "Dar es salaam - Mafia Island", label: "Dar es salaam - Mafia Island" },
+    
     { value: "Mafia Island - Zanzibar", label: "Mafia Island - Zanzibar" },
-    { value: "Zanzibar - Mafia Island", label: "Zanzibar - Mafia Island" }
+    { value: "Zanzibar - Mafia Island", label: "Zanzibar - Mafia Island" },
+
+    { value: "Kisiju - Mafia Island", label: "Kisiju - Mafia Island" },
+    { value: "Mafia Island - Kisiju", label: "Mafia Island - Kisiju" },
+
+    { value: "Kilwa,somanga - Mafia Island", label: "Kilwa,somanga - Mafia Island" },
+    { value: "Mafia Island - Kilwa,somanga", label: "Mafia Island - Kilwa,somanga" }
+  ]
   ]
 
   const dayOptions = [
