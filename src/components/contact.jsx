@@ -27,7 +27,7 @@ export function Contact() {
               href="tel:+255777000000" 
               className="text-primary hover:text-primary/80 block mt-2"
             >
-              +255 777 000 000
+              +255 776 986 840
             </a>
           </div>
 
@@ -46,7 +46,7 @@ export function Contact() {
               href="mailto:info@mafiaferry.com" 
               className="text-primary hover:text-primary/80 block mt-2"
             >
-              info@mafiaferry.com
+              buccaphilox0104@gmail.com
             </a>
           </div>
 
@@ -62,7 +62,7 @@ export function Contact() {
               Find us at:
             </p>
             <p className="text-foreground mt-2">
-              Mafia Island Ferry Terminal,<br />
+              Kigamboni,<br />
               Kilindoni, Mafia Island,<br />
               Tanzania
             </p>
