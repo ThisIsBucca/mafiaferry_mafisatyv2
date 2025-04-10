@@ -33,7 +33,7 @@ export default function SchedulesAdmin() {
     { value: "Kilwa,somanga - Mafia Island", label: "Kilwa,somanga - Mafia Island" },
     { value: "Mafia Island - Kilwa,somanga", label: "Mafia Island - Kilwa,somanga" }
   ]
-  ]
+  
 
   const dayOptions = [
     { value: "Monday", label: "Monday" },
