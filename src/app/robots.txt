@@ -1,0 +1,14 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://mafiaferry.com/sitemap.xml
+
+# Prevent crawling of admin pages
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+
+# Crawl delay
+Crawl-delay: 10 
