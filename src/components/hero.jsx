@@ -12,6 +12,7 @@ export function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isHovering, setIsHovering] = useState(false)
 
+
   const images = [
     {
       url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//ferrydaw.jpg',
@@ -20,6 +21,14 @@ export function Hero() {
     {
       url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//openart-image_qq2r6JCc_1743214522482_raw.jpg',
       caption: 'River Rufiji'
+    },
+     {
+      url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//mafiaferrybizznex.png',
+      caption: 'mafiaferrybizznex whatsapp group'
+    },
+    {
+      url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//mafiaferrySchedule.png',
+      caption: 'mafiaferrySchedule whatsapp group'
     },
     {
       url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//Runway%202025-02-12T17_59_48.795Z%20Erase%20and%20Replace%20remove%20this%20icons.png',
