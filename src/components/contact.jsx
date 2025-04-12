@@ -86,7 +86,7 @@ export function Contact() {
               Join our passengers' WhatsApp group for schedule updates, announcements, and community discussions.
             </p>
             <a 
-              href="https://whatsapp.com/group/xyz123" 
+              href="https://chat.whatsapp.com/DpEfq8kAhFlCNJDMZht8c2" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="inline-flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-md hover:bg-[#25D366]/90 transition-colors"
@@ -113,7 +113,7 @@ export function Contact() {
               Connect with other businesses and stay updated on cargo services and business opportunities.
             </p>
             <a 
-              href="https://whatsapp.com/group/abc456" 
+              href="https://chat.whatsapp.com/GKtI7pGZk8R2sFG8oOLG4Y" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="inline-flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-md hover:bg-[#25D366]/90 transition-colors"
