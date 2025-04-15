@@ -10,6 +10,9 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://mafiaferry.com" />
         
+        {/* Google Analytics Script */}
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=G-TKFV5E8GLS`}></script>
+        
         {/* Structured Data for Rich Results */}
         <script type="application/ld+json">
           {`

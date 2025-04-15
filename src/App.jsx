@@ -13,6 +13,7 @@ import { ScrollToTop } from "./components/scroll-to-top"
 import { SupportBanner } from "./components/support-banner"
 import { initializeDatabase } from "./lib/initDb"
 import { useEffect } from "react"
+import { AnalyticsProvider } from './components/AnalyticsProvider'
 
 const queryClient = new QueryClient()
 
@@ -22,12 +23,14 @@ export default function App() {
   }, [])
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-        <Toaster position="top-right" />
-      </AuthProvider>
-    </QueryClientProvider>
+    <AnalyticsProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+          <Toaster position="top-right" />
+        </AuthProvider>
+      </QueryClientProvider>
+    </AnalyticsProvider>
   )
 }
 
