@@ -11,12 +11,18 @@ import { ArticlesAdmin } from "./pages/admin/articles"
 import { LoginPage } from "./pages/admin/login"
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { MainContent } from "./App"
+import { RouteChangeListener } from "./components/RouteChangeListener"
 
 export const router = createBrowserRouter(
   [
     {
       path: "/",
-      element: <MainContent />,
+      element: (
+        <>
+          <RouteChangeListener />
+          <MainContent />
+        </>
+      ),
     },
     {
       path: "/blog",

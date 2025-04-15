@@ -11,9 +11,9 @@ import { Contact } from "./components/contact"
 import { Footer } from "./components/footer"
 import { ScrollToTop } from "./components/scroll-to-top"
 import { SupportBanner } from "./components/support-banner"
+import { AnalyticsProvider } from './components/AnalyticsProvider'
 import { initializeDatabase } from "./lib/initDb"
 import { useEffect } from "react"
-import { AnalyticsProvider } from './components/AnalyticsProvider'
 
 const queryClient = new QueryClient()
 
@@ -23,14 +23,14 @@ export default function App() {
   }, [])
 
   return (
-    <AnalyticsProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <AnalyticsProvider>
           <RouterProvider router={router} />
           <Toaster position="top-right" />
-        </AuthProvider>
-      </QueryClientProvider>
-    </AnalyticsProvider>
+        </AnalyticsProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
 
