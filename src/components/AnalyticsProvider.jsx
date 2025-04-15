@@ -4,23 +4,21 @@ import { trackPageView, trackSession } from '../lib/analytics'
 import { initGA, trackPageViewGA, trackDeviceInfoGA, trackSessionDurationGA } from '../lib/ga'
 
 export function AnalyticsProvider({ children }) {
-  const location = useLocation()
-
+  // Initialize Google Analytics and device tracking
   useEffect(() => {
-    // Initialize Google Analytics
     initGA()
-    // Track device information
     trackDeviceInfoGA()
   }, [])
 
+  // Track page views and sessions
   useEffect(() => {
-    // Track page view on route change
-    trackPageView()
-    trackPageViewGA(location.pathname)
-  }, [location.pathname])
+    // Track page view
+    if (typeof window !== 'undefined') {
+      trackPageView()
+      trackPageViewGA(window.location.pathname)
+    }
 
-  useEffect(() => {
-    // Track session on component mount
+    // Track session
     const sessionStart = new Date()
     trackSession()
 
