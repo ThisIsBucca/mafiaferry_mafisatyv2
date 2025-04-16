@@ -1,5 +1,5 @@
 // Google Analytics 4 Measurement ID
-const GA_MEASUREMENT_ID = 'G-TKFV5E8GLS' // Updated Measurement ID
+const GA_MEASUREMENT_ID = 'G-TKFV5E8GLS'
 
 // Initialize Google Analytics
 export function initGA() {
@@ -9,13 +9,17 @@ export function initGA() {
       window.dataLayer.push(arguments)
     }
     gtag('js', new Date())
-    gtag('config', GA_MEASUREMENT_ID)
+    gtag('config', GA_MEASUREMENT_ID, {
+      debug_mode: true, // Enable debug mode to see events in console
+      send_page_view: true
+    })
   }
 }
 
 // Track page views
 export function trackPageViewGA(path) {
   if (typeof window !== 'undefined' && window.gtag) {
+    console.log('Tracking page view:', path) // Debug log
     window.gtag('event', 'page_view', {
       page_path: path,
       page_title: document.title,
@@ -27,16 +31,22 @@ export function trackPageViewGA(path) {
 // Track custom events
 export function trackEventGA(eventName, eventParams = {}) {
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, eventParams)
+    console.log('Tracking event:', eventName, eventParams) // Debug log
+    window.gtag('event', eventName, {
+      ...eventParams,
+      send_to: GA_MEASUREMENT_ID
+    })
   }
 }
 
 // Track user engagement
 export function trackUserEngagementGA(engagementType, details = {}) {
   if (typeof window !== 'undefined' && window.gtag) {
+    console.log('Tracking engagement:', engagementType, details) // Debug log
     window.gtag('event', 'user_engagement', {
       engagement_type: engagementType,
-      ...details
+      ...details,
+      send_to: GA_MEASUREMENT_ID
     })
   }
 }
@@ -46,7 +56,8 @@ export function trackFormSubmissionGA(formId, formData) {
   trackEventGA('form_submit', {
     form_id: formId,
     form_name: formData.name || 'unnamed_form',
-    form_data: JSON.stringify(formData)
+    form_data: JSON.stringify(formData),
+    send_to: GA_MEASUREMENT_ID
   })
 }
 
@@ -54,7 +65,8 @@ export function trackFormSubmissionGA(formId, formData) {
 export function trackButtonClickGA(buttonId, buttonText) {
   trackEventGA('button_click', {
     button_id: buttonId,
-    button_text: buttonText
+    button_text: buttonText,
+    send_to: GA_MEASUREMENT_ID
   })
 }
 
@@ -62,14 +74,16 @@ export function trackButtonClickGA(buttonId, buttonText) {
 export function trackLinkClickGA(linkUrl, linkText) {
   trackEventGA('link_click', {
     link_url: linkUrl,
-    link_text: linkText
+    link_text: linkText,
+    send_to: GA_MEASUREMENT_ID
   })
 }
 
 // Track session duration
 export function trackSessionDurationGA(duration) {
   trackEventGA('session_duration', {
-    duration_seconds: duration
+    duration_seconds: duration,
+    send_to: GA_MEASUREMENT_ID
   })
 }
 
@@ -82,7 +96,10 @@ export function trackDeviceInfoGA() {
     user_agent: navigator.userAgent
   }
   
-  trackEventGA('device_info', deviceInfo)
+  trackEventGA('device_info', {
+    ...deviceInfo,
+    send_to: GA_MEASUREMENT_ID
+  })
 }
 
 // Helper function to determine device type

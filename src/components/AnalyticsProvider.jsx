@@ -1,39 +1,44 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { trackPageView, trackSession } from '../lib/analytics'
-import { initGA, trackPageViewGA, trackDeviceInfoGA, trackSessionDurationGA } from '../lib/ga'
+import { supabase } from '../lib/supabase'
+import { trackPageView, trackEvent, trackSession } from '../lib/analytics'
 
 export function AnalyticsProvider({ children }) {
-  // Initialize Google Analytics and device tracking
-  useEffect(() => {
-    initGA()
-    trackDeviceInfoGA()
-  }, [])
+  const location = useLocation()
 
-  // Track page views and sessions
   useEffect(() => {
     // Track page view
-    if (typeof window !== 'undefined') {
-      trackPageView()
-      trackPageViewGA(window.location.pathname)
+    if (location) {
+      trackPageView(location.pathname)
     }
 
     // Track session
-    const sessionStart = new Date()
-    trackSession()
+    const trackUserSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session) {
+          trackSession(session.user.id)
+        }
+      } catch (error) {
+        console.error('Error tracking session:', error)
+      }
+    }
+    trackUserSession()
 
-    // Track session end when user leaves
-    const handleBeforeUnload = () => {
-      const sessionEnd = new Date()
-      const duration = Math.floor((sessionEnd - sessionStart) / 1000)
-      trackSessionDurationGA(duration)
+    // Track events
+    const handleClick = (e) => {
+      const target = e.target.closest('[data-analytics]')
+      if (target) {
+        const { category, action, label } = target.dataset
+        if (category && action) {
+          trackEvent(category, action, label)
+        }
+      }
     }
 
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [])
+    document.addEventListener('click', handleClick)
+    return () => document.removeEventListener('click', handleClick)
+  }, [location?.pathname])
 
   return children
 } 
