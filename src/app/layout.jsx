@@ -11,7 +11,18 @@ export default function RootLayout({ children }) {
         <link rel="canonical" href="https://mafiaferry.com" />
         
         {/* Google Analytics Script */}
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=G-TKFV5E8GLS`}></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-TKFV5E8GLS"></script>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-TKFV5E8GLS', {
+              page_path: window.location.pathname,
+              send_page_view: true
+            });
+          `
+        }} />
         
         {/* Structured Data for Rich Results */}
         <script type="application/ld+json">

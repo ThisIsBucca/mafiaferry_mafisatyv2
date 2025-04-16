@@ -1,70 +1,73 @@
 import { supabase } from './supabase'
-import { useAuth } from '../contexts/AuthContext'
 
 // Track page view
-export async function trackPageView() {
-  const { user } = useAuth()
-  const pagePath = window.location.pathname
-  const referrer = document.referrer
-  const userAgent = navigator.userAgent
-  const deviceType = getDeviceType()
-
+export async function trackPageView(path) {
   try {
-    await supabase.from('analytics_pageviews').insert({
-      user_id: user?.id,
-      page_path: pagePath,
-      referrer,
-      user_agent: userAgent,
-      device_type: deviceType
-    })
+    const { data: { session } } = await supabase.auth.getSession()
+    const userId = session?.user?.id || 'anonymous'
+    
+    const { error } = await supabase
+      .from('analytics_pageviews')
+      .insert({
+        path,
+        user_id: userId,
+        user_agent: navigator.userAgent,
+        referrer: document.referrer,
+        is_authenticated: !!session?.user
+      })
+
+    if (error) {
+      console.error('Error tracking page view:', error)
+    }
   } catch (error) {
-    console.error('Error tracking page view:', error)
+    console.error('Error in trackPageView:', error)
   }
 }
 
 // Track custom event
-export async function trackEvent(eventType, eventData = {}) {
-  const { user } = useAuth()
-  const pagePath = window.location.pathname
-
+export async function trackEvent(category, action, label) {
   try {
-    await supabase.from('analytics_events').insert({
-      user_id: user?.id,
-      event_type: eventType,
-      event_data: eventData,
-      page_path: pagePath
-    })
+    const { data: { session } } = await supabase.auth.getSession()
+    const userId = session?.user?.id || 'anonymous'
+    
+    const { error } = await supabase
+      .from('analytics_events')
+      .insert({
+        category,
+        action,
+        label,
+        user_id: userId,
+        is_authenticated: !!session?.user
+      })
+
+    if (error) {
+      console.error('Error tracking event:', error)
+    }
   } catch (error) {
-    console.error('Error tracking event:', error)
+    console.error('Error in trackEvent:', error)
   }
 }
 
 // Track session
-export async function trackSession() {
-  const { user } = useAuth()
-  const sessionStart = new Date()
-
+export async function trackSession(userId) {
   try {
-    const { data: session } = await supabase.from('analytics_sessions').insert({
-      user_id: user?.id,
-      session_start: sessionStart
-    }).select().single()
+    const { data: { session } } = await supabase.auth.getSession()
+    const currentUserId = userId || session?.user?.id || 'anonymous'
+    
+    const { error } = await supabase
+      .from('analytics_sessions')
+      .insert({
+        user_id: currentUserId,
+        user_agent: navigator.userAgent,
+        referrer: document.referrer,
+        is_authenticated: !!session?.user
+      })
 
-    // Store session ID for later updates
-    window.sessionId = session.id
-
-    // Track session end when user leaves
-    window.addEventListener('beforeunload', () => {
-      const sessionEnd = new Date()
-      const duration = Math.floor((sessionEnd - sessionStart) / 1000)
-      
-      supabase.from('analytics_sessions').update({
-        session_end: sessionEnd,
-        duration_seconds: duration
-      }).eq('id', session.id)
-    })
+    if (error) {
+      console.error('Error tracking session:', error)
+    }
   } catch (error) {
-    console.error('Error tracking session:', error)
+    console.error('Error in trackSession:', error)
   }
 }
 
@@ -82,6 +85,7 @@ function getDeviceType() {
 
 // Track form submissions
 export function trackFormSubmission(formId, formData) {
+  console.log('Tracking form submission:', { formId, formData })
   trackEvent('form_submission', {
     form_id: formId,
     form_data: formData
@@ -90,6 +94,7 @@ export function trackFormSubmission(formId, formData) {
 
 // Track button clicks
 export function trackButtonClick(buttonId, buttonText) {
+  console.log('Tracking button click:', { buttonId, buttonText })
   trackEvent('button_click', {
     button_id: buttonId,
     button_text: buttonText
@@ -98,6 +103,7 @@ export function trackButtonClick(buttonId, buttonText) {
 
 // Track link clicks
 export function trackLinkClick(linkUrl, linkText) {
+  console.log('Tracking link click:', { linkUrl, linkText })
   trackEvent('link_click', {
     link_url: linkUrl,
     link_text: linkText

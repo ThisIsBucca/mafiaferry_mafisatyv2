@@ -1,15 +1,25 @@
-import { Outlet, Link, useLocation } from "react-router-dom"
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "../../contexts/AuthContext"
 import { useState } from "react"
 import { Menu, X, Home } from "lucide-react"
 
 export function AdminLayout() {
-  const { logout } = useAuth()
+  const { signOut } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const isActive = (path) => {
     return location.pathname === `/admin${path}`
+  }
+
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+      navigate('/')
+    } catch (error) {
+      console.error('Error during sign out:', error)
+    }
   }
 
   return (
@@ -82,7 +92,7 @@ export function AdminLayout() {
                 Articles
               </Link>
               <button
-                onClick={logout}
+                onClick={handleSignOut}
                 className="w-full text-left px-4 py-2 rounded-lg text-foreground hover:bg-accent"
               >
                 Logout
@@ -140,7 +150,7 @@ export function AdminLayout() {
                   </Link>
                   <button
                     onClick={() => {
-                      logout()
+                      handleSignOut()
                       setIsMobileMenuOpen(false)
                     }}
                     className="w-full text-left px-4 py-2 rounded-lg text-foreground hover:bg-accent"

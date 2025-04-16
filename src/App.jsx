@@ -25,10 +25,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <AnalyticsProvider>
-          <RouterProvider router={router} />
-          <Toaster position="top-right" />
-        </AnalyticsProvider>
+        <RouterProvider router={router}>
+          <AnalyticsProvider>
+            <Toaster position="top-right" />
+          </AnalyticsProvider>
+        </RouterProvider>
       </AuthProvider>
     </QueryClientProvider>
   )
