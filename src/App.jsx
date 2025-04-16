@@ -12,6 +12,7 @@ import { Footer } from "./components/footer"
 import { ScrollToTop } from "./components/scroll-to-top"
 import { SupportBanner } from "./components/support-banner"
 import { AnalyticsProvider } from './components/AnalyticsProvider'
+import { GoogleAnalytics } from './components/GoogleAnalytics'
 import { initializeDatabase } from "./lib/initDb"
 import { useEffect } from "react"
 
@@ -27,6 +28,7 @@ export default function App() {
       <AuthProvider>
         <RouterProvider router={router}>
           <AnalyticsProvider>
+            <GoogleAnalytics />
             <Toaster position="top-right" />
           </AnalyticsProvider>
         </RouterProvider>
