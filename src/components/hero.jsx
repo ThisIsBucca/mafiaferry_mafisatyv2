@@ -12,19 +12,18 @@ export function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isHovering, setIsHovering] = useState(false)
 
-
   const images = [
     {
       url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//ferrydaw.jpg',
-      caption: 'Utende Beach'
+      caption: 'Pwani ya Utende'
     },
     {
       url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//openart-image_qq2r6JCc_1743214522482_raw.jpg',
-      caption: 'River Rufiji'
+      caption: 'Mto wa Rufiji'
     },
     {
       url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//image%20(6).jpg',
-      caption: 'Ship on way to Mafia Island'
+      caption: 'Meli ya Kisasa'
     }
   ]
 
@@ -155,7 +154,7 @@ export function Hero() {
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
-          {/* Image caption back in original position */}
+          {/* Image caption */}
           <motion.div
             variants={itemVariants}
             className="mb-8"
@@ -175,11 +174,14 @@ export function Hero() {
             transition={{ duration: 0.3 }}
           >
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white relative z-10 font-display">
-              Your Gateway
+              Mafiaferry
             </h1>
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-primary via-primary/80 to-primary-foreground font-display mt-2">
-              to Mafia Island
-            </h1>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-primary via-primary/80 to-primary-foreground font-display mt-2">
+              Habari za Usafiri wa Majini Kisiwa cha Mafia Online
+            </h2>
+            <p className="mt-4 text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
+              Taarifa za Vyombo vya Usafiri wa Majini Kati ya Mafia na Bara
+            </p>
             <motion.div
               className="absolute -top-8 left-1/2 -translate-x-1/2 w-24 h-24 bg-primary/20 rounded-full blur-3xl"
               animate={{
@@ -206,24 +208,15 @@ export function Hero() {
             />
           </motion.div>
 
-          <motion.p 
-            variants={itemVariants}
-            className="text-lg sm:text-xl text-white/90 mb-8 relative z-10"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.3 }}
-          >
-            Experience the beauty of Tanzania's hidden gem with our reliable ferry services
-          </motion.p>
-
           <motion.div 
             variants={itemVariants}
             className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-12"
           >
             {[
-              { icon: Ship, text: "Modern Ferries" },
-              { icon: Calendar, text: "Daily Schedules" },
-              { icon: Clock, text: "On Time Service" },
-              { icon: MapPin, text: "Multiple Routes" }
+              { icon: Ship, text: "Meli za Kisasa" },
+              { icon: Calendar, text: "Ratiba za Kila Siku" },
+              { icon: Clock, text: "Huduma ya Wakati" },
+              { icon: MapPin, text: "Njia Nyingi" }
             ].map((item, index) => (
               <motion.div
                 key={index}
