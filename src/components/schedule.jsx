@@ -22,6 +22,45 @@ import { formatInTimeZone } from 'date-fns-tz'
 
 const TIMEZONE = "Africa/Dar_es_Salaam"
 
+// Map day names to numbers (0-6) and Swahili translations
+const dayMap = {
+  'Monday': { index: 0, swahili: 'Jumatatu' },
+  'Tuesday': { index: 1, swahili: 'Jumanne' },
+  'Wednesday': { index: 2, swahili: 'Jumatano' },
+  'Thursday': { index: 3, swahili: 'Alhamisi' },
+  'Friday': { index: 4, swahili: 'Ijumaa' },
+  'Saturday': { index: 5, swahili: 'Jumamosi' },
+  'Sunday': { index: 6, swahili: 'Jumapili' }
+}
+
+// Add Swahili month names
+const swahiliMonths = {
+  'January': 'Januari',
+  'February': 'Februari',
+  'March': 'Machi',
+  'April': 'Aprili',
+  'May': 'Mei',
+  'June': 'Juni',
+  'July': 'Julai',
+  'August': 'Agosti',
+  'September': 'Septemba',
+  'October': 'Oktoba',
+  'November': 'Novemba',
+  'December': 'Desemba'
+}
+
+// Function to translate duration to Swahili
+const translateDuration = (duration) => {
+  if (!duration) return ''
+  return duration
+    .replace('hours', 'masaa')
+    .replace('hour', 'saa')
+    .replace('minutes', 'dakika')
+    .replace('minute', 'dakika')
+    .replace('days', 'siku')
+    .replace('day', 'siku')
+}
+
 const getCurrentMafiaTime = () => {
   const now = new Date()
   return new Date(formatInTimeZone(now, TIMEZONE, 'yyyy-MM-dd HH:mm:ss'))
@@ -32,14 +71,8 @@ const getDayInCurrentWeek = (dayName, time) => {
   const startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 }) // Week starts on Monday
   const [hours, minutes] = time.split(':').map(Number)
   
-  // Map day names to numbers (0-6)
-  const dayMap = {
-    'Monday': 0, 'Tuesday': 1, 'Wednesday': 2, 'Thursday': 3,
-    'Friday': 4, 'Saturday': 5, 'Sunday': 6
-  }
-  
   // Get the target day's date in current week
-  let targetDate = addDays(startOfCurrentWeek, dayMap[dayName])
+  let targetDate = addDays(startOfCurrentWeek, dayMap[dayName].index)
   targetDate = setHours(setMinutes(targetDate, minutes), hours)
   
   // If the day/time has passed this week, get next week's date
@@ -64,10 +97,20 @@ const getNextDepartureDate = (days, departureTime) => {
 }
 
 const getTimeOfDay = (hours) => {
-  if (hours >= 5 && hours < 12) return 'Morning'
-  if (hours >= 12 && hours < 17) return 'Afternoon'
-  if (hours >= 17 && hours < 20) return 'Evening'
-  return 'Night'
+  if (hours >= 5 && hours < 12) return 'Asubuhi'
+  if (hours >= 12 && hours < 17) return 'Mchana'
+  if (hours >= 17 && hours < 20) return 'Jioni'
+  return 'Usiku'
+}
+
+// Add Swahili time format
+const formatSwahiliDate = (date) => {
+  const day = format(date, 'EEEE')
+  const month = format(date, 'MMMM')
+  const dayNum = format(date, 'd')
+  const year = format(date, 'yyyy')
+  
+  return `${dayMap[day].swahili}, ${dayNum} ${swahiliMonths[month]}, ${year}`
 }
 
 const getJourneyStatus = (days, departureTime) => {
@@ -77,11 +120,11 @@ const getJourneyStatus = (days, departureTime) => {
   if (!nextDeparture) {
     const [hours] = departureTime.split(':').map(Number)
     return {
-      status: 'No Schedule',
+      status: 'Hakuna Ratiba',
       className: 'bg-gray-100/10 text-gray-500 border-gray-200/20',
       timeRemaining: '',
       localTime: `${format(parse(departureTime, 'HH:mm', new Date()), 'h:mm a')} (${getTimeOfDay(hours)})`,
-      nextDepartureDate: 'Schedule unavailable'
+      nextDepartureDate: 'Ratiba haipatikani'
     }
   }
 
@@ -90,17 +133,30 @@ const getJourneyStatus = (days, departureTime) => {
   
   const formatTimeRemaining = () => {
     if (minutesUntilDeparture <= 0) return ''
-    return formatDistanceToNow(nextDeparture, { addSuffix: true })
+    const timeStr = formatDistanceToNow(nextDeparture, { addSuffix: true })
+    // Translate time remaining to Swahili
+    return timeStr
+      .replace('in ', 'kwa ')
+      .replace('about ', 'takriban ')
+      .replace('less than ', 'chini ya ')
+      .replace('over ', 'zaidi ya ')
+      .replace('almost ', 'karibu ')
+      .replace('days', 'siku')
+      .replace('day', 'siku')
+      .replace('hours', 'masaa')
+      .replace('hour', 'saa')
+      .replace('minutes', 'dakika')
+      .replace('minute', 'dakika')
   }
 
   const departureHours = nextDeparture.getHours()
   const localTime = `${format(nextDeparture, 'h:mm a')} (${getTimeOfDay(departureHours)})`
-  const nextDepartureDate = format(nextDeparture, 'EEEE, MMMM d, yyyy')
+  const nextDepartureDate = formatSwahiliDate(nextDeparture)
   const timeRemaining = formatTimeRemaining()
 
   if (hoursUntilDeparture > 2) {
     return {
-      status: 'Upcoming',
+      status: 'Inakuja',
       className: 'bg-emerald-100/10 text-emerald-500 border-emerald-200/20',
       timeRemaining,
       localTime,
@@ -108,7 +164,7 @@ const getJourneyStatus = (days, departureTime) => {
     }
   } else if (minutesUntilDeparture > 0) {
     return {
-      status: 'Departing Soon',
+      status: 'Inatoka Hivi Karibuni',
       className: 'bg-yellow-100/10 text-yellow-500 border-yellow-200/20',
       timeRemaining,
       localTime,
@@ -116,7 +172,7 @@ const getJourneyStatus = (days, departureTime) => {
     }
   } else {
     return {
-      status: 'Departed',
+      status: 'Imetoka',
       className: 'bg-red-100/10 text-red-500 border-red-200/20',
       timeRemaining: '',
       localTime,
@@ -156,7 +212,7 @@ export function Schedule() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary">
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm font-medium">Loading Schedules</span>
+              <span className="text-sm font-medium">Inapakia Ratiba</span>
             </div>
           </motion.div>
         </div>
@@ -176,14 +232,14 @@ export function Schedule() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 text-destructive mb-8">
               <AlertCircle className="w-4 h-4" />
-              <span className="text-sm font-medium">Schedule Error</span>
+              <span className="text-sm font-medium">Hitilafu ya Ratiba</span>
             </div>
             <button
               onClick={() => refetch()}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
             >
               <RefreshCcw className="w-4 h-4" />
-              Try Again
+              Jaribu Tena
             </button>
           </motion.div>
         </div>
@@ -203,29 +259,32 @@ export function Schedule() {
         >
           <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-primary/10 text-primary mb-6 sm:mb-8">
             <Ship className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="text-xs sm:text-sm font-medium">Live Schedule</span>
+            <span className="text-xs sm:text-sm font-medium">Ratiba ya Moja kwa Moja</span>
           </div>
           <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6">
             <span className="bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
-              Ferry Schedule
+              Ratiba za Vyombo vya Majini
             </span>
           </h2>
+          <p className="text-sm text-muted-foreground mb-8">
+            Mashua | Meli | Vyombo vya Usafiri wa Majini
+          </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto">
             <div className="flex items-center gap-2 justify-center">
               <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-              <span className="text-xs text-muted-foreground">Upcoming: More than 2 hours until departure</span>
+              <span className="text-xs text-muted-foreground">Inakuja: Zaidi ya masaa 2 hadi kuondoka</span>
             </div>
             <div className="flex items-center gap-2 justify-center">
               <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-              <span className="text-xs text-muted-foreground">Departing Soon: Less than 2 hours remaining</span>
+              <span className="text-xs text-muted-foreground">Inatoka Hivi Karibuni: Chini ya masaa 2 iliyobaki</span>
             </div>
             <div className="flex items-center gap-2 justify-center">
               <div className="w-2 h-2 rounded-full bg-red-500"></div>
-              <span className="text-xs text-muted-foreground">Departed: Journey has started</span>
+              <span className="text-xs text-muted-foreground">Imetoka: Safari imeanza</span>
             </div>
             <div className="flex items-center gap-2 justify-center">
               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-              <span className="text-xs text-muted-foreground">Scheduled: Not operating today</span>
+              <span className="text-xs text-muted-foreground">Imeratibiwa: Haiendeshwi leo</span>
             </div>
           </div>
         </motion.div>
@@ -265,26 +324,28 @@ export function Schedule() {
                   <div className="flex flex-col space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground">Route</p>
+                        <p className="text-xs text-muted-foreground">Njia</p>
                         <h4 className="text-sm sm:text-base font-medium">{schedule.route}</h4>
                       </div>
                       <div className="text-right space-y-1">
-                        <p className="text-xs text-muted-foreground">Journey Duration</p>
-                        <span className="text-xs sm:text-sm">{schedule.duration}</span>
+                        <p className="text-xs text-muted-foreground">Muda wa Safari</p>
+                        <span className="text-xs sm:text-sm">{translateDuration(schedule.duration)}</span>
                       </div>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <p className="text-xs text-muted-foreground">Operating Days</p>
+                        <p className="text-xs text-muted-foreground">Siku ya Safari</p>
                         <div className="flex items-center gap-1.5 sm:gap-2">
                           <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
-                          <span className="text-xs sm:text-sm">{schedule.days}</span>
+                          <span className="text-xs sm:text-sm">
+                            {schedule.days.split(',').map(day => dayMap[day.trim()].swahili).join(', ')}
+                          </span>
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <p className="text-xs text-muted-foreground">Next Departure</p>
+                        <p className="text-xs text-muted-foreground">Kuondoka Kijijini</p>
                         <div className="flex flex-col gap-1">
                           {(() => {
                             const { localTime, nextDepartureDate } = getJourneyStatus(schedule.days, schedule.departure)
@@ -305,17 +366,17 @@ export function Schedule() {
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-xs text-muted-foreground">Additional Information</p>
+                      <p className="text-xs text-muted-foreground">Taarifa za Ziada</p>
                       <div className="rounded-lg border border-red-200/20 bg-red-50/10 p-3">
                         <div className="flex items-start gap-1.5 sm:gap-2">
                           <Info className="w-3 h-3 sm:w-4 sm:h-4 text-red-500/70 mt-0.5" />
                           <span className="text-xs sm:text-sm text-red-900/70 dark:text-red-300/90">
-                            {schedule.notes || 'No additional notes'}
+                            {schedule.notes || 'Hakuna maelezo ya ziada'}
                           </span>
                         </div>
                       </div>
                       <div className="mt-2 text-xs text-muted-foreground text-center">
-                        All times shown in Mafia Island local time (EAT)
+                        Muda wote unaonyeshwa kwa wakati wa Mafia Island (EAT)
                       </div>
                     </div>
                   </div>

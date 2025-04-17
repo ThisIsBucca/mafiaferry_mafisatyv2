@@ -11,9 +11,9 @@ export function NewsUpdates() {
       <section className="py-16 bg-muted/20">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Latest News & Updates</h2>
+            <h2 className="text-3xl font-bold mb-4">Habari na Matukio ya Hivi Karibuni</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas.
+              Fahamu habari mpya, matukio, na taarifa za usafiri kuhusu Kisiwa cha Mafia na maeneo yake.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -40,16 +40,16 @@ export function NewsUpdates() {
       <section className="py-16 bg-muted/20">
         <div className="container">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Latest News & Updates</h2>
+            <h2 className="text-3xl font-bold mb-4">Habari na Matukio ya Hivi Karibuni</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas.
+              Fahamu habari mpya, matukio, na taarifa za usafiri kuhusu Kisiwa cha Mafia na maeneo yake.
             </p>
           </div>
           <div className="flex flex-col items-center justify-center text-center space-y-4">
             <Newspaper className="w-12 h-12 text-muted-foreground" />
-            <h3 className="text-lg font-medium">No News Available</h3>
+            <h3 className="text-lg font-medium">Hakuna Habari Zilizopatikana</h3>
             <p className="text-sm text-muted-foreground max-w-md">
-              There are currently no news articles available. Please check back later for updates.
+              Kwa sasa hakuna makala za habari zinazopatikana. Tafadhali rudi tena baadae kwa habari mpya.
             </p>
           </div>
         </div>
@@ -61,9 +61,9 @@ export function NewsUpdates() {
     <section className="py-16 bg-muted/20">
       <div className="container">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Latest News & Updates</h2>
+          <h2 className="text-3xl font-bold mb-4">Habari na Matukio ya Hivi Karibuni</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Stay informed with the latest news, updates, and travel information about Mafia Island and its surrounding areas.
+            Fahamu habari mpya, matukio, na taarifa za usafiri kuhusu Kisiwa cha Mafia na maeneo yake.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -75,7 +75,7 @@ export function NewsUpdates() {
                   alt={article.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
-                    e.target.src = "https://placehold.co/600x400?text=No+Image"
+                    e.target.src = "https://placehold.co/600x400?text=Hakuna+Picha"
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
@@ -100,7 +100,7 @@ export function NewsUpdates() {
                     to={`/blog/${article.slug}`}
                     className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
                   >
-                    Read More
+                    Soma Zaidi
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 )}
