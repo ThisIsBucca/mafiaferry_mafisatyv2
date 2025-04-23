@@ -140,6 +140,7 @@ export default function SchedulesAdmin() {
       ship_name: formData.get('ship_name'),
       route: formData.get('route'),
       days: formData.get('days'),
+      date: formData.get('date'),
       departure: formData.get('departure'),
       arrival: formData.get('arrival'),
       duration: formData.get('duration'),
@@ -228,6 +229,16 @@ export default function SchedulesAdmin() {
                     </option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Date</label>
+                <input
+                  type="date"
+                  name="date"
+                  defaultValue={editingSchedule.date}
+                  className="w-full px-3 py-2 rounded-md border bg-background"
+                  required
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Departure Time</label>
@@ -326,6 +337,7 @@ export default function SchedulesAdmin() {
             <div className="space-y-2 text-sm">
               <p><span className="font-medium">Route:</span> {schedule.route}</p>
               <p><span className="font-medium">Days:</span> {schedule.days}</p>
+              <p><span className="font-medium">Date:</span> {schedule.date}</p>
               <p><span className="font-medium">Departure:</span> {schedule.departure}</p>
               <p><span className="font-medium">Arrival:</span> {schedule.arrival}</p>
               <p><span className="font-medium">Duration:</span> {schedule.duration}</p>
@@ -345,6 +357,7 @@ export default function SchedulesAdmin() {
               <th className="text-left py-2 px-2 sm:px-4">Ship Name</th>
               <th className="text-left py-2 px-2 sm:px-4">Route</th>
               <th className="text-left py-2 px-2 sm:px-4">Days</th>
+              <th className="text-left py-2 px-2 sm:px-4">Date</th>
               <th className="text-left py-2 px-2 sm:px-4">Departure</th>
               <th className="text-left py-2 px-2 sm:px-4">Arrival</th>
               <th className="text-left py-2 px-2 sm:px-4">Duration</th>
@@ -358,6 +371,7 @@ export default function SchedulesAdmin() {
                 <td className="py-2 px-2 sm:px-4">{schedule.ship_name}</td>
                 <td className="py-2 px-2 sm:px-4">{schedule.route}</td>
                 <td className="py-2 px-2 sm:px-4">{schedule.days}</td>
+                <td className="py-2 px-2 sm:px-4">{schedule.date}</td>
                 <td className="py-2 px-2 sm:px-4">{schedule.departure}</td>
                 <td className="py-2 px-2 sm:px-4">{schedule.arrival}</td>
                 <td className="py-2 px-2 sm:px-4">{schedule.duration}</td>

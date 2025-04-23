@@ -12,6 +12,7 @@ import { LoginPage } from "./pages/admin/login"
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { MainContent } from "./App"
 import { RouteChangeListener } from "./components/RouteChangeListener"
+import NotFound from "./pages/NotFound"
 
 export const router = createBrowserRouter(
   [
@@ -73,6 +74,10 @@ export const router = createBrowserRouter(
           element: <ArticlesAdmin />,
         },
       ],
+    },
+    {
+      path: "*",
+      element: <NotFound />,
     },
   ],
   {
