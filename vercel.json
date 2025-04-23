@@ -2,26 +2,21 @@
   "routes": [
     
     {
-      "src": "/^(.*\\.\\w+$)",
+      "src": "/assets/(.*)",
       "headers": {
-        "X-Content-Type-Options": "nosniff",
-        "X-Frame-Options": "DENY",
-        "X-XSS-Protection": "1; mode=block"
+        "Content-Type": null  
       },
-      "dest": "/$1"
+      "dest": "/assets/$1"
     },
    
     {
-      "src": "/[^.]+",
+      "src": "/(.*\\.\\w+$)",
       "headers": {
-        "X-Content-Type-Options": "nosniff",
-        "X-Frame-Options": "DENY",
-        "X-XSS-Protection": "1; mode=block"
+        "Content-Type": null
       },
-      "dest": "/",
-      "status": 200
+      "dest": "/$1"
     },
-   
+    
     {
       "src": "/(.*)",
       "headers": {
@@ -29,6 +24,17 @@
         "X-Frame-Options": "DENY",
         "X-XSS-Protection": "1; mode=block"
       },
+      "continue": true
+    },
+ 
+    {
+      "src": "/[^.]+",
+      "dest": "/",
+      "status": 200
+    },
+    
+    {
+      "src": "/(.*)",
       "dest": "/index.html"
     }
   ]
