@@ -11,6 +11,7 @@ import { Contact } from "./components/contact"
 import { Footer } from "./components/footer"
 import { ScrollToTop } from "./components/scroll-to-top"
 import { SupportBanner } from "./components/support-banner"
+import { ScrollingBanner } from "./components/ScrollingBanner"
 import { AnalyticsProvider } from './components/AnalyticsProvider'
 import { GoogleAnalytics } from './components/GoogleAnalytics'
 import { initializeDatabase } from "./lib/initDb"
@@ -42,6 +43,7 @@ export function MainContent() {
     <>
       <SupportBanner />
       <Navbar />
+      <ScrollingBanner />
       <main>
         <Hero />
         <Schedule />
