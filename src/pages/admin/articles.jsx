@@ -5,10 +5,13 @@ import { toast } from "react-hot-toast"
 import { Plus, Pencil, Trash2, Loader2, Image } from "lucide-react"
 import { uploadImage, deleteImage } from "../../lib/storage"
 import { useAuth } from "../../contexts/AuthContext"
+import ReactQuill from 'react-quill'
+import 'react-quill/dist/quill.snow.css'
 
 export function ArticlesAdmin() {
   const [editingArticle, setEditingArticle] = useState(null)
   const [imageFile, setImageFile] = useState(null)
+  const [contentValue, setContentValue] = useState('')
   const queryClient = useQueryClient()
   const { user } = useAuth()
 
@@ -230,12 +233,18 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
     }
   })
 
+  useEffect(() => {
+    if (editingArticle) {
+      setContentValue(editingArticle.content || '')
+    }
+  }, [editingArticle])
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const formData = new FormData(e.target)
     const article = {
       title: formData.get('title'),
-      content: formData.get('content'),
+      content: contentValue,
       excerpt: formData.get('excerpt'),
       category: formData.get('category'),
       author: formData.get('author'),
@@ -284,97 +293,135 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
   return (
     <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl font-bold">Manage Articles</h1>
+        <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary/80 to-accent/80 bg-clip-text text-transparent drop-shadow-md">
+          Manage Articles
+        </h1>
         <button
           onClick={() => setEditingArticle({})}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary/90 to-accent/80 text-primary-foreground shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-5 h-5" />
           Add Article
         </button>
       </div>
 
+      {/* Modal Overlay */}
       {editingArticle && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8">
-          <div className="bg-card rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+        <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-8">
+          <div className="relative bg-card/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/20 p-0 sm:p-0 w-full max-w-2xl max-h-[95vh] overflow-y-auto glassmorphism">
+            <button
+              onClick={() => setEditingArticle(null)}
+              className="absolute top-3 right-3 text-muted-foreground hover:text-primary rounded-full p-1 bg-background/70 shadow"
+              aria-label="Close"
+            >
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" /></svg>
+            </button>
+            <h2 className="text-xl font-semibold mb-2 pt-8 text-center bg-gradient-to-r from-primary/80 to-accent/80 bg-clip-text text-transparent drop-shadow">
               {editingArticle.id ? 'Edit Article' : 'Add Article'}
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-6 sm:px-10 py-6">
+              {/* Image Upload */}
               <div>
-                <label className="block text-sm font-medium mb-1">Title</label>
-                <input
-                  type="text"
-                  name="title"
-                  defaultValue={editingArticle.title}
-                  className="w-full px-3 py-2 rounded-md border bg-background"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Content</label>
-                <textarea
-                  name="content"
-                  defaultValue={editingArticle.content}
-                  className="w-full px-3 py-2 rounded-md border bg-background"
-                  rows={6}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Image</label>
-                <div className="flex items-center gap-4">
-                  <label className="flex-1">
-                    <div className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50">
-                      <div className="text-center">
-                        <Image className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">
-                          Click to upload or drag and drop
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          PNG, JPG, GIF up to 10MB
-                        </p>
-                      </div>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                      />
+                <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Image</div>
+                <label className="block cursor-pointer group">
+                  <div className="flex items-center justify-center w-full h-40 border-2 border-dashed rounded-xl transition-all duration-200 bg-background/60 group-hover:border-primary/60 group-hover:bg-primary/10 relative overflow-hidden">
+                    <div className="text-center pointer-events-none select-none">
+                      <Image className="w-8 h-8 mx-auto mb-2 text-muted-foreground group-hover:text-primary" />
+                      <p className="text-sm text-muted-foreground group-hover:text-primary">Click to upload or drag and drop</p>
+                      <p className="text-xs text-muted-foreground">PNG, JPG, GIF up to 10MB</p>
                     </div>
-                  </label>
-                  <img
-                    id="image-preview"
-                    src={editingArticle.image_url}
-                    alt="Preview"
-                    className="w-32 h-32 object-cover rounded-lg hidden"
+                    <input
+                      type="file"
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                </label>
+                <img
+                  id="image-preview"
+                  src={editingArticle.image_url}
+                  alt="Preview"
+                  className="w-full h-40 object-cover rounded-xl border border-primary/10 shadow-lg mt-2 bg-background/60 transition-all duration-200"
+                />
+              </div>
+              {/* Content Field Only - Advanced Layout */}
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-primary">Content</span>
+                  <span className="ml-auto text-xs text-muted-foreground italic">Rich text supported</span>
+                </div>
+                <div className="relative rounded-2xl border border-primary/30 bg-gradient-to-br from-background/80 via-primary/5 to-accent/10 shadow-xl focus-within:ring-2 focus-within:ring-primary/40 transition-all overflow-hidden">
+                  <ReactQuill
+                    theme="snow"
+                    value={contentValue}
+                    onChange={setContentValue}
+                    className="rounded-2xl min-h-[260px] max-h-[420px] focus:outline-none focus:ring-0 text-lg font-sans quill-cool"
+                    placeholder="Write your article content here..."
+                    modules={{
+                      toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'align': [] }],
+                        ['link', 'image'],
+                        ['clean']
+                      ]
+                    }}
+                    formats={[
+                      'header', 'bold', 'italic', 'underline', 'strike', 'blockquote',
+                      'color', 'background', 'list', 'bullet', 'align', 'link', 'image'
+                    ]}
                   />
+                  <div className="absolute -top-3 left-4 bg-background/90 px-2 text-xs text-primary font-semibold rounded shadow pointer-events-none select-none">Main Content</div>
+                  <style>{`
+                    .quill-cool .ql-toolbar {
+                      background: linear-gradient(90deg, var(--tw-gradient-stops));
+                      --tw-gradient-from: #f0f4ff;
+                      --tw-gradient-to: #e0e7ff;
+                      border-radius: 1rem 1rem 0 0;
+                      border: none;
+                      box-shadow: 0 2px 8px 0 rgba(80,120,255,0.07);
+                      padding: 0.5rem 1rem;
+                    }
+                    .quill-cool .ql-container {
+                      background: transparent;
+                      border: none;
+                      font-size: 1.08rem;
+                      min-height: 200px;
+                      border-radius: 0 0 1rem 1rem;
+                      padding: 1rem;
+                    }
+                    .quill-cool .ql-editor {
+                      background: transparent;
+                      color: #222;
+                      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+                      min-height: 200px;
+                    }
+                    .quill-cool .ql-toolbar button {
+                      border-radius: 0.5rem;
+                      transition: background 0.2s;
+                    }
+                    .quill-cool .ql-toolbar button:hover, .quill-cool .ql-toolbar button.ql-active {
+                      background: #e0e7ff;
+                    }
+                  `}</style>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="is_default"
-                  id="is_default"
-                  defaultChecked={editingArticle.is_default}
-                  className="rounded border-gray-300"
-                />
-                <label htmlFor="is_default" className="text-sm">
-                  Set as default article
-                </label>
-              </div>
-              <div className="flex flex-col sm:flex-row justify-end gap-2">
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row justify-end gap-2 mt-2">
                 <button
                   type="button"
                   onClick={() => setEditingArticle(null)}
-                  className="w-full sm:w-auto px-4 py-2 rounded-lg border hover:bg-muted"
+                  className="w-full sm:w-auto px-4 py-2 rounded-lg border border-primary/20 bg-background/70 hover:bg-muted/60 shadow"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={addUpdateMutation.isPending}
-                  className="w-full sm:w-auto px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                  className="w-full sm:w-auto px-4 py-2 rounded-lg bg-gradient-to-r from-primary/90 to-accent/80 text-primary-foreground shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200 disabled:opacity-50"
                 >
                   {addUpdateMutation.isPending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -388,21 +435,25 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
         </div>
       )}
 
-      <div className="grid gap-4">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
         {articles?.map((article) => (
-          <div key={article.id} className="bg-card rounded-lg shadow p-4">
+          <div key={article.id} className="bg-card/80 backdrop-blur-lg rounded-2xl shadow-xl border border-primary/10 p-6 group transition-all duration-200 hover:shadow-2xl hover:border-primary/30 glassmorphism flex flex-col">
             <div className="flex justify-between items-start mb-4">
-              <h2 className="text-lg font-semibold">{article.title}</h2>
+              <h2 className="text-lg font-semibold bg-gradient-to-r from-primary/80 to-accent/80 bg-clip-text text-transparent drop-shadow">
+                {article.title}
+              </h2>
               <div className="flex gap-2">
                 <button
                   onClick={() => setEditingArticle(article)}
-                  className="p-1 hover:text-primary"
+                  className="p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary shadow-sm transition-all duration-150"
+                  aria-label="Edit"
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => deleteMutation.mutate(article.id)}
-                  className="p-1 hover:text-destructive"
+                  className="p-2 rounded-full bg-destructive/10 hover:bg-destructive/20 text-destructive shadow-sm transition-all duration-150"
+                  aria-label="Delete"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -412,14 +463,14 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
               <img
                 src={article.image_url}
                 alt={article.title}
-                className="w-full h-48 object-cover rounded-lg mb-4"
+                className="w-full h-48 object-cover rounded-xl border border-primary/10 shadow mb-4"
               />
             )}
-            <p className="text-sm text-muted-foreground whitespace-pre-line">
+            <p className="text-sm text-muted-foreground whitespace-pre-line mb-2 flex-1">
               {article.content}
             </p>
             {article.is_default && (
-              <span className="inline-block mt-2 px-2 py-1 text-xs bg-primary/10 text-primary rounded">
+              <span className="inline-block mt-2 px-3 py-1 text-xs font-semibold bg-gradient-to-r from-primary/20 to-accent/20 text-primary rounded-full shadow">
                 Default Article
               </span>
             )}
@@ -428,4 +479,4 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
       </div>
     </div>
   )
-} 
+}
