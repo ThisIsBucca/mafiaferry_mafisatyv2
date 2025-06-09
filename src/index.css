@@ -6,73 +6,268 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
- 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
- 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
- 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
- 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
- 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
- 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
- 
-    --radius: 0.5rem;
+    --background: 36 60% 98%; /* Sand beige */
+    --foreground: 28 20% 18%; /* Warm brown text */
+    --card: 36 60% 99%; /* Off-white card */
+    --card-foreground: 28 20% 18%;
+    --popover: 36 60% 99%;
+    --popover-foreground: 28 20% 18%;
+    --primary: 32 90% 60%; /* Peach/gold */
+    --primary-foreground: 36 60% 99%;
+    --secondary: 28 40% 92%; /* Lighter sand */
+    --secondary-foreground: 28 20% 18%;
+    --muted: 32 60% 90%; /* Soft peach */
+    --muted-foreground: 28 10% 40%;
+    --accent: 38 80% 55%; /* Bronze accent */
+    --accent-foreground: 36 60% 99%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 36 30% 88%;
+    --input: 36 30% 88%;
+    --ring: 32 90% 60%;
+    --radius: 1.25rem;
+    --glass: rgba(255,245,230,0.75); /* More pronounced glass */
+    --glass-blur: blur(18px);
+    --shadow-card: 0 8px 32px 0 rgba(44,32,56,0.10), 0 1.5px 0 0 hsl(var(--border)/0.18);
+    --shadow-card-hover: 0 16px 48px 0 rgba(44,32,56,0.16), 0 0 0 2px hsl(var(--primary)/0.18);
+    --shadow-btn: 0 2px 8px 0 rgba(44,32,56,0.10), 0 0 0 2px hsl(var(--primary)/0.10);
+    --shadow-btn-glow: 0 0 16px 2px hsl(var(--accent)/0.18), 0 0 0 2px hsl(var(--primary)/0.18);
+    font-family: 'Outfit', 'Poppins', Arial, sans-serif;
+    --gradient-main: linear-gradient(135deg, hsl(36,60%,98%) 0%, hsl(32,90%,96%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(var(--primary)/0.92), hsl(var(--accent)/0.92));
   }
- 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
- 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
- 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
- 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
- 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
- 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
- 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --background: 265 32% 16%; /* Deep muted purple/indigo */
+    --foreground: 38 80% 92%; /* Warm gold text */
+    --card: 265 32% 20%; /* Slightly lighter indigo card */
+    --card-foreground: 38 80% 92%;
+    --popover: 265 32% 20%;
+    --popover-foreground: 38 80% 92%;
+    --primary: 32 100% 62%; /* Amber/sunset orange */
+    --primary-foreground: 265 32% 16%;
+    --secondary: 265 32% 24%; /* Muted indigo */
+    --secondary-foreground: 38 80% 92%;
+    --muted: 265 32% 22%;
+    --muted-foreground: 38 80% 80%;
+    --accent: 32 100% 70%; /* Glowing amber accent */
+    --accent-foreground: 265 32% 16%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 38 80% 92%;
+    --border: 265 32% 28%;
+    --input: 265 32% 28%;
+    --ring: 32 100% 62%;
+    --radius: 1.25rem;
+    --glass: rgba(44,32,56,0.80);
+    --glass-blur: blur(22px);
+    --shadow-card: 0 8px 32px 0 rgba(44,32,56,0.18), 0 0 0 1.5px hsl(var(--primary)/0.18);
+    --shadow-card-hover: 0 20px 56px 0 rgba(32,16,32,0.22), 0 0 0 2px hsl(var(--primary)/0.22);
+    --shadow-btn: 0 2px 8px 0 rgba(44,32,56,0.16), 0 0 0 2px hsl(var(--primary)/0.12);
+    --shadow-btn-glow: 0 0 24px 4px hsl(var(--accent)/0.22), 0 0 0 2px hsl(var(--primary)/0.22);
+    font-family: 'Outfit', 'Poppins', Arial, sans-serif;
+    --gradient-main: linear-gradient(135deg, hsl(265,32%,16%) 0%, hsl(265,32%,22%) 100%);
+    --gradient-accent: linear-gradient(90deg, hsl(var(--primary)/0.22), hsl(var(--accent)/0.22));
+  }
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+    font-family: 'Outfit', 'Poppins', Arial, sans-serif;
+    background-image: linear-gradient(135deg, hsl(36,60%,98%) 0%, hsl(32,90%,96%) 100%);
+  }
+  .dark body {
+    background-image: linear-gradient(135deg, hsl(265,32%,16%) 0%, hsl(265,32%,22%) 100%);
+  }
+  .glass {
+    background: var(--glass);
+    backdrop-filter: var(--glass-blur);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 32px 0 rgba(44,32,56,0.10);
+    border: 1.5px solid hsl(var(--border)/0.5);
+  }
+  .card {
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    background: hsl(var(--card));
+    border: 1.5px solid hsl(var(--border)/0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  .dark .card {
+    box-shadow: var(--shadow-card);
+    background: hsl(var(--card));
+    border: 1.5px solid hsl(var(--border)/0.5);
+  }
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: linear-gradient(120deg, hsl(var(--secondary)/0.04), hsl(var(--accent)/0.03));
+  }
+  .dark .card::after {
+    background: linear-gradient(120deg, hsl(var(--primary)/0.08), hsl(var(--secondary)/0.06));
+  }
+  button, .btn {
+    @apply rounded-2xl px-6 py-3 font-semibold text-base transition-all duration-200 shadow-sm border border-primary/40;
+    min-height: 48px;
+    min-width: 48px;
+    letter-spacing: 0.01em;
+    box-shadow: var(--shadow-btn), 0 2px 8px 0 rgba(44,32,56,0.08);
+    background: linear-gradient(90deg, hsl(var(--primary)/0.92), hsl(var(--accent)/0.92));
+    color: hsl(var(--primary-foreground));
+    border-radius: var(--radius);
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  button::after, .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: 0 0 8px 2px hsl(var(--primary)/0.22), 0 0 0 2px hsl(var(--primary)/0.12);
+    opacity: 0.7;
+    transition: box-shadow 0.2s;
+  }
+  .dark button, .dark .btn {
+    background: linear-gradient(90deg, hsl(var(--primary)/0.22), hsl(var(--accent)/0.22));
+    color: hsl(var(--primary-foreground));
+    box-shadow: var(--shadow-btn-glow), 0 0 16px 2px hsl(var(--primary)/0.22), 0 0 0 2px hsl(var(--primary)/0.18);
+  }
+  .dark button::after, .dark .btn::after {
+    box-shadow: 0 0 18px 4px hsl(var(--accent)/0.22), 0 0 0 2px hsl(var(--primary)/0.18);
+    opacity: 1;
+  }
+  /* Modal inner shadow for dark mode */
+  .dark .modal {
+    box-shadow: 0 2px 24px 0 rgba(44,32,56,0.32) inset, 0 4px 32px 0 rgba(44,32,56,0.18);
+  }
+  /* Luxurious toggle (placeholder, for implementation in React) */
+  .theme-toggle {
+    width: 48px;
+    height: 28px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, hsl(var(--primary)/0.18), hsl(var(--accent)/0.18));
+    box-shadow: 0 2px 8px 0 rgba(44,32,56,0.10);
+    position: relative;
+    cursor: pointer;
+    border: 1.5px solid hsl(var(--border)/0.5);
+    transition: background 0.3s;
+  }
+  .theme-toggle .toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+    box-shadow: 0 2px 8px 0 hsl(var(--primary)/0.18);
+    transition: left 0.3s, background 0.3s;
+  }
+  .dark .theme-toggle {
+    background: linear-gradient(90deg, hsl(var(--primary)/0.22), hsl(var(--accent)/0.22));
+  }
+  .dark .theme-toggle .toggle-thumb {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
+  }
+  /* Custom Scrollbar Styling */
+  ::-webkit-scrollbar {
+    width: 12px;
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(120deg, hsl(var(--accent)/0.18), hsl(var(--primary)/0.22));
+    border-radius: 8px;
+    border: 2px solid hsl(var(--background));
+    box-shadow: 0 2px 8px 0 rgba(44,32,56,0.04);
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: linear-gradient(120deg, hsl(var(--accent)/0.22), hsl(var(--primary)/0.28));
+    border: 2px solid hsl(var(--background));
+  }
+  /* Focus & Accessibility States */
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px hsl(var(--primary)/0.18);
+    transition: box-shadow 0.2s;
+  }
+  /* Card Hover/Active Effects */
+  .card, .glass {
+    transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+  }
+  .card:hover, .glass:hover {
+    box-shadow: var(--shadow-card-hover), 0 0 0 2px hsl(var(--primary)/0.18);
+    transform: translateY(-2px) scale(1.012);
+    border-color: hsl(var(--primary));
+  }
+  .card:active, .glass:active {
+    box-shadow: 0 2px 8px 0 rgba(44,32,56,0.08);
+    transform: scale(0.98);
+  }
+  /* Animated Gradient Border Utility */
+  .animated-gradient-border {
+    position: relative;
+    z-index: 0;
+  }
+  .animated-gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(270deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)) 80%);
+    background-size: 400% 400%;
+    animation: gradientMove 6s ease-in-out infinite;
+  }
+  @keyframes gradientMove {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  /* Prose Typography (for blog/content) */
+  .prose {
+    color: hsl(var(--foreground));
+    font-family: 'Outfit', 'Poppins', Arial, sans-serif;
+    line-height: 1.7;
+    font-size: 1.08rem;
+    max-width: 65ch;
+  }
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    color: hsl(var(--primary));
+    font-family: 'Poppins', 'Outfit', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .prose a {
+    color: hsl(var(--accent));
+    text-decoration: underline dotted;
+    transition: color 0.18s;
+  }
+  .prose a:hover {
+    color: hsl(var(--primary));
   }
 }
- 
+
+/* Mobile-first, touch-friendly tweaks */
+@media (hover: none) and (pointer: coarse) {
+  button, .btn, .card, .glass {
+    box-shadow: 0 2px 8px 0 rgba(44,32,56,0.08);
+    transition: none;
+  }
+  .card:hover, .glass:hover {
+    box-shadow: 0 2px 8px 0 rgba(44,32,56,0.08);
+    transform: none;
+    border-color: inherit;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+    /* x app theme only, no custom gradient */
   }
 }
