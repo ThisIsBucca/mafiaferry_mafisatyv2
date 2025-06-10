@@ -1,27 +1,50 @@
-import { supabase } from './supabase'
+import { supabase, publicSupabase } from './supabase'
 
 export async function initializeDatabase() {
   try {
-    // Create articles table
-    const { error: articlesError } = await supabase.rpc('create_articles_table')
-    if (articlesError) {
-      console.error('Error creating articles table:', articlesError)
+    // First check if the articles table exists using a public query
+    const { error: checkError } = await publicSupabase
+      .from('articles')
+      .select('count')
+      .limit(0)
+
+    // If the table exists and is accessible, we don't need to initialize
+    if (!checkError) {
+      console.log('Articles table already exists and is accessible')
       return
     }
 
-    // Check if default article exists
-    const { data: existingArticle, error: checkError } = await supabase
+    // If we need to create the table, we need an authenticated session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError || !session) {
+      console.warn('No authenticated session for database initialization')
+      return
+    }
+
+    // Create articles table if needed
+    const { error: articlesError } = await supabase.rpc('create_articles_table')
+    if (articlesError) {
+      if (articlesError.message?.includes('already exists')) {
+        console.log('Articles table already exists')
+      } else {
+        console.error('Error creating articles table:', articlesError)
+        return
+      }
+    }
+
+    // Check for default article using public client
+    const { data: existingArticle, error: defaultCheckError } = await publicSupabase
       .from('articles')
       .select('id')
       .eq('is_default', true)
       .single()
 
-    if (checkError && checkError.code !== 'PGRST116') {
-      console.error('Error checking for default article:', checkError)
+    if (defaultCheckError && defaultCheckError.code !== 'PGRST116') {
+      console.error('Error checking for default article:', defaultCheckError)
       return
     }
 
-    // If no default article exists, create one
+    // Create default article if needed
     if (!existingArticle) {
       const { error: insertError } = await supabase
         .from('articles')
@@ -39,7 +62,13 @@ Key Features:
 
 Whether you're looking for adventure, relaxation, or a unique cultural experience, Mafia Island has something for everyone. Come discover this tropical paradise!`,
             image_url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-            is_default: true
+            is_default: true,
+            user_id: session.user.id,
+            slug: 'welcome-to-mafia-island',
+            category: 'Tourism',
+            author: 'Mafia Ferry Team',
+            read_time: '5 min read',
+            excerpt: 'Discover the hidden gem of Tanzania - Mafia Island',
           }
         ])
 
@@ -49,8 +78,8 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
       }
     }
 
-    console.log('Database initialized successfully')
+    console.log('Database initialization completed successfully')
   } catch (error) {
-    console.error('Error initializing database:', error)
+    console.error('Unexpected error during database initialization:', error)
   }
-} 
+}
