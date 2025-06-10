@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase, publicSupabase } from './supabase'
 
 // Track page view
 export async function trackPageView(path) {
@@ -6,7 +6,10 @@ export async function trackPageView(path) {
     const { data: { session } } = await supabase.auth.getSession()
     const userId = session?.user?.id || 'anonymous'
     
-    const { error } = await supabase
+    // Use the appropriate client based on authentication status
+    const client = session?.user ? supabase : publicSupabase
+    
+    const { error } = await client
       .from('analytics_pageviews')
       .insert({
         path,
@@ -17,6 +20,11 @@ export async function trackPageView(path) {
       })
 
     if (error) {
+      // Don't log 401/403 errors for anonymous users
+      if ((!session?.user && (error.status === 401 || error.status === 403))) {
+        console.log('Anonymous analytics event not tracked (expected)')
+        return
+      }
       console.error('Error tracking page view:', error)
     }
   } catch (error) {
@@ -30,7 +38,10 @@ export async function trackEvent(category, action, label) {
     const { data: { session } } = await supabase.auth.getSession()
     const userId = session?.user?.id || 'anonymous'
     
-    const { error } = await supabase
+    // Use the appropriate client based on authentication status
+    const client = session?.user ? supabase : publicSupabase
+    
+    const { error } = await client
       .from('analytics_events')
       .insert({
         category,
@@ -41,6 +52,11 @@ export async function trackEvent(category, action, label) {
       })
 
     if (error) {
+      // Don't log 401/403 errors for anonymous users
+      if ((!session?.user && (error.status === 401 || error.status === 403))) {
+        console.log('Anonymous analytics event not tracked (expected)')
+        return
+      }
       console.error('Error tracking event:', error)
     }
   } catch (error) {
@@ -108,4 +124,4 @@ export function trackLinkClick(linkUrl, linkText) {
     link_url: linkUrl,
     link_text: linkText
   })
-} 
+}

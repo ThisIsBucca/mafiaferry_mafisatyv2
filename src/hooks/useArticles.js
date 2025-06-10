@@ -1,31 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '../lib/supabase'
+import { supabase, publicSupabase } from '../lib/supabase'
 
 export function useArticles() {
   const queryClient = useQueryClient()
-
-  // Verify table structure
-  const verifyTable = async () => {
-    console.log('Verifying articles table...')
-    const { data, error } = await supabase
-      .from('articles')
-      .select('id, title, content, slug, created_at, read_time, image_url, category, author')
-      .limit(1)
-    
-    if (error) {
-      console.error('Error verifying articles table:', error)
-      throw error
-    }
-    
-    console.log('Articles table verified:', data)
-    return data
-  }
 
   const articlesQuery = useQuery({
     queryKey: ['articles'],
     queryFn: async () => {
       console.log('=== Fetching Articles ===')
-      const { data, error } = await supabase
+      const { data, error } = await publicSupabase
         .from('articles')
         .select('*')
         .order('created_at', { ascending: false })
@@ -46,15 +29,15 @@ export function useArticles() {
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     cacheTime: 1000 * 60 * 30, // 30 minutes
-    retry: 3, // Retry failed requests 3 times
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   })
 
   const defaultArticleQuery = useQuery({
     queryKey: ['default-article'],
     queryFn: async () => {
       console.log('Fetching default article...')
-      const { data: existingArticle, error: checkError } = await supabase
+      const { data: existingArticle, error: checkError } = await publicSupabase
         .from('articles')
         .select('*')
         .eq('is_default', true)
@@ -243,4 +226,4 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
     createDefaultArticle,
     updateArticle
   }
-} 
+}

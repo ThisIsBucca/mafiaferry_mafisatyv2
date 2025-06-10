@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
-import { Ship, Clock, Calendar, Info, Loader2, AlertCircle, RefreshCcw } from "lucide-react"
+import { Ship, Clock, Calendar, Info, Loader2, AlertCircle, RefreshCcw, Ticket, MessageCircle } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { publicSupabase } from "../lib/supabase"
 import {
@@ -240,76 +240,83 @@ export function Schedule() {
             </span>
           </h2>
           <p className="text-sm text-muted-foreground mb-8">
-            Mashua | Meli | Vyombo vya Usafiri wa Majini
+            Angalia ratiba ya mashua, meli na vyombo vingine vya usafiri wa majini kwa siku zilizochaguliwa. Taarifa hizi zinakupa mwongozo wa safari zako kati ya Mafia na maeneo mengine.
           </p>
-          
-          <div className="overflow-x-auto mb-8 max-w-md mx-auto">
-            <table className="w-full border-collapse shadow-md rounded-lg overflow-hidden">
-              <tbody>
-                <tr className="bg-primary/10">
-                  <td className="py-3 px-4 text-center font-medium border-r border-primary/20">
+            <div className="mb-8 max-w-2xl mx-auto px-4">
+            <div className="relative">
+              {/* Decorative elements */}
+              <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
+              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent/5 rounded-full blur-2xl" />
+              
+              {/* Main container */}
+              <div className="relative bg-gradient-to-br from-background/80 via-background/60 to-background/80 backdrop-blur-xl rounded-2xl border border-primary/10 shadow-xl overflow-hidden">
+                {/* Date selection buttons */}                <div className="grid grid-cols-3 gap-2 p-4">
+                  {[
+                    { key: 'today', label: 'Leo', icon: '🌅' },
+                    { key: 'tomorrow', label: 'Kesho', icon: '🌄' },
+                    { key: 'dayAfterTomorrow', label: 'Kesho Kutwa', icon: '📅' }
+                  ].map((date) => (
                     <button
-                      onClick={() => setSelectedDate('today')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedDate === 'today' 
-                          ? 'bg-primary text-primary-foreground shadow-sm' 
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                      key={date.key}
+                      onClick={() => setSelectedDate(date.key)}
+                      className={`relative group overflow-hidden rounded-xl transition-all duration-300 flex flex-col items-center justify-center min-h-[80px] ${
+                        selectedDate === date.key
+                          ? 'bg-primary text-primary-foreground shadow-lg scale-100'
+                          : 'bg-background/80 hover:bg-primary/5 text-foreground hover:scale-[0.98] border border-primary/10'
                       }`}
                     >
-                      Leo
+                      {/* Button background effects */}
+                      <div className={`absolute inset-0 transition-opacity duration-300 ${
+                        selectedDate === date.key
+                          ? 'opacity-100'
+                          : 'opacity-0 group-hover:opacity-50'
+                      }`}>
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
+                        <div className="absolute inset-0 bg-grid-white/10" />
+                      </div>
+                      
+                      {/* Button content */}
+                      <div className="relative flex flex-col items-center gap-2 px-3 py-2">
+                        <span className="text-lg">{date.icon}</span>
+                        <span className="text-sm font-bold  tracking-wide text-center leading-tight">{date.label}</span>
+                      </div>
                     </button>
-                  </td>
-                  <td className="py-3 px-4 text-center font-medium border-r border-primary/20">
-                    <button
-                      onClick={() => setSelectedDate('tomorrow')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedDate === 'tomorrow' 
-                          ? 'bg-primary text-primary-foreground shadow-sm' 
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                      }`}
-                    >
-                      Kesho
-                    </button>
-                  </td>
-                  <td className="py-3 px-4 text-center font-medium">
-                    <button
-                      onClick={() => setSelectedDate('dayAfterTomorrow')}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        selectedDate === 'dayAfterTomorrow' 
-                          ? 'bg-primary text-primary-foreground shadow-sm' 
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                      }`}
-                    >
-                      Kesho Kutwa
-                    </button>
-                  </td>
-                </tr>
-                <tr className="bg-primary/5 border-t border-primary/20">
-                  <td colSpan="3" className="py-3 px-4 text-center">
-                    <div className="text-lg font-medium text-primary">
-                      {getSelectedDateText()}
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
+                  ))}
+                </div>
 
-        {!filteredSchedules || filteredSchedules.length === 0 ? (
+                {/* Selected date display */}
+                <div className="relative px-4 py-5 text-center bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
+                  <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                  <div className="text-lg font-medium bg-gradient-to-r from-primary/80 to-accent/80 bg-clip-text text-transparent">
+                    {getSelectedDateText()}
+                  </div>
+                  <div className="absolute left-0 right-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>        {!filteredSchedules || filteredSchedules.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className="text-center max-w-3xl mx-auto"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted text-muted-foreground mb-8">
-              <AlertCircle className="w-4 h-4" />
-              <span className="text-sm font-medium">Hakuna Vyombo vinavyosafiri {selectedDate === 'today' ? 'Leo' : selectedDate === 'tomorrow' ? 'Kesho' : 'Kesho Kutwa'}</span>
+          >            <div className="bg-card/50 backdrop-blur-sm border border-primary/10 rounded-xl p-6 shadow-lg">              <div className="space-y-4">
+                <p className="text-muted-foreground text-center leading-relaxed">
+                  Hakuna vyombo vya usafiri wa majini vinavyosafiri {selectedDate === 'today' ? 'leo' : selectedDate === 'tomorrow' ? 'kesho' : 'kesho kutwa'}. Tafadhali angalia ratiba ya siku nyingine au wasiliana nasi kwa maelezo zaidi:
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm">
+                  <div className="px-4 py-2 rounded-lg bg-primary/5 border border-primary/10">
+                    <span className="font-medium text-primary">Bucca:</span>
+                    <span className="ml-2 text-foreground">0776986840</span>
+                  </div>
+                  <div className="px-4 py-2 rounded-lg bg-primary/5 border border-primary/10">
+                    <span className="font-medium text-primary">Philox:</span>
+                    <span className="ml-2 text-foreground">0688103733</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="text-muted-foreground">
-              Hakuna vyombo vya usafiri wa majini vinavyosafiri {selectedDate === 'today' ? 'leo' : selectedDate === 'tomorrow' ? 'kesho' : 'kesho kutwa'}. Tafadhali angalia ratiba ya siku nyingine.
-            </p>
           </motion.div>
         ) : (
           <div className={`grid gap-4 sm:gap-8 ${
@@ -413,6 +420,21 @@ export function Schedule() {
                             <CurrentMafiaTime />
                           </div>
                         </div>
+                      </div>                      {/* Booking Button */}                      <div className="mt-4 sm:mt-6">
+                        <button
+                          onClick={() => window.location.href = `https://wa.me/255776986840?text=Habari, naomba kujua kuhusu tiketi ya ${schedule.ship_name} kwa tarehe ${formatSwahiliDate(new Date(schedule.date))}`}
+                          className="relative w-full flex items-center justify-center gap-2 px-4 py-3.5 text-base font-semibold text-white rounded-xl transition-all duration-300 overflow-hidden group"
+                          style={{
+                            backgroundColor: '#25D366',
+                            boxShadow: '0 4px 15px rgba(37, 211, 102, 0.4)',
+                            transform: 'translateZ(0)'
+                          }}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-[#25D366] via-[#20BD5C] to-[#25D366] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          <MessageCircle className="w-5 h-5 relative z-10" />
+                          <span className="relative z-10">Nunua Tiketi</span>
+                          <div className="absolute inset-0 rounded-xl" style={{ boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.3)' }} />
+                        </button>
                       </div>
                     </div>
                   </div>
