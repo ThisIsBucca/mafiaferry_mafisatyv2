@@ -2,9 +2,16 @@ import { useArticles } from "../hooks/useArticles"
 import { format } from "date-fns"
 import { Calendar, Clock, Newspaper, ArrowRight, User, AlertCircle } from "lucide-react"
 import { Link } from "react-router-dom"
+import { staticArticles } from '../pages/blog';
+import { ArticleCard } from './ArticleCard';
 
 export function NewsUpdates() {
-  const { articles, defaultArticle, isLoading, error } = useArticles()
+  const { articles, isLoading, error } = useArticles()
+  // Merge static and dynamic articles, static first
+  const allArticles = [
+    ...staticArticles,
+    ...(articles || [])
+  ];
 
   // Handle errors gracefully
   if (error) {
@@ -58,9 +65,7 @@ export function NewsUpdates() {
     )
   }
 
-  const displayArticles = articles?.length > 0 ? articles : defaultArticle ? [defaultArticle] : []
-
-  if (displayArticles.length === 0) {
+  if (allArticles.length === 0) {
     return (
       <section className="relative py-20 bg-gradient-to-b from-background to-muted/20">
         <div className="absolute inset-0 bg-grid-primary/5 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
@@ -100,67 +105,8 @@ export function NewsUpdates() {
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayArticles.map((article) => (
-            <article key={article.id} className="group relative rounded-2xl border bg-card/50 backdrop-blur-sm overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-500">
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative h-52 overflow-hidden">
-                <img
-                  src={article.image_url}
-                  alt={article.title}
-                  className="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700"
-                  onError={(e) => {
-                    e.target.src = "https://placehold.co/600x400?text=Hakuna+Picha"
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/50 to-transparent" />
-                <div className="absolute bottom-4 left-4">
-                  <span className="inline-flex items-center gap-1 text-xs font-medium bg-primary/20 text-primary backdrop-blur-sm px-3 py-1 rounded-full border border-primary/10">
-                    {article.category || "Habari"}
-                  </span>
-                </div>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between text-sm text-muted-foreground/80">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4" />
-                      <span>{format(new Date(article.created_at), "MMM d, yyyy")}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4" />
-                      <span>{format(new Date(article.created_at), "h:mm a")}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-xl font-semibold line-clamp-2 group-hover:text-primary transition-colors duration-300">
-                    {article.title}
-                  </h3>
-                  <p className="text-muted-foreground/80 text-sm line-clamp-3">
-                    {article.content}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between pt-4 border-t border-border/10">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="w-4 h-4 text-primary" />
-                    </div>
-                    <span className="text-sm font-medium text-foreground/80">
-                      {article.author || "Admin"}
-                    </span>
-                  </div>
-                  {article.slug && (
-                    <Link
-                      to={`/blog/${article.slug}`}
-                      className="group/link inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-                    >
-                      Soma Zaidi
-                      <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform duration-300" />
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </article>
+          {allArticles.map((article) => (
+            <ArticleCard key={article.id} article={article} />
           ))}
         </div>
       </div>

@@ -43,11 +43,11 @@ export function ArticleCard({ article }) {
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/30 flex items-center justify-center ring-2 ring-background shadow-sm">
               <span className="text-sm font-semibold text-primary">
-                {article.author.charAt(0)}
+                {(article.author && article.author.charAt(0)) || 'A'}
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium leading-snug">{article.author}</span>
+              <span className="text-sm font-medium leading-snug">{article.author || 'Admin'}</span>
               <span className="text-xs text-muted-foreground/60">Author</span>
             </div>
           </div>
@@ -64,3 +64,5 @@ export function ArticleCard({ article }) {
     </div>
   )
 }
+
+// No changes needed here for ArticleCard itself. The change is in the home/news section to render both static and dynamic articles.
