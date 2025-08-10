@@ -99,40 +99,58 @@ export function Hero() {
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
-          {/* Left: Title, subtitle, description */}
-          <div className="w-full mb-4 bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-primary/20 shadow-lg md:shadow-xl p-4 sm:p-6 md:p-8 rounded-3xl flex flex-col items-center justify-center min-h-[260px] max-w-2xl mx-auto relative overflow-visible" style={{boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)'}}>
+          {/* Redesigned Hero Content: Modern, minimal, glassmorphic, mobile-first */}
+          <div className="w-full max-w-lg mx-auto mb-8 bg-white/20 dark:bg-black/30 backdrop-blur-3xl rounded-3xl flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-12 relative shadow-2xl border-0" style={{ boxShadow: '0 8px 32px 0 rgba(31,38,135,0.12)' }}>
             <motion.div
               variants={itemVariants}
-              className="mb-6"
+              className="mb-3"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               key={currentImageIndex}
             >
-              <span className="inline-block px-4 py-2 rounded-full bg-background/70 backdrop-blur text-primary text-sm font-semibold shadow border border-primary/10">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-background/60 backdrop-blur text-primary text-xs font-semibold shadow border border-primary/10">
                 {images[currentImageIndex].caption}
               </span>
             </motion.div>
             <motion.div
               variants={itemVariants}
-              className="relative mb-4"
+              className="relative mb-2 w-full"
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.3 }}
             >
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary-foreground drop-shadow-lg tracking-tight font-display">
+              <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary-foreground drop-shadow-xl tracking-tight font-display mb-2">
                 Mafiaferry
               </h1>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground/90 font-display mt-2 drop-shadow-md tracking-tight">
+              <h2 className="text-lg sm:text-2xl font-semibold text-foreground/90 font-display mb-3 drop-shadow-md tracking-tight">
                 Habari za Usafiri wa Majini Kisiwa cha Mafia Online
               </h2>
-              <p className="mt-3 text-base sm:text-lg text-foreground/80 max-w-xl mx-auto font-medium">
+              <p className="text-base sm:text-lg text-foreground/80 max-w-md mx-auto font-medium mb-4">
                 Taarifa za Vyombo vya Usafiri wa Majini Kati ya Mafia na Bara
               </p>
+              {/* Feature list for visual appeal */}
+              <div className="w-full flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mb-5">
+                <div className="flex items-center gap-2 bg-primary/10 rounded-xl px-3 py-1 text-primary text-xs sm:text-sm font-semibold shadow-sm">
+                  <Ship className="w-4 h-4 sm:w-5 sm:h-5" /> Meli za Kisasa
+                </div>
+                <div className="flex items-center gap-2 bg-accent/10 rounded-xl px-3 py-1 text-accent text-xs sm:text-sm font-semibold shadow-sm">
+                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5" /> Ratiba za Kila Siku
+                </div>
+                <div className="flex items-center gap-2 bg-primary/10 rounded-xl px-3 py-1 text-primary text-xs sm:text-sm font-semibold shadow-sm">
+                  <Clock className="w-4 h-4 sm:w-5 sm:h-5" /> Huduma ya Wakati
+                </div>
+              </div>
+              <button
+                onClick={scrollToContent}
+                className="mt-2 px-6 py-2 rounded-full bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-colors text-base sm:text-lg"
+              >
+                Jifunze Zaidi
+              </button>
               {/* Animated accent circles for depth */}
               <motion.div
-                className="absolute -top-8 left-1/2 -translate-x-1/2 w-20 h-20 bg-primary/30 rounded-full blur-2xl"
+                className="absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-primary/30 rounded-full blur-2xl"
                 animate={{
                   scale: [1, 1.2, 1],
-                  opacity: [0.18, 0.28, 0.18],
+                  opacity: [0.13, 0.22, 0.13],
                 }}
                 transition={{
                   duration: 4,
@@ -141,10 +159,10 @@ export function Hero() {
                 }}
               />
               <motion.div
-                className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-28 h-28 bg-accent/20 rounded-full blur-2xl"
+                className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-24 h-24 bg-accent/20 rounded-full blur-2xl"
                 animate={{
                   scale: [1.2, 1, 1.2],
-                  opacity: [0.22, 0.13, 0.22],
+                  opacity: [0.18, 0.10, 0.18],
                 }}
                 transition={{
                   duration: 4,
