@@ -71,6 +71,7 @@ export function Navbar() {
     { href: "/#schedule", label: "Schedule", icon: <Ship className="w-4 h-4" /> },
     { href: "/#news", label: "News", icon: <MessageSquare className="w-4 h-4" /> },
     { href: "/#contact", label: "Contact", icon: <Phone className="w-4 h-4" /> },
+    { href: "/blog", label: "Blog", icon: <MessageSquare className="w-4 h-4" /> }, // Added Blog button
   ]
   const scrollToSection = (elementId) => {
     const element = document.getElementById(elementId)
@@ -82,54 +83,42 @@ export function Navbar() {
     }
   }
   const handleNavClick = (e, href) => {
-    e.preventDefault()
-    
-    const scrollToTarget = () => {
-      if (href === "/") {
+    // Only prevent default for section links
+    if (href.startsWith('/#')) {
+      e.preventDefault();
+      const sectionId = href.replace('/#', '');
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const headerOffset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
         window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        })
-      } else {
-        const sectionId = href.replace("/#", "")
-        const element = document.getElementById(sectionId)
-        if (element) {
-          const headerOffset = 80
-          const elementPosition = element.getBoundingClientRect().top
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset
-          
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: "smooth"
-          })
-        }
+          top: offsetPosition,
+          behavior: 'smooth',
+        });
+      }
+      // For mobile: close menu after scroll
+      if (window.innerWidth < 768) {
+        setIsOpen(false);
       }
     }
-
-    // For mobile: close menu first, then scroll after animation
-    if (window.innerWidth < 768) {
-      setIsOpen(false)
-      // Wait for menu close animation to complete
-      setTimeout(scrollToTarget, 300)
-    } else {
-      // For desktop: scroll immediately
-      scrollToTarget()
-    }
+    // For non-section links, let default navigation happen
   }
 
   const isActive = (path) => {
-    // Handle news pages specially
-    if (path === "/#news" && location.pathname.startsWith("/news")) {
-      return true
+    // Blog page and subpages
+    if (path === "/blog") {
+      return location.pathname === "/blog" || location.pathname.startsWith("/blog/");
     }
-
-    // For home
-    if (path === "/" && activeSection === "/") {
-      return true
+    // Home page (only when exactly on '/')
+    if (path === "/") {
+      return location.pathname === "/";
     }
-
-    // For other sections
-    return path === activeSection
+    // Section tabs (Schedule, News, Contact) only active on home page and when their section is active
+    if (["/#schedule", "/#news", "/#contact"].includes(path)) {
+      return location.pathname === "/" && activeSection === path;
+    }
+    return false;
   }
 
   // Add scroll event listener to update active state
@@ -164,35 +153,67 @@ export function Navbar() {
         </Link>        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-2">
           <div className="flex items-center bg-muted/50 rounded-full p-1">
-            {navItems.map((item) => (              <Link
-                key={item.href}
-                to={item.href}
-                onClick={(e) => handleNavClick(e, item.href)}
-                className="relative flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-full group"
-              >
-                <span className={`flex items-center justify-center gap-2 relative z-10 transition-colors duration-200 ${
-                  isActive(item.href)
-                    ? "text-white"
-                    : "text-muted-foreground group-hover:text-primary"
-                }`}>
-                  <span className="flex items-center justify-center w-4 h-4">
-                    {item.icon}
+            {navItems.map((item) => (
+              item.href.startsWith('/#') ? (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={(e) => handleNavClick(e, item.href)}
+                  className="relative flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-full group"
+                >
+                  <span className={`flex items-center justify-center gap-2 relative z-10 transition-colors duration-200 ${
+                    isActive(item.href)
+                      ? (["/#schedule", "/#news", "/#contact"].includes(item.href) ? "text-primary" : "text-white")
+                      : "text-muted-foreground group-hover:text-primary"
+                  }`}>
+                    <span className="flex items-center justify-center w-4 h-4">
+                      {item.icon}
+                    </span>
+                    {item.label}
                   </span>
-                  {item.label}
-                </span>
-                {isActive(item.href) && (
-                  <motion.div
-                    layoutId="navbar-pill"
-                    className="absolute inset-0 bg-primary rounded-full"
-                    transition={{ 
-                      type: "spring",
-                      stiffness: 500,
-                      damping: 35,
-                      duration: 0.3 
-                    }}
-                  />
-                )}
-              </Link>
+                  {isActive(item.href) && (
+                    <motion.div
+                      layoutId="navbar-pill"
+                      className={`absolute inset-0 rounded-full ${["/#schedule", "/#news", "/#contact"].includes(item.href) ? "bg-primary/10" : "bg-primary"}`}
+                      transition={{ 
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 35,
+                        duration: 0.3 
+                      }}
+                    />
+                  )}
+                </Link>
+              ) : (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="relative flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-full group"
+                >
+                  <span className={`flex items-center justify-center gap-2 relative z-10 transition-colors duration-200 ${
+                    isActive(item.href)
+                      ? "text-white"
+                      : "text-muted-foreground group-hover:text-primary"
+                  }`}>
+                    <span className="flex items-center justify-center w-4 h-4">
+                      {item.icon}
+                    </span>
+                    {item.label}
+                  </span>
+                  {isActive(item.href) && (
+                    <motion.div
+                      layoutId="navbar-pill"
+                      className="absolute inset-0 bg-primary rounded-full"
+                      transition={{ 
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 35,
+                        duration: 0.3 
+                      }}
+                    />
+                  )}
+                </Link>
+              )
             ))}
           </div>
 
@@ -253,22 +274,41 @@ export function Navbar() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
                   key={item.href}
-                >                  <Link
-                    to={item.href}
-                    className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      isActive(item.href)
-                        ? "bg-primary text-white"
-                        : "text-foreground dark:text-foreground hover:bg-muted"
-                    }`}
-                    onClick={(e) => handleNavClick(e, item.href)}
-                  >
-                    <span className="flex items-center justify-center w-5 h-5">
-                      <span className={`${isActive(item.href) ? "text-white" : "text-primary dark:text-primary"}`}>
-                        {item.icon}
+                >
+                  {item.href.startsWith('/#') ? (
+                    <Link
+                      to={item.href}
+                      className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        isActive(item.href)
+                          ? (["/#schedule", "/#news", "/#contact"].includes(item.href) ? "text-primary bg-primary/10" : "bg-primary text-white")
+                          : "text-foreground dark:text-foreground hover:bg-muted"
+                      }`}
+                      onClick={(e) => handleNavClick(e, item.href)}
+                    >
+                      <span className="flex items-center justify-center w-5 h-5">
+                        <span className={`${isActive(item.href) ? (["/#schedule", "/#news", "/#contact"].includes(item.href) ? "text-primary" : "text-white") : "text-primary dark:text-primary"}`}>
+                          {item.icon}
+                        </span>
                       </span>
-                    </span>
-                    {item.label}
-                  </Link>
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <Link
+                      to={item.href}
+                      className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                        isActive(item.href)
+                          ? "bg-primary text-white"
+                          : "text-foreground dark:text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      <span className="flex items-center justify-center w-5 h-5">
+                        <span className={`${isActive(item.href) ? "text-white" : "text-primary dark:text-primary"}`}>
+                          {item.icon}
+                        </span>
+                      </span>
+                      {item.label}
+                    </Link>
+                  )}
                 </motion.div>
               ))}
               

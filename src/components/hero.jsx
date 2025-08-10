@@ -95,43 +95,44 @@ export function Hero() {
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="w-full flex flex-col md:flex-row items-stretch justify-center text-center max-w-5xl mx-auto gap-4 md:gap-12 md:rounded-3xl md:shadow-xl transition-all duration-300"
+          className="w-full flex flex-col items-stretch justify-center text-center max-w-5xl mx-auto gap-4 md:gap-12 md:rounded-3xl md:shadow-xl transition-all duration-300"
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
           {/* Left: Title, subtitle, description */}
-          <div className="w-full md:w-1/2 mb-4 md:mb-0 bg-glass card shadow-lg md:shadow-2xl p-4 sm:p-8 md:p-10 rounded-2xl flex flex-col items-center justify-center min-h-[320px]">
+          <div className="w-full mb-4 bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-primary/20 shadow-lg md:shadow-xl p-4 sm:p-6 md:p-8 rounded-3xl flex flex-col items-center justify-center min-h-[260px] max-w-2xl mx-auto relative overflow-visible" style={{boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)'}}>
             <motion.div
               variants={itemVariants}
-              className="mb-8"
+              className="mb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               key={currentImageIndex}
             >
-              <span className="inline-block px-4 py-2 rounded-full bg-background/80 backdrop-blur-sm text-primary text-sm font-medium shadow">
+              <span className="inline-block px-4 py-2 rounded-full bg-background/70 backdrop-blur text-primary text-sm font-semibold shadow border border-primary/10">
                 {images[currentImageIndex].caption}
               </span>
             </motion.div>
             <motion.div
               variants={itemVariants}
-              className="relative mb-6"
-              whileHover={{ scale: 1.02 }}
+              className="relative mb-4"
+              whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.3 }}
             >
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary-foreground relative z-10 font-display drop-shadow-lg">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary-foreground drop-shadow-lg tracking-tight font-display">
                 Mafiaferry
               </h1>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground/90 font-display mt-2 drop-shadow-md">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground/90 font-display mt-2 drop-shadow-md tracking-tight">
                 Habari za Usafiri wa Majini Kisiwa cha Mafia Online
               </h2>
-              <p className="mt-4 text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto">
+              <p className="mt-3 text-base sm:text-lg text-foreground/80 max-w-xl mx-auto font-medium">
                 Taarifa za Vyombo vya Usafiri wa Majini Kati ya Mafia na Bara
               </p>
+              {/* Animated accent circles for depth */}
               <motion.div
-                className="absolute -top-8 left-1/2 -translate-x-1/2 w-24 h-24 bg-primary/30 rounded-full blur-3xl"
+                className="absolute -top-8 left-1/2 -translate-x-1/2 w-20 h-20 bg-primary/30 rounded-full blur-2xl"
                 animate={{
                   scale: [1, 1.2, 1],
-                  opacity: [0.2, 0.3, 0.2],
+                  opacity: [0.18, 0.28, 0.18],
                 }}
                 transition={{
                   duration: 4,
@@ -140,10 +141,10 @@ export function Hero() {
                 }}
               />
               <motion.div
-                className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-32 h-32 bg-accent/20 rounded-full blur-3xl"
+                className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-28 h-28 bg-accent/20 rounded-full blur-2xl"
                 animate={{
                   scale: [1.2, 1, 1.2],
-                  opacity: [0.3, 0.2, 0.3],
+                  opacity: [0.22, 0.13, 0.22],
                 }}
                 transition={{
                   duration: 4,
@@ -151,90 +152,6 @@ export function Hero() {
                   ease: "easeInOut"
                 }}
               />
-            </motion.div>
-          </div>
-          {/* Right: Feature grid with carousel */}
-          <div className="w-full md:w-1/2 bg-glass card shadow-lg md:shadow-2xl p-4 sm:p-8 md:p-10 rounded-2xl flex flex-col items-center justify-center min-h-[380px] relative overflow-visible">
-            {/* Carousel UI moved inside feature grid card */}
-            <div className="w-full flex flex-col items-center mb-6 relative z-10">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <button
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-white/80 dark:bg-black/60 border border-primary/40 shadow-lg hover:bg-primary/20 hover:dark:bg-primary/30 transition-colors duration-200 text-primary dark:text-accent focus:outline-none focus:ring-2 focus:ring-primary/60 disabled:opacity-40 disabled:cursor-not-allowed"
-                  onClick={() => setCurrentImageIndex((currentImageIndex - 1 + images.length) % images.length)}
-                  aria-label="Previous image"
-                  disabled={images.length <= 1}
-                  type="button"
-                >
-                  <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3.2" viewBox="0 0 24 24" className="mx-auto drop-shadow-md">
-                    <path d="M15 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.2" />
-                  </svg>
-                </button>
-                {images.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`w-2.5 h-2.5 rounded-full border border-primary/30 transition-all duration-200 mx-1 ${
-                      index === currentImageIndex ? 'bg-primary shadow-lg shadow-primary/30 scale-110' : 'bg-accent/40'
-                    }`}
-                    onClick={() => setCurrentImageIndex(index)}
-                    aria-label={`Go to image ${index + 1}`}
-                    type="button"
-                  />
-                ))}
-                <button
-                  className="w-9 h-9 flex items-center justify-center rounded-full bg-white/80 dark:bg-black/60 border border-primary/40 shadow-lg hover:bg-primary/20 hover:dark:bg-primary/30 transition-colors duration-200 text-primary dark:text-accent focus:outline-none focus:ring-2 focus:ring-primary/60 disabled:opacity-40 disabled:cursor-not-allowed"
-                  onClick={() => setCurrentImageIndex((currentImageIndex + 1) % images.length)}
-                  aria-label="Next image"
-                  disabled={images.length <= 1}
-                  type="button"
-                >
-                  <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3.2" viewBox="0 0 24 24" className="mx-auto drop-shadow-md">
-                    <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3.2" />
-                  </svg>
-                </button>
-              </div>
-              <div className="mt-1 text-xs text-foreground/70 font-medium bg-background/80 px-3 py-1 rounded-full shadow backdrop-blur-sm">
-                {images[currentImageIndex].caption}
-              </div>
-              {/* Decorative circle behind carousel for depth */}
-              <motion.div
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-primary/10 blur-2xl z-0"
-                animate={{
-                  scale: [1, 1.1, 1],
-                  opacity: [0.13, 0.22, 0.13],
-                }}
-                transition={{
-                  duration: 7,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-            </div>
-            {/* Feature grid below carousel */}
-            <motion.div 
-              variants={itemVariants}
-              className="grid grid-cols-2 gap-3 sm:gap-4 mb-0 w-full z-10"
-            >
-              {[
-                { icon: Ship, text: "Meli za Kisasa" },
-                { icon: Calendar, text: "Ratiba za Kila Siku" },
-                { icon: Clock, text: "Huduma ya Wakati" },
-                { icon: MapPin, text: "Njia Nyingi" }
-              ].map((item, index) => (
-                <motion.div
-                  key={index}
-                  className="bg-glass border border-primary/10 shadow-lg rounded-xl p-4 cursor-pointer hover:bg-primary/20 hover:shadow-2xl transition-all duration-200 flex flex-col items-center group"
-                  whileHover={{ 
-                    scale: 1.07,
-                    y: -2
-                  }}
-                  transition={{ duration: 0.22 }}
-                >
-                  <item.icon className="w-9 h-9 mx-auto mb-2 text-primary drop-shadow group-hover:text-accent transition-colors duration-200" />
-                  <p className="text-foreground/90 text-sm font-semibold tracking-wide group-hover:text-primary transition-colors duration-200 text-center">
-                    {item.text}
-                  </p>
-                </motion.div>
-              ))}
             </motion.div>
           </div>
         </motion.div>

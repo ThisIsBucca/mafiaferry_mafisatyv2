@@ -7,96 +7,17 @@ export function useArticles() {
   const articlesQuery = useQuery({
     queryKey: ['articles'],
     queryFn: async () => {
-      console.log('=== Fetching Articles ===')
       const { data, error } = await publicSupabase
         .from('articles')
         .select('*')
         .order('created_at', { ascending: false })
-      
-      if (error) {
-        console.error('Error fetching articles:', error)
-        throw error
-      }
-      
-      console.log('Fetched articles:', data?.map(a => ({
-        id: a.id,
-        title: a.title,
-        slug: a.slug,
-        created_at: a.created_at,
-        content: a.content?.substring(0, 50) + '...'
-      })))
+      if (error) throw error
       return data || []
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     cacheTime: 1000 * 60 * 30, // 30 minutes
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  })
-
-  const defaultArticleQuery = useQuery({
-    queryKey: ['default-article'],
-    queryFn: async () => {
-      console.log('Fetching default article...')
-      const { data: existingArticle, error: checkError } = await publicSupabase
-        .from('articles')
-        .select('*')
-        .eq('is_default', true)
-        .single()
-      
-      if (checkError && checkError.code !== 'PGRST116') {
-        console.error('Error fetching default article:', checkError)
-        throw checkError
-      }
-      
-      console.log('Fetched default article:', existingArticle)
-      return existingArticle
-    },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  })
-
-  const createDefaultArticle = useMutation({
-    mutationFn: async () => {
-      // Check authentication
-      const { data: { session }, error: authError } = await supabase.auth.getSession()
-      if (authError) throw authError
-      if (!session) throw new Error('No active session')
-
-      const defaultArticle = {
-        title: 'Welcome to Mafia Island',
-        content: `Mafia Island is a hidden gem in the Indian Ocean, located off the coast of Tanzania. Known for its pristine beaches, rich marine life, and laid-back atmosphere, it offers a perfect escape from the hustle and bustle of everyday life.
-
-Key Features:
-- Stunning coral reefs perfect for snorkeling and diving
-- Abundant marine life including whale sharks and sea turtles
-- Beautiful white sand beaches
-- Rich cultural heritage and friendly local communities
-- Excellent fishing opportunities
-
-Whether you're looking for adventure, relaxation, or a unique cultural experience, Mafia Island has something for everyone. Come discover this tropical paradise!`,
-        excerpt: 'Discover the hidden gem of Tanzania - Mafia Island, with its pristine beaches, rich marine life, and unique cultural experiences.',
-        category: 'Tourism',
-        image_url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-        author: 'Mafia Ferry Team',
-        read_time: '5 min read',
-        is_default: true,
-        slug: 'welcome-to-mafia-island',
-        user_id: session.user.id
-      }
-
-      const { data: newArticle, error: insertError } = await supabase
-        .from('articles')
-        .insert(defaultArticle)
-        .select()
-        .single()
-
-      if (insertError) throw insertError
-      return newArticle
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['articles'] })
-      queryClient.invalidateQueries({ queryKey: ['default-article'] })
-    }
   })
 
   const createArticle = useMutation({
@@ -218,12 +139,10 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
 
   return {
     articles: articlesQuery.data ?? [],
-    defaultArticle: defaultArticleQuery.data,
-    isLoading: articlesQuery.isLoading || defaultArticleQuery.isLoading,
-    isError: articlesQuery.isError || defaultArticleQuery.isError,
-    error: articlesQuery.error || defaultArticleQuery.error,
+    isLoading: articlesQuery.isLoading,
+    isError: articlesQuery.isError,
+    error: articlesQuery.error,
     createArticle,
-    createDefaultArticle,
     updateArticle
   }
 }

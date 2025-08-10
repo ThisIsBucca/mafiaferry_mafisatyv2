@@ -4,6 +4,42 @@ import { useArticles } from '../hooks/useArticles'
 import { Calendar, Clock, ChevronLeft, Search, Rss, Home } from "lucide-react"
 import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet'
+import BlogPost from './blog-post'
+
+export const staticArticles = [
+  {
+    id: 'static-mafia-ferry-guide',
+    slug: 'mafia-ferry-guide',
+    title: 'Complete Guide to Mafia Island Ferries',
+    created_at: '2024-03-15',
+    content: `
+      <p>Planning your trip to Mafia Island? Here's everything you need to know about ferry services between Mafia Island and Nyamisati.</p>
+      <h2>Available Services</h2>
+      <p>Currently, there are two main ferry services operating between Mafia Island and Nyamisati:</p>
+      <ul>
+        <li>MV. Songosongo - Faster service with cargo focus</li>
+        <li>MV. Kilindoni - More passenger-friendly with larger capacity</li>
+      </ul>
+      <h2>Schedule Information</h2>
+      <p>Both ferries operate on specific days of the week, with schedules designed to accommodate both passenger and cargo needs. Check our main schedule page for detailed timings.</p>
+      <h2>Booking Tips</h2>
+      <ul>
+        <li>Book in advance during peak season</li>
+        <li>Arrive at least 30 minutes before departure</li>
+        <li>Check weather conditions before travel</li>
+        <li>Consider cargo ferry for larger items</li>
+      </ul>
+      <h2>What to Expect</h2>
+      <p>The journey typically takes 4-5 hours, depending on the vessel and conditions. Both ferries offer basic amenities and comfortable seating arrangements.</p>
+    `,
+    category: 'Travel Guide',
+    read_time: '5 min read',
+    excerpt: "Planning your trip to Mafia Island? Here's everything you need to know about ferry services between Mafia Island and Nyamisati.",
+    author: 'Mafia Ferry',
+    image_url: '/images/placeholder.jpg',
+    isStatic: true,
+  },
+]
 
 export default function Blog() {
   const { slug } = useParams()
@@ -21,9 +57,13 @@ export default function Blog() {
     window.scrollTo(0, 0)
   }, [location.pathname])
 
-  
+  // Merge static and dynamic articles for listing
+  const allArticles = [
+    ...staticArticles,
+    ...(articles || [])
+  ]
 
-  const filteredArticles = articles?.filter(article => 
+  const filteredArticles = allArticles?.filter(article => 
     article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     article.content.toLowerCase().includes(searchQuery.toLowerCase())
   )
@@ -153,10 +193,12 @@ export default function Blog() {
 
   // If we have a slug, show the single article view
   if (slug) {
-    console.log('Looking for article with slug:', slug)
-    const article = articles.find(a => a.slug === slug)
-    console.log('Found article:', article)
-
+    // Try dynamic first
+    let article = (articles || []).find(a => a.slug === slug)
+    // If not found, try static
+    if (!article) {
+      article = staticArticles.find(a => a.slug === slug)
+    }
     if (!article) {
       return (
         <>
@@ -437,4 +479,4 @@ export default function Blog() {
       <BlogFooter />
     </>
   )
-} 
+}
