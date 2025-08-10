@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "../../lib/supabase"
 import { toast } from "react-hot-toast"
@@ -7,6 +7,18 @@ import { Plus, Pencil, Trash2, Loader2 } from "lucide-react"
 export default function SchedulesAdmin() {
   const [editingSchedule, setEditingSchedule] = useState(null)
   const queryClient = useQueryClient()
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    if (editingSchedule) {
+      document.body.classList.add('overflow-hidden')
+    } else {
+      document.body.classList.remove('overflow-hidden')
+    }
+    return () => {
+      document.body.classList.remove('overflow-hidden')
+    }
+  }, [editingSchedule])
 
   // Predefined options for form fields
   const shipOptions = [
@@ -164,20 +176,23 @@ export default function SchedulesAdmin() {
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row justify-around items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <h1 className="text-xl sm:text-2xl font-bold">Manage Schedules</h1>
         <button
           onClick={() => setEditingSchedule({})}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
-        >
+          className="w-full sm:w-auto inline-flex 
+          items-center justify-center gap-2 px-4 py-2
+           rounded-lg bg-primary text-primary-foreground
+            hover:bg-primary/90"
+        > 
           <Plus className="w-4 h-4" />
           Add Schedule
         </button>
       </div>
 
       {editingSchedule && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8">
-          <div className="bg-card rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8">
+          <div className="bg-card rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto relative z-60">
             <h2 className="text-lg sm:text-xl font-semibold mb-4">
               {editingSchedule.id ? 'Edit Schedule' : 'Add Schedule'}
             </h2>
@@ -350,8 +365,8 @@ export default function SchedulesAdmin() {
       </div>
 
       {/* Desktop View - Table Layout */}
-      <div className="hidden lg:block overflow-x-auto">
-        <table className="w-full">
+      <div className="hidden lg:block w-full overflow-x-auto">
+        <table className="min-w-full w-full">
           <thead>
             <tr className="border-b">
               <th className="text-left py-2 px-2 sm:px-4">Ship Name</th>
@@ -397,4 +412,4 @@ export default function SchedulesAdmin() {
       </div>
     </div>
   )
-} 
+}
