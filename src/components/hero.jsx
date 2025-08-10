@@ -124,27 +124,17 @@ export function Hero() {
               <h2 className="text-lg sm:text-2xl font-semibold text-foreground/90 font-display mb-3 drop-shadow-md tracking-tight">
                 Habari za Usafiri wa Majini Kisiwa cha Mafia Online
               </h2>
-              <p className="text-base sm:text-lg text-foreground/80 max-w-md mx-auto font-medium mb-4">
+              <p className="text-base sm:text-lg text-foreground/80 max-w-md mx-auto font-medium mb-6">
                 Taarifa za Vyombo vya Usafiri wa Majini Kati ya Mafia na Bara
               </p>
-              {/* Feature list for visual appeal */}
-              <div className="w-full flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mb-5">
-                <div className="flex items-center gap-2 bg-primary/10 rounded-xl px-3 py-1 text-primary text-xs sm:text-sm font-semibold shadow-sm">
-                  <Ship className="w-4 h-4 sm:w-5 sm:h-5" /> Meli za Kisasa
-                </div>
-                <div className="flex items-center gap-2 bg-accent/10 rounded-xl px-3 py-1 text-accent text-xs sm:text-sm font-semibold shadow-sm">
-                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5" /> Ratiba za Kila Siku
-                </div>
-                <div className="flex items-center gap-2 bg-primary/10 rounded-xl px-3 py-1 text-primary text-xs sm:text-sm font-semibold shadow-sm">
-                  <Clock className="w-4 h-4 sm:w-5 sm:h-5" /> Huduma ya Wakati
-                </div>
-              </div>
-              <button
-                onClick={scrollToContent}
-                className="mt-2 px-6 py-2 rounded-full bg-primary text-primary-foreground font-bold shadow-lg hover:bg-primary/90 transition-colors text-base sm:text-lg"
+              {/* Cool animated anchor link instead of button/feature list */}
+              <a
+                href="#schedule"
+                className="inline-block w-full sm:w-auto text-center px-8 py-3 rounded-full text-lg sm:text-xl font-bold bg-gradient-to-r from-primary via-accent to-primary-foreground text-white shadow-xl hover:scale-105 transition-transform duration-300 animate-gradient-x"
+                style={{ backgroundSize: '200% 200%', animation: 'gradient-x 3s ease-in-out infinite' }}
               >
-                Jifunze Zaidi
-              </button>
+                Angalia Ratiba na Huduma
+              </a>
               {/* Animated accent circles for depth */}
               <motion.div
                 className="absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 bg-primary/30 rounded-full blur-2xl"
