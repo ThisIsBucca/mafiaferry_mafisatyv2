@@ -38,7 +38,7 @@ export async function uploadImage(file) {
 
     // Upload the file
     const { data, error } = await supabase.storage
-      .from('images')
+      .from('article-images')
       .upload(filePath, file, {
         cacheControl: '3600',
         upsert: false,
@@ -52,7 +52,7 @@ export async function uploadImage(file) {
 
     // Get the public URL
     const { data: { publicUrl } } = supabase.storage
-      .from('images')
+      .from('article-images')
       .getPublicUrl(filePath)
 
     return publicUrl
@@ -73,7 +73,7 @@ export async function deleteImage(url) {
     const filePath = url.split('/').pop()
     
     const { error } = await supabase.storage
-      .from('images')
+      .from('article-images')
       .remove([filePath])
 
     if (error) {
