@@ -137,9 +137,6 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
         if (authError) throw authError
         if (!session) throw new Error('No active session')
 
-        console.log('Current user:', session.user)
-        console.log('Article data:', article)
-
         let imageUrl = article.image_url
 
         // Upload new image if provided
@@ -152,29 +149,39 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
               console.error('Error deleting old image:', error)
             }
           }
-
           // Upload new image
-          imageUrl = await uploadImage(imageFile)
+          try {
+            imageUrl = await uploadImage(imageFile)
+            console.log('Returned publicUrl from uploadImage:', imageUrl)
+            if (!imageUrl) {
+              throw new Error('Image upload failed: No URL returned')
+            }
+            console.log('Image uploaded, URL to be saved in article:', imageUrl)
+          } catch (uploadError) {
+            console.error('Image upload error:', uploadError)
+            throw new Error('Image upload failed. Please try again.')
+          }
+        }
+
+        // Ensure required fields
+        if (!article.title || !article.content) {
+          throw new Error('Title and content are required')
         }
 
         const articleData = {
           ...article,
           image_url: imageUrl,
-          // Ensure slug is generated if not provided
           slug: article.slug || article.title
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)/g, ''),
-          // Add user_id to track ownership
           user_id: session.user.id
         }
-
-        console.log('Saving article with data:', articleData)
 
         if (article.id) {
           const { data, error } = await supabase
             .from('articles')
-            .update(articleData)
+            .update([articleData])
             .eq('id', article.id)
             .select()
           
@@ -184,9 +191,11 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
           }
           return data
         } else {
+          // Remove id if present (should not be sent on insert)
+          delete articleData.id
           const { data, error } = await supabase
             .from('articles')
-            .insert(articleData)
+            .insert([articleData])
             .select()
           
           if (error) {
@@ -239,6 +248,20 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
     }
   }, [editingArticle])
 
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    if (editingArticle) {
+      document.body.classList.add('overflow-hidden')
+    } else {
+      document.body.classList.remove('overflow-hidden')
+      setContentValue('')
+      setImageFile(null)
+    }
+    return () => {
+      document.body.classList.remove('overflow-hidden')
+    }
+  }, [editingArticle])
+
   const handleSubmit = (e) => {
     e.preventDefault()
     const formData = new FormData(e.target)
@@ -282,6 +305,12 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
     }
   }
 
+  const handleCloseModal = () => {
+    setEditingArticle(null)
+    setContentValue('')
+    setImageFile(null)
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -310,7 +339,7 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
         <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-8">
           <div className="relative bg-card/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-primary/20 p-0 sm:p-0 w-full max-w-2xl max-h-[95vh] overflow-y-auto glassmorphism">
             <button
-              onClick={() => setEditingArticle(null)}
+              onClick={handleCloseModal}
               className="absolute top-3 right-3 text-muted-foreground hover:text-primary rounded-full p-1 bg-background/70 shadow"
               aria-label="Close"
             >
@@ -320,6 +349,19 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
               {editingArticle.id ? 'Edit Article' : 'Add Article'}
             </h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-8 px-6 sm:px-10 py-6">
+              {/* Title Field */}
+              <div>
+                <label htmlFor="title" className="block text-xs font-semibold uppercase tracking-wider text-primary mb-2">Title <span className="text-destructive">*</span></label>
+                <input
+                  type="text"
+                  id="title"
+                  name="title"
+                  required
+                  defaultValue={editingArticle?.title || ''}
+                  placeholder="Enter article title"
+                  className="w-full px-3 py-2 rounded-lg border border-primary/20 bg-background/70 focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all text-base shadow"
+                />
+              </div>
               {/* Image Upload */}
               <div>
                 <div className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Image</div>
@@ -340,7 +382,7 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
                 </label>
                 <img
                   id="image-preview"
-                  src={editingArticle.image_url}
+                  src={(() => { console.log('Preview image src:', editingArticle.image_url); return editingArticle.image_url })()}
                   alt="Preview"
                   className="w-full h-40 object-cover rounded-xl border border-primary/10 shadow-lg mt-2 bg-background/60 transition-all duration-200"
                 />
@@ -413,7 +455,7 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
               <div className="flex flex-col sm:flex-row justify-end gap-2 mt-2">
                 <button
                   type="button"
-                  onClick={() => setEditingArticle(null)}
+                  onClick={handleCloseModal}
                   className="w-full sm:w-auto px-4 py-2 rounded-lg border border-primary/20 bg-background/70 hover:bg-muted/60 shadow"
                 >
                   Cancel
@@ -436,46 +478,49 @@ Whether you're looking for adventure, relaxation, or a unique cultural experienc
       )}
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
-        {articles?.map((article) => (
-          <div key={article.id} className="bg-card/80 backdrop-blur-lg rounded-2xl shadow-xl border border-primary/10 p-6 group transition-all duration-200 hover:shadow-2xl hover:border-primary/30 glassmorphism flex flex-col">
-            <div className="flex justify-between items-start mb-4">
-              <h2 className="text-lg font-semibold bg-gradient-to-r from-primary/80 to-accent/80 bg-clip-text text-transparent drop-shadow">
-                {article.title}
-              </h2>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setEditingArticle(article)}
-                  className="p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary shadow-sm transition-all duration-150"
-                  aria-label="Edit"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => deleteMutation.mutate(article.id)}
-                  className="p-2 rounded-full bg-destructive/10 hover:bg-destructive/20 text-destructive shadow-sm transition-all duration-150"
-                  aria-label="Delete"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+        {articles?.map((article) => {
+          console.log('Article image_url:', article.image_url, 'Title:', article.title)
+          return (
+            <div key={article.id} className="bg-card/80 backdrop-blur-lg rounded-2xl shadow-xl border border-primary/10 p-6 group transition-all duration-200 hover:shadow-2xl hover:border-primary/30 glassmorphism flex flex-col">
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-lg font-semibold bg-gradient-to-r from-primary/80 to-accent/80 bg-clip-text text-transparent drop-shadow">
+                  {article.title}
+                </h2>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setEditingArticle(article)}
+                    className="p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary shadow-sm transition-all duration-150"
+                    aria-label="Edit"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => deleteMutation.mutate(article.id)}
+                    className="p-2 rounded-full bg-destructive/10 hover:bg-destructive/20 text-destructive shadow-sm transition-all duration-150"
+                    aria-label="Delete"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
+              {article.image_url && (
+                <img
+                  src={(() => { console.log('Article card image src:', article.image_url); return article.image_url })()}
+                  alt={article.title}
+                  className="w-full h-48 object-cover rounded-xl border border-primary/10 shadow mb-4"
+                />
+              )}
+              <p className="text-sm text-muted-foreground whitespace-pre-line mb-2 flex-1">
+                {article.content}
+              </p>
+              {article.is_default && (
+                <span className="inline-block mt-2 px-3 py-1 text-xs font-semibold bg-gradient-to-r from-primary/20 to-accent/20 text-primary rounded-full shadow">
+                  Default Article
+                </span>
+              )}
             </div>
-            {article.image_url && (
-              <img
-                src={article.image_url}
-                alt={article.title}
-                className="w-full h-48 object-cover rounded-xl border border-primary/10 shadow mb-4"
-              />
-            )}
-            <p className="text-sm text-muted-foreground whitespace-pre-line mb-2 flex-1">
-              {article.content}
-            </p>
-            {article.is_default && (
-              <span className="inline-block mt-2 px-3 py-1 text-xs font-semibold bg-gradient-to-r from-primary/20 to-accent/20 text-primary rounded-full shadow">
-                Default Article
-              </span>
-            )}
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )
