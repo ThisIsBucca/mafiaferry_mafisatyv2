@@ -2,6 +2,9 @@ import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import { Calendar, Clock, MapPin, Ship } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query";
+import AdCarouselCard from './AdCarouselCard';
+import { supabase } from '../lib/supabase';
 
 export function Hero() {
   const [ref, inView] = useInView({
@@ -27,33 +30,26 @@ export function Hero() {
     }
   ]
 
-  // Example product data for the ad carousel
-  const products = [
-    {
-      name: 'Mafia T-shirt',
-      price: 'TZS 25,000',
-      image: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80'
+  // Fetch products for the ad carousel dynamically
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
     },
-    {
-      name: 'Safari Hat',
-      price: 'TZS 15,000',
-      image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80'
-    },
-    {
-      name: 'Beach Bag',
-      price: 'TZS 30,000',
-      image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80'
-    }
-  ];
+  });
+
   const [productIndex, setProductIndex] = useState(0);
 
   // Carousel auto-advance
   useEffect(() => {
+    if (!Array.isArray(products) || products.length === 0) return;
     const interval = setInterval(() => {
       setProductIndex((prev) => (prev + 1) % products.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [products.length]);
+  }, [products && products.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -192,39 +188,24 @@ export function Hero() {
             </motion.div>
           </div>
         </motion.div>
-        {/* Advertisement Card with Carousel */}
-        <div className="w-full md:w-1/2 max-w-md mx-auto bg-white/30 dark:bg-black/30 backdrop-blur-2xl rounded-3xl flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-12 shadow-2xl border-0 glassmorphism relative">
-          <h3 className="text-xl font-bold mb-4 text-primary drop-shadow">Matangazo ya Bidhaa</h3>
-          <div className="relative w-full flex flex-col items-center">
-            <img
-              src={products[productIndex].image}
-              alt={products[productIndex].name}
-              className="w-40 h-40 object-cover rounded-xl border border-primary/10 shadow mb-4 bg-background/60"
-            />
-            <div className="text-lg font-semibold text-foreground mb-1">{products[productIndex].name}</div>
-            <div className="text-primary text-base font-bold mb-2">{products[productIndex].price}</div>
-            <div className="flex gap-2 mt-2">
-              <button
-                aria-label="Previous product"
-                className="p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary shadow-sm transition-all duration-150"
-                onClick={() => setProductIndex((productIndex - 1 + products.length) % products.length)}
-              >&#8592;</button>
-              <button
-                aria-label="Next product"
-                className="p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary shadow-sm transition-all duration-150"
-                onClick={() => setProductIndex((productIndex + 1) % products.length)}
-              >&#8594;</button>
-            </div>
-            <div className="flex gap-1 mt-3 justify-center">
-              {products.map((_, idx) => (
-                <span
-                  key={idx}
-                  className={`inline-block w-2 h-2 rounded-full ${idx === productIndex ? 'bg-primary' : 'bg-primary/30'}`}
-                />
-              ))}
-            </div>
+        {/* Advertisement Card with Carousel (dynamic) */}
+        {isLoading ? (
+          <div className="w-full md:w-1/2 max-w-md mx-auto bg-white/30 dark:bg-black/30 backdrop-blur-2xl rounded-3xl flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-12 shadow-2xl border-0 glassmorphism relative animate-pulse min-h-[400px]">
+            <div className="h-10 w-2/3 bg-primary/10 rounded mb-6" />
+            <div className="h-56 w-56 bg-primary/10 rounded-2xl mb-4" />
+            <div className="h-6 w-1/2 bg-primary/10 rounded mb-2" />
+            <div className="h-4 w-1/3 bg-primary/10 rounded mb-2" />
+            <div className="h-4 w-2/3 bg-primary/10 rounded mb-2" />
+            <div className="h-4 w-1/4 bg-primary/10 rounded mb-2" />
           </div>
-        </div>
+        ) : Array.isArray(products) && products.length > 0 ? (
+          <AdCarouselCard products={products} />
+        ) : (
+          <div className="w-full md:w-1/2 max-w-md mx-auto bg-white/30 dark:bg-black/30 backdrop-blur-2xl rounded-3xl flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-12 shadow-2xl border-0 glassmorphism relative min-h-[400px] text-center text-muted-foreground">
+            <h3 className="text-xl font-bold mb-4 text-primary drop-shadow">Matangazo ya Bidhaa</h3>
+            <div>Hakuna bidhaa za kutangaza kwa sasa.</div>
+          </div>
+        )}
       </div>
       {/* Overlay gradient with interactive hover effect */}
       <motion.div 

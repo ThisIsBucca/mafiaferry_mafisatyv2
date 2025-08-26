@@ -91,6 +91,16 @@ export function AdminLayout() {
               >
                 Articles
               </Link>
+              <Link
+                to="/admin/products"
+                className={`block px-4 py-2 rounded-lg ${
+                  isActive("/products")
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground hover:bg-accent"
+                }`}
+              >
+                Products
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="w-full text-left px-4 py-2 rounded-lg text-foreground hover:bg-accent"
@@ -148,6 +158,17 @@ export function AdminLayout() {
                   >
                     Articles
                   </Link>
+                  <Link
+                    to="/admin/products"
+                    className={`block px-4 py-2 rounded-lg ${
+                      isActive("/products")
+                        ? "bg-primary text-primary-foreground"
+                        : "text-foreground hover:bg-accent"
+                    }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Products
+                  </Link>
                   <button
                     onClick={() => {
                       handleSignOut()
@@ -170,4 +191,4 @@ export function AdminLayout() {
       </div>
     </div>
   )
-} 
+}
