@@ -13,6 +13,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { MainContent } from "./App"
 import { RouteChangeListener } from "./components/RouteChangeListener"
 import NotFound from "./pages/NotFound"
+import ProductsAdmin from "./pages/admin/products"
 
 export const router = createBrowserRouter(
   [
@@ -73,6 +74,10 @@ export const router = createBrowserRouter(
           path: "articles",
           element: <ArticlesAdmin />,
         },
+        {
+          path: "products",
+          element: <ProductsAdmin />,
+        },
       ],
     },
     {
@@ -86,4 +91,4 @@ export const router = createBrowserRouter(
       v7_relativeSplatPath: true
     }
   }
-) 
+)
