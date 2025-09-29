@@ -17,7 +17,7 @@ export default function AdCarouselCard({ products }) {
       <h3 className="text-2xl font-extrabold mb-4 text-primary drop-shadow tracking-tight">Matangazo ya Bidhaa</h3>
       <div className="relative w-full flex flex-col items-center">
         <img
-          src={product.image}
+          src={product.image_url}
           alt={product.name}
           className="w-56 h-56 object-cover rounded-2xl border-4 border-primary/20 shadow-xl mb-4 bg-background/60 transition-all duration-300"
         />

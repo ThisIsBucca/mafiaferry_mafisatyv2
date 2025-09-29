@@ -1,7 +1,7 @@
 import { FileType } from 'lucide-react'
 import { supabase } from './supabase'
 
-export async function uploadImage(file) {
+export async function uploadImage(file, productName) {
   try {
     // Debug: log file object and type
     console.log('uploadImage received file:', file)
@@ -14,10 +14,13 @@ export async function uploadImage(file) {
     if (authError) throw authError
     if (!session) throw new Error('No active session')
 
-    // Generate a unique filename
+    // Generate a filename based on product name (slugified) and timestamp
     const fileExt = file.name.split('.').pop().toLowerCase()
-    const fileName = `${Math.random()}.${fileExt}`
-    const filePath = fileName // Save directly to root of 'images' bucket
+    const slug = productName
+      ? productName.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+      : 'product';
+    const fileName = `${slug}-${Date.now()}.${fileExt}`
+    const filePath = fileName // Save directly to root of 'article-images' bucket
 
     // Set correct content-type for common image types
     let contentType = file.type
