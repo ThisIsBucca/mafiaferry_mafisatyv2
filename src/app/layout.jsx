@@ -8,7 +8,20 @@ export default function RootLayout({ children }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="canonical" href="https://mafiaferry.com" />
+        <link rel="canonical" href="https://mafiaferry.vercel.app" />
+                         
+  
+        <meta property="og:title" content="MafiaFerry" />
+        <meta property="og:description" content="Official ferry service to Mafia Island, Tanzania" />
+        <meta property="og:image" content="https://example.com/preview-image.jpg" />                     
+        <meta property="og:type" content="website" />
+        
+        
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:title" content="MafiaFerry" />
+        <meta property="twitter:description" content="Official ferry service to Mafia Island, Tanzania" />
+        <meta property="twitter:image" content="https://example.com/preview-image.jpg" />
+        
         
         {/* Google Analytics Script */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-TKFV5E8GLS"></script>
@@ -32,7 +45,7 @@ export default function RootLayout({ children }) {
               "@type": "TransportationService",
               "name": "MafiaFerry",
               "description": "Official ferry service to Mafia Island, Tanzania",
-              "url": "https://mafiaferry.com",
+              "url": "https://mafiaferry.vercel.app",
               "areaServed": {
                 "@type": "Place",
                 "name": "Mafia Island",

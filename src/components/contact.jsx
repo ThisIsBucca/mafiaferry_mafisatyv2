@@ -24,7 +24,7 @@ export function Contact() {
             <div className="relative">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-4 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
-                  <Phone className="h-6 w-6 text-primary" />
+                  <Phone className="h-6 w-6 text-primary animate-bounce" />
                 </div>
                 <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 to-foreground/80">Simu</h3>
               </div>
@@ -47,7 +47,7 @@ export function Contact() {
             <div className="relative">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-4 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
-                  <Mail className="h-6 w-6 text-primary" />
+                  <Mail className="h-6 w-6 text-primary animate-bounce" />
                 </div>
                 <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 to-foreground/80">Barua Pepe</h3>
               </div>
@@ -70,7 +70,7 @@ export function Contact() {
             <div className="relative">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-4 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
-                  <MapPin className="h-6 w-6 text-primary" />
+                  <MapPin className="h-6 w-6 text-primary animate-bounce" />
                 </div>
                 <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-foreground/90 to-foreground/80">Anwani</h3>
               </div>

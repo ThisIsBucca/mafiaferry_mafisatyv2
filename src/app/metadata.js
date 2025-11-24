@@ -1,7 +1,7 @@
 export const defaultMetadata = {
   title: 'MafiaFerry - Your Gateway to Mafia Island | Official Ferry Service',
   description: 'Book reliable ferry services to Mafia Island, Tanzania. Daily schedules, modern vessels, and professional service. Your trusted transportation partner for Mafia Island adventures.',
-  keywords: 'Mafia Island ferry, MafiaFerry, Tanzania ferry service, Mafia Island transport, boat to Mafia Island, Kilindoni ferry, Mafia Island travel, Tanzania island transport, Mafia Island booking',
+  keywords: 'mafia island ferry, kisiwa cha mafia,kilindoni,how to get to mafia island , mafia island tours, mafia island authentic, mafia island whalesharks,nyamisati, usafiri wa mafia, MafiaFerry,mafia, Tanzania ferry service, Mafia Island transport, boat to Mafia Island, Kilindoni ferry, Mafia Island travel, Tanzania island transport, Mafia Island booking',
   openGraph: {
     title: 'MafiaFerry - Official Ferry Service to Mafia Island',
     description: 'Your trusted ferry service to Mafia Island. Modern vessels, daily schedules, and professional service for a comfortable journey.',
@@ -13,7 +13,7 @@ export const defaultMetadata = {
         alt: 'MV Kilindoni Ferry to Mafia Island',
       }
     ],
-    locale: 'en_US',
+    locale: 'en_US', 
     type: 'website',
     siteName: 'MafiaFerry',
   },

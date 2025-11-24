@@ -307,7 +307,7 @@ export function Schedule() {
 
                       {/* Button content */}
                       <div className="relative flex flex-col items-center gap-2 px-3 py-2">
-                        <span className="text-lg">{date.icon}</span>
+                        {/* <span className="text-lg">{date.icon}</span> */}
                         <span className="text-sm font-bold  tracking-wide text-center leading-tight">
                           {date.label}
                         </span>
@@ -546,7 +546,7 @@ export function Schedule() {
                             transform: "translateZ(0)",
                           }}
                         >
-                          <div className="absolute inset-0 bg-gradient-to-r from-[#25D366] via-[#20BD5C] to-[#25D366] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-[#25D366] via-[#20BD5C] to-[#25D366]  group-hover:opacity-100 transition-opacity duration-300" />
                           <MessageCircle className="w-5 h-5 relative z-10" />
                           <span className="relative z-10">Nunua Tiketi</span>
                           <div
