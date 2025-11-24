@@ -139,12 +139,12 @@ export function Footer() {
             <p className="text-xs text-muted-foreground/60 mt-2">
               Designed & Developed by{" "}
               <a
-                href="https://buccaportfolio.vercel.app"
+               href="https://thisisbucca.github.io/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:text-primary/80 transition-colors"
               >
-                BuccaDev
+                thisisbucca
               </a>
             </p>
           </div>
