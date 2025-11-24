@@ -539,7 +539,7 @@ export function Schedule() {
                               new Date(schedule.date)
                             )}`)
                           }
-                          className="relative opacity-5 cursor-not-allowed w-full flex items-center justify-center gap-2 px-4 py-3.5 text-base font-semibold text-white rounded-xl transition-all duration-300 overflow-hidden group"
+                          className="relative  cursor-not-allowed w-full flex items-center justify-center gap-2 px-4 py-3.5 text-base font-semibold text-white rounded-xl transition-all duration-300 overflow-hidden group"
                           style={{
                             backgroundColor: "#25D366",
                             boxShadow: "0 4px 15px rgba(37, 211, 102, 0.4)",
