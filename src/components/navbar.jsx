@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { Menu, X, Sun, Moon, Anchor, Ship, Phone, MessageSquare } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import mafiaFerryIcon from '../../public/favicon-32x32.png';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -144,7 +145,8 @@ export function Navbar() {
           className="flex items-center gap-2 transition-transform hover:scale-105"
         >
           <div className="relative">
-            <Anchor className="w-8 h-8 text-primary" />
+            {/* <Anchor className="w-8 h-8 text-primary" /> */}
+            <img src={mafiaFerryIcon} alt="Mafia Ferry Logo" className="w-8 h-8 rounded-full" />
             <div className="absolute inset-0 bg-primary/20 blur-lg -z-10" />
           </div>
           <span className="font-bold text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">

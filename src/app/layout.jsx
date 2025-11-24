@@ -1,4 +1,5 @@
 import { defaultMetadata } from './metadata'
+import ferryImage from './assets/mafiaFerry.png';
 
 export const metadata = defaultMetadata
 
@@ -9,18 +10,20 @@ export default function RootLayout({ children }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://mafiaferry.vercel.app" />
+        <link rel="icon" href="/favicon.ico" />
+
                          
   
         <meta property="og:title" content="MafiaFerry" />
         <meta property="og:description" content="Official ferry service to Mafia Island, Tanzania" />
-        <meta property="og:image" content="https://example.com/preview-image.jpg" />                     
+        <meta property="og:image" content={ferryImage} />                     
         <meta property="og:type" content="website" />
         
         
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:title" content="MafiaFerry" />
         <meta property="twitter:description" content="Official ferry service to Mafia Island, Tanzania" />
-        <meta property="twitter:image" content="https://example.com/preview-image.jpg" />
+        <meta property="twitter:image" content={ferryImage} />
         
         
         {/* Google Analytics Script */}
