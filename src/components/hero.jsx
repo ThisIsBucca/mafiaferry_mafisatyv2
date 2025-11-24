@@ -143,7 +143,8 @@ export function Hero() {
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.3 }}
             >
-              <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary-foreground drop-shadow-xl tracking-tight font-display mb-2">
+              
+              {/* <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary-foreground drop-shadow-xl tracking-tight font-display mb-2">
                 Mafiaferry
               </h1>
               <h2 className="text-lg sm:text-2xl font-semibold text-foreground/90 font-display mb-3 drop-shadow-md tracking-tight">
@@ -151,8 +152,9 @@ export function Hero() {
               </h2>
               <p className="text-base sm:text-lg text-foreground/80 max-w-md mx-auto font-medium mb-6">
                 Taarifa za Vyombo vya Usafiri wa Majini Kati ya Mafia na Bara
-              </p>
+              </p> */}
               {/* Cool animated anchor link instead of button/feature list */}
+
               <a
                 href="#schedule"
                 className="inline-block w-full sm:w-auto text-center px-8 py-3 rounded-full text-lg sm:text-xl font-bold bg-gradient-to-r from-primary via-accent to-primary-foreground text-white shadow-xl hover:scale-105 transition-transform duration-300 animate-gradient-x"
@@ -189,7 +191,8 @@ export function Hero() {
           </div>
         </motion.div>
         {/* Advertisement Card with Carousel (dynamic) */}
-        {isLoading ? (
+        
+        {/* {isLoading ? (
           <div className="w-full md:w-1/2 max-w-md mx-auto bg-white/30 dark:bg-black/30 backdrop-blur-2xl rounded-3xl flex flex-col items-center justify-center px-4 py-8 sm:px-8 sm:py-12 shadow-2xl border-0 glassmorphism relative animate-pulse min-h-[400px]">
             <div className="h-10 w-2/3 bg-primary/10 rounded mb-6" />
             <div className="h-56 w-56 bg-primary/10 rounded-2xl mb-4" />
@@ -205,7 +208,7 @@ export function Hero() {
             <h3 className="text-xl font-bold mb-4 text-primary drop-shadow">Matangazo ya Bidhaa</h3>
             <div>Hakuna bidhaa za kutangaza kwa sasa.</div>
           </div>
-        )}
+        )} */}
       </div>
       {/* Overlay gradient with interactive hover effect */}
       <motion.div 
