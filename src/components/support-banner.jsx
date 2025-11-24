@@ -36,7 +36,7 @@ export function SupportBanner() {
             href="https://thisisbucca.github.io/"
             className="font-medium bg-gradient-to-r from-primary/90 to-primary bg-clip-text text-transparent hover:from-primary hover:to-primary/90 transition-all duration-300"
           >
-            Bucca
+            thisisbucca
           </a>
         </motion.div>
 
