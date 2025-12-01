@@ -1,42 +1,187 @@
 <!doctype html>
 <html lang="en">
 
-<head>
+  <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Favicon -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="/favicon.ico" />
 
-  <!-- PNG Icons -->
-  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+  <!-- Primary Metadata -->
+  <title>MafiaFerry – Official Ferry to Mafia Island, Tanzania</title>
+  <meta name="description" content="Book the official ferry to Mafia Island from Nyamisati, Tanzania. Safe, reliable daily trips with modern vessels, verified crew, and secure online booking." />
+  <meta name="keywords" content="mafia ferry, mafia island ferry, ferry to mafia island, nyamisati ferry, kilindoni ferry, mafia island transport, boat to mafia island, mafia ferry booking, tanzania ferry, mafia island travel, how to get to mafia island" />
 
-  <!-- Apple Icon -->
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://mafiaferry.vercel.app" />
 
-  <!-- Manifest for PWA support -->
-  <link rel="manifest" href="/manifest.json" />
+  <!-- Robots -->
+  <meta name="robots" content="index, follow" />
+  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
-  <meta name="google-adsense-account" content="ca-pub-3994249111297893" />
+  <!-- Verification -->
+  <meta name="google-site-verification" content="" />
 
-  <title>Mafia Ferry Schedule</title>
+  <!-- Open Graph -->
+  <meta property="og:title" content="MafiaFerry – Safe & Reliable Ferry to Mafia Island" />
+  <meta property="og:description" content="Travel safely to Mafia Island with the official ferry service. Daily departures, modern vessels, professional crew, and trusted booking." />
+  <meta property="og:image" content="/mafiaFerry.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mafiaferry.vercel.app" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="MafiaFerry – Book Your Trip to Mafia Island" />
+  <meta name="twitter:description" content="Book your official ferry to Mafia Island. Safe, daily transportation from Nyamisati to Kilindoni. Fast booking & reliable service." />
+  <meta name="twitter:image" content="./src/assets/mafiaFerry.png" />
+
+  <!-- hreflang -->
+  <link rel="alternate" href="https://mafiaferry.vercel.app" hreflang="en" />
+  <link rel="alternate" href="https://mafiaferry.vercel.app" hreflang="x-default" />
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TKFV5E8GLS"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TKFV5E8GLS', {
+      page_path: window.location.pathname,
+      send_page_view: true
+    });
+  </script>
+
+  <!-- JSON-LD Structured Data -->
+
+  <!-- 1. Transportation Service Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TransportationService",
+    "name": "MafiaFerry",
+    "description": "Book the official ferry to Mafia Island from Nyamisati, Tanzania. Safe, reliable daily trips with modern vessels, verified crew, and secure online booking.",
+    "url": "https://mafiaferry.vercel.app",
+    "image": "/mafiaFerry.png",
+    "areaServed": {
+      "@type": "Place",
+      "name": "Mafia Island",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "Tanzania"
+      }
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Ferry Services",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Daily Ferry Service",
+            "description": "Regular ferry service between Nyamisati & Mafia Island"
+          }
+        }
+      ]
+    }
+  }
+  </script>
+
+  <!-- 2. Local Business Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Mafia Ferry",
+    "description": "Book the official ferry to Mafia Island from Nyamisati, Tanzania. Safe, reliable daily trips with modern vessels, verified crew, and secure online booking.",
+    "url": "https://mafiaferry.vercel.app",
+    "logo": "/logo.png",
+    "image": "/mafiaFerry.png",
+    "telephone": "+255000000000",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Nyamisati Ferry Terminal",
+      "addressLocality": "Nyamisati",
+      "addressRegion": "Pwani",
+      "postalCode": "00000",
+      "addressCountry": "TZ"
+    },
+    "areaServed": "Mafia Island, Tanzania",
+    "openingHours": "Mo-Su 08:00-18:00",
+    "priceRange": "$$"
+  }
+  </script>
+
+  <!-- 3. Breadcrumb Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://mafiaferry.vercel.app"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Ferry Services",
+        "item": "https://mafiaferry.vercel.app/blog"
+      }
+    ]
+  }
+  </script>
+
+  <!-- 4. FAQ Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I get to Mafia Island?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can reach Mafia Island by taking the official ferry from Nyamisati to Kilindoni. The ferry operates daily and offers safe and reliable transport."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Where does the Mafia Ferry depart from?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The ferry departs from Nyamisati, Tanzania, and arrives at Kilindoni on Mafia Island."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How can I book the Mafia Ferry?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can book your ferry tickets online through our official website using secure and verified payment options."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long is the ferry ride?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The ferry journey takes around 3–4 hours depending on weather conditions."
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body>
   <div id="root"></div>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TKFV5E8GLS"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-TKFV5E8GLS');
-  </script>
   <script type="module" src="/src/main.jsx"></script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3994249111297893"
-    crossorigin="anonymous"></script>
 </body>
 
 </html>
