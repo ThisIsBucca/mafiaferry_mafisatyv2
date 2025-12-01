@@ -1,49 +1,82 @@
-import ferryImage from './assets/mafiaFerry.png';
-
+// Import your images from src/assets
+import ferryImage from "./assets/mafiaFerry.png";
+import logoImage from "./assets/mafiaFerry.png";
 
 export const defaultMetadata = {
-  title: 'MafiaFerry – Book the Official Ferry to Mafia Island, Tanzania',
+  // ---- BASIC SEO ----
+  title: "MafiaFerry – Official Partner to Mafia Island, Tanzania",
   description:
-    'Book safe and reliable ferry services to Mafia Island from Nyamisati, Tanzania. Check daily schedules, modern vessels, secure booking, and trusted transport to Kilindoni, Mafia Island.',
+    "Book the official ferry to Mafia Island from Nyamisati, Tanzania. Safe, reliable daily trips with modern vessels, verified crew, and secure online booking.",
   keywords:
-    'mafia island ferry, ferry to mafia island, mafia island transport, nyamisati to mafia island, kilindoni ferry, how to get to mafia island, mafia island travel, mafia island tickets, mafia island tours, mafia island whalesharks, mafia ferry booking, Tanzania ferry service, MafiaFerry, usafiri wa mafia, safari mafia island, boat to mafia island',
+    "mafia ferry, mafia island ferry, ferry to mafia island, nyamisati ferry, kilindoni ferry, mafia island transport, boat to mafia island, mafia ferry booking, tanzania ferry, mafia island travel, how to get to mafia island",
+
+  // ---- BASE URL ----
+  metadataBase: "https://www.mafiaferry.vercel.app",
+
+  // ---- OPEN GRAPH ----
   openGraph: {
-    title: 'MafiaFerry – Official Ferry to Mafia Island | Safe & Reliable',
+    title: "MafiaFerry – Safe & Reliable Ferry to Mafia Island",
     description:
-      'Travel to Mafia Island with the official ferry service. Modern vessels, professional crew, and daily departures. Smooth and safe transport from Nyamisati to Kilindoni.',
+      "Travel safely to Mafia Island with the official ferry service. Daily departures, modern vessels, professional crew, and trusted booking.",
+    url: "https://www.mafiaferry.vercel.app",
+    siteName: "MafiaFerry",
+    type: "website",
+    locale: "en_US",
+
     images: [
       {
         url: ferryImage,
         width: 1200,
         height: 630,
-        alt: 'MV Kilindoni – Ferry to Mafia Island',
+        alt: "Mafia Ferry – Official Transport to Mafia Island",
       },
     ],
-    locale: 'en_US',
-    type: 'website',
-    siteName: 'MafiaFerry',
   },
+
+  // ---- TWITTER ----
   twitter: {
-    card: 'summary_large_image',
-    title: 'MafiaFerry – Book Your Ferry to Mafia Island',
+    card: "summary_large_image",
+    title: "MafiaFerry – Book Your Trip to Mafia Island",
     description:
-      'Reserve your ferry to Mafia Island. Fast, safe, and reliable maritime transport with daily schedules.',
-    images: [
-      ferryImage,
-    ],
+      "Book your official ferry to Mafia Island. Safe, daily transportation from Nyamisati to Kilindoni. Fast booking & reliable service.",
+    images: [ferryImage],
+    creator: "@mafiaferry", // leave empty if no account
   },
+
+  // ---- ROBOTS ----
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
     },
   },
+
+  // ---- VERIFICATION ----
   verification: {
-    google: 'add-your-google-site-verification-here',
+    google: "",
+    pinterest: "",
+    yandex: "",
+  },
+
+  // ---- ALTERNATE / CANONICAL ----
+  alternates: {
+    canonical: "https://www.mafiaferry.vercel.app",
+    languages: {
+      en: "https://www.mafiaferry.vercel.app",
+      "x-default": "https://www.mafiaferry.vercel.app",
+    },
+  },
+
+  // ---- ORGANIZATION (for schema) ----
+  organization: {
+    name: "MafiaFerry",
+    legalName: "Mafia Island Ferry Services",
+    url: "https://www.mafiaferry.vercel.app",
+    logo: logoImage,
   },
 };

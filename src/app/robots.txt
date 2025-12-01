@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://mafiaferry.com/sitemap.xml
+Sitemap: https://mafiaferry.vercel.app/sitemap.xml
 
 # Prevent crawling of admin pages
 Disallow: /admin/

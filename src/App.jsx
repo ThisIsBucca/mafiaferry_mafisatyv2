@@ -16,6 +16,7 @@ import { AnalyticsProvider } from './components/AnalyticsProvider'
 import { GoogleAnalytics } from './components/GoogleAnalytics'
 import { initializeDatabase } from "./lib/initDb"
 import { useEffect } from "react"
+import { HelmetProvider } from "react-helmet-async"
 
 const queryClient = new QueryClient()
 
@@ -25,6 +26,7 @@ export default function App() {
   }, [])
 
   return (
+    <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <RouterProvider router={router}>
@@ -35,6 +37,7 @@ export default function App() {
         </RouterProvider>
       </AuthProvider>
     </QueryClientProvider>
+    </HelmetProvider>
   )
 }
 
