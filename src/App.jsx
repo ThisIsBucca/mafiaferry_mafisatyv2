@@ -4,7 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext"
 import { router } from "./router"
 import { Toaster } from "react-hot-toast"
 import { Navbar } from "./components/navbar"
-// import { Hero } from "./components/hero"
+import { Hero } from "./components/hero"
 import { Schedule } from "./components/schedule"
 // import { NewsUpdates } from "./components/news-updates"
 import { Contact } from "./components/contact"
@@ -48,7 +48,7 @@ export function MainContent() {
       <Navbar />
       <ScrollingBanner />
       <main>
-        {/* <Hero /> */}
+        <Hero />
         <Schedule />
         {/* <NewsUpdates /> */}
         <Contact />

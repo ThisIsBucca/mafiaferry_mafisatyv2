@@ -61,7 +61,7 @@ export function SupportBanner() {
             className="group inline-flex items-center gap-1.5 px-2 py-1 rounded-full hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all duration-300"
           >
             <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:scale-110" />
-            <span>Admin</span>
+            <span>LOGIN</span>
           </Link>
         </motion.div>
       </div>
