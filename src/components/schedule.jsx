@@ -1,570 +1,167 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
-import {
-  Ship,
-  Clock,
-  Calendar,
-  Info,
-  Loader2,
-  AlertCircle,
-  RefreshCcw,
-  Ticket,
-  MessageCircle,
+import { 
+  Ship, Clock, Info, Loader2, AlertCircle, 
+  ChevronRight, ShoppingCart
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { publicSupabase } from "../lib/supabase";
-import {
-  format,
-  parse,
-  startOfWeek,
-  addDays,
-  isAfter,
-  isBefore,
-  isSameDay,
-  addWeeks,
-  differenceInMinutes,
-  differenceInHours,
-  setHours,
-  setMinutes,
-  formatDistanceToNow,
-} from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
-import { useState, useEffect } from "react";
+import { format, addDays } from "date-fns";
+import { useState } from "react";
 
-const TIMEZONE = "Africa/Dar_es_Salaam";
-
-const dayMap = {
-  Monday: { index: 0, swahili: "Jumatatu" },
-  Tuesday: { index: 1, swahili: "Jumanne" },
-  Wednesday: { index: 2, swahili: "Jumatano" },
-  Thursday: { index: 3, swahili: "Alhamisi" },
-  Friday: { index: 4, swahili: "Ijumaa" },
-  Saturday: { index: 5, swahili: "Jumamosi" },
-  Sunday: { index: 6, swahili: "Jumapili" },
-};
-
-const swahiliMonths = {
-  January: "Januari",
-  February: "Februari",
-  March: "Machi",
-  April: "Aprili",
-  May: "Mei",
-  June: "Juni",
-  July: "Julai",
-  August: "Agosti",
-  September: "Septemba",
-  October: "Oktoba",
-  November: "Novemba",
-  December: "Desemba",
-};
-
-const translateDuration = (duration) => {
-  if (!duration) return "";
-  return duration
-    .replace("hours", "masaa")
-    .replace("hour", "saa")
-    .replace("minutes", "dakika")
-    .replace("minute", "dakika")
-    .replace("days", "siku")
-    .replace("day", "siku");
-};
-
-const getCurrentMafiaTime = () => {
-  const now = new Date();
-  const mafiaTime = formatInTimeZone(now, TIMEZONE, "yyyy-MM-dd HH:mm:ss");
-  return new Date(mafiaTime);
-};
-
-const getTimeOfDay = (hours) => {
-  if (hours >= 5 && hours < 12) return "Asubuhi";
-  if (hours >= 12 && hours < 17) return "Mchana";
-  if (hours >= 17 && hours < 20) return "Jioni";
-  return "Usiku";
-};
+// --- Helpers & Translations (Keep existing dayMap and swahiliMonths) ---
+const dayMap = { Monday: { swahili: "Jumatatu" }, Tuesday: { swahili: "Jumanne" }, Wednesday: { swahili: "Jumatano" }, Thursday: { swahili: "Alhamisi" }, Friday: { swahili: "Ijumaa" }, Saturday: { swahili: "Jumamosi" }, Sunday: { swahili: "Jumapili" }};
+const swahiliMonths = { January: "Januari", February: "Februari", March: "Machi", April: "Aprili", May: "Mei", June: "Juni", July: "Julai", August: "Agosti", September: "Septemba", October: "Oktoba", November: "Novemba", December: "Desemba" };
 
 const formatSwahiliDate = (date) => {
-  const dateInTZ = new Date(
-    date.toLocaleString("en-US", { timeZone: TIMEZONE })
-  );
-  const day = format(dateInTZ, "EEEE");
-  const month = format(dateInTZ, "MMMM");
-  const dayNum = format(dateInTZ, "d");
-  const year = format(dateInTZ, "yyyy");
-
-  return `${dayMap[day].swahili}, ${dayNum} ${swahiliMonths[month]}, ${year}`;
+  const day = format(date, "EEEE");
+  const month = format(date, "MMMM");
+  return `${dayMap[day].swahili}, ${format(date, "d")} ${swahiliMonths[month]}, ${format(date, "yyyy")}`;
 };
 
-function CurrentMafiaTime() {
-  const [currentTime, setCurrentTime] = useState(getCurrentMafiaTime());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(getCurrentMafiaTime());
-    }, 60000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="text-xs text-muted-foreground text-center">
-      Muda wote unaonyeshwa kwa wakati wa Mafia Island (EAT):{" "}
-      {format(currentTime, "h:mm a")}
-    </div>
-  );
-}
-
 export function Schedule() {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
-
   const [selectedDate, setSelectedDate] = useState("today");
-  const [, setForceUpdate] = useState({});
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setForceUpdate({});
-    }, 60000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  const getSelectedDate = () => {
-    const now = getCurrentMafiaTime();
-    let targetDate;
-
-    if (selectedDate === "today") {
-      targetDate = now;
-    } else if (selectedDate === "tomorrow") {
-      targetDate = addDays(now, 1);
-    } else if (selectedDate === "dayAfterTomorrow") {
-      targetDate = addDays(now, 2);
-    } else {
-      targetDate = now;
-    }
-
-    return targetDate;
+  const getTargetDate = () => {
+    const now = new Date();
+    if (selectedDate === "tomorrow") return addDays(now, 1);
+    if (selectedDate === "dayAfterTomorrow") return addDays(now, 2);
+    return now;
   };
 
-  const getSelectedDateText = () => {
-    const dateObj = getSelectedDate();
-    const dayName = format(dateObj, "EEEE");
-    const dayNum = format(dateObj, "d");
-    const month = format(dateObj, "MMMM");
-    const year = format(dateObj, "yyyy");
-
-    return `${dayMap[dayName].swahili}, ${dayNum} ${swahiliMonths[month]}, ${year}`;
-  };
-
-  const {
-    data: schedules,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery({
+  const { data: schedules, isLoading, isError } = useQuery({
     queryKey: ["public-schedules"],
     queryFn: async () => {
-      const { data, error } = await publicSupabase
-        .from("schedules")
-        .select("*")
-        .order("created_at", { ascending: true });
-
+      const { data, error } = await publicSupabase.from("schedules").select("*").order("departure", { ascending: true });
       if (error) throw error;
       return data;
     },
   });
 
-  const filteredSchedules = schedules?.filter((schedule) => {
-    try {
-      if (!schedule.date) {
-        console.log("Schedule missing date:", schedule.id);
-        return false;
-      }
-
-      const selectedDateObj = getSelectedDate();
-      const selectedDateStr = format(selectedDateObj, "yyyy-MM-dd");
-      return schedule.date === selectedDateStr;
-    } catch (error) {
-      console.error("Error parsing date for schedule:", schedule.id, error);
-      return false;
-    }
-  });
-
-  if (isLoading) {
-    return (
-      <section className="py-20" id="schedule">
-        <div className="container px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center max-w-3xl mx-auto"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span className="text-sm font-medium">Inapakia Ratiba</span>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-    );
-  }
-
-  if (isError) {
-    return (
-      <section className="py-20" id="schedule">
-        <div className="container px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center max-w-3xl mx-auto"
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 text-destructive mb-8">
-              <AlertCircle className="w-4 h-4" />
-              <span className="text-sm font-medium">Hitilafu ya Ratiba</span>
-            </div>
-            <button
-              onClick={() => refetch()}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
-            >
-              <RefreshCcw className="w-4 h-4" />
-              Jaribu Tena
-            </button>
-          </motion.div>
-        </div>
-      </section>
-    );
-  }
+  const filteredSchedules = schedules?.filter(s => s.date === format(getTargetDate(), "yyyy-MM-dd"));
 
   return (
-    <section className="py-12 sm:py-20" id="schedule">
-      <div className="container px-4 sm:px-6 lg:px-8">
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0, y: 20 }}
+    <section 
+      className="relative py-16 text-white min-h-screen overflow-hidden flex flex-col justify-center" 
+      id="schedule"
+    >
+      {/* --- BACKGROUND IMAGE WITH OVERLAY --- */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//image%20(6).jpg" 
+          alt="Ocean Background" 
+          className="w-full h-full object-cover"
+        />
+        {/* Overlay using your color #271c36 */}
+        <div className="absolute inset-0 bg-[#271c36]/90 backdrop-blur-sm" />
+      </div>
+
+      <div className="container relative z-10 px-4 mx-auto max-w-6xl">
+        
+        {/* --- COMPACT HEADER SECTION --- */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center max-w-3xl mx-auto mb-8 sm:mb-16"
+          className="bg-white/5 border border-white/10 backdrop-blur-xl p-6 lg:p-8 rounded-[2rem] flex flex-col lg:flex-row items-center justify-between gap-8 mb-10 shadow-2xl"
         >
-          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full bg-primary/10 text-primary mb-6 sm:mb-8">
-            <Ship className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="text-xs sm:text-sm font-medium">
-              Ratiba ya Usafiri
-            </span>
+          <div className="text-center lg:text-left">
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-amber-500">
+              Ratiba za Vyombo
+            </h2>
+            <p className="text-xs text-white/50 uppercase tracking-widest mt-1 font-bold">
+              {formatSwahiliDate(getTargetDate())}
+            </p>
           </div>
-          <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6">
-            <span className="bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
-              Ratiba za Vyombo vya Majini
-            </span>
-          </h2>
-          <p className="text-sm text-muted-foreground mb-8">
-            Angalia ratiba ya mashua, meli na vyombo vingine vya usafiri wa
-            majini kwa siku zilizochaguliwa. Taarifa hizi zinakupa mwongozo wa
-            safari zako kati ya Mafia na maeneo mengine.
-          </p>
-          <div className="mb-8 max-w-2xl mx-auto px-4">
-            <div className="relative">
-              {/* Decorative elements */}
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
-              <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-accent/5 rounded-full blur-2xl" />
 
-              {/* Main container */}
-              <div className="relative bg-gradient-to-br from-background/80 via-background/60 to-background/80 backdrop-blur-xl rounded-2xl border border-primary/10 shadow-xl overflow-hidden">
-                {/* Date selection buttons */}{" "}
-                <div className="grid grid-cols-3 gap-2 p-4">
-                  {[
-                    { key: "today", label: "Leo", icon: "🌅" },
-                    { key: "tomorrow", label: "Kesho", icon: "🌄" },
-                    {
-                      key: "dayAfterTomorrow",
-                      label: "Kesho Kutwa",
-                      icon: "📅",
-                    },
-                  ].map((date) => (
-                    <button
-                      key={date.key}
-                      onClick={() => setSelectedDate(date.key)}
-                      className={`relative group overflow-hidden rounded-xl transition-all duration-300 flex flex-col items-center justify-center min-h-[80px] ${
-                        selectedDate === date.key
-                          ? "bg-primary text-primary-foreground shadow-lg scale-100"
-                          : "bg-background/80 hover:bg-primary/5 text-foreground hover:scale-[0.98] border border-primary/10"
-                      }`}
-                    >
-                      {/* Button background effects */}
-                      <div
-                        className={`absolute inset-0 transition-opacity duration-300 ${
-                          selectedDate === date.key
-                            ? "opacity-100"
-                            : "opacity-0 group-hover:opacity-50"
-                        }`}
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20" />
-                        <div className="absolute inset-0 bg-grid-white/10" />
-                      </div>
-
-                      {/* Button content */}
-                      <div className="relative flex flex-col items-center gap-2 px-3 py-2">
-                        {/* <span className="text-lg">{date.icon}</span> */}
-                        <span className="text-sm font-bold  tracking-wide text-center leading-tight">
-                          {date.label}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                {/* Selected date display */}
-                <div className="relative px-4 py-5 text-center bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
-                  <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-                  <div className="text-lg font-medium bg-gradient-to-r from-primary/80 to-accent/80 bg-clip-text text-transparent">
-                    {getSelectedDateText()}
-                  </div>
-                  <div className="absolute left-0 right-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-                </div>
-              </div>
-            </div>
+          {/* Date Selector with Spacing between buttons */}
+          <div className="flex gap-4 p-2 bg-black/20 rounded-2xl border border-white/5">
+            {[
+              { key: "today", label: "Leo" },
+              { key: "tomorrow", label: "Kesho" },
+              { key: "dayAfterTomorrow", label: "Kesho Kutwa" }
+            ].map((d) => (
+              <button
+                key={d.key}
+                onClick={() => setSelectedDate(d.key)}
+                className={`px-8 py-3 rounded-xl text-xs font-bold transition-all duration-300 ${
+                  selectedDate === d.key 
+                  ? "bg-amber-500 text-black shadow-lg shadow-amber-500/30 scale-105" 
+                  : "text-white/40 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                {d.label}
+              </button>
+            ))}
           </div>
-        </motion.div>{" "}
-        {!filteredSchedules || filteredSchedules.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center max-w-3xl mx-auto"
-          >
-            {" "}
-            <div className="bg-card/50 backdrop-blur-sm border border-primary/10 rounded-xl p-6 shadow-lg">
-              {" "}
-              <div className="space-y-4">
-                <p className="text-muted-foreground text-center leading-relaxed">
-                  Hakuna vyombo vya usafiri wa majini vinavyosafiri{" "}
-                  {selectedDate === "today"
-                    ? "leo"
-                    : selectedDate === "tomorrow"
-                    ? "kesho"
-                    : "kesho kutwa"}
-                  . Tafadhali angalia ratiba ya siku nyingine au wasiliana nasi
-                  kwa maelezo zaidi:
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm">
-                  <div className="px-4 py-2 rounded-lg bg-primary/5 border border-primary/10">
-                    <span className="font-medium text-primary">Bucca:</span>
-                    <span className="ml-2 text-foreground">0776986840</span>
-                  </div>
-                  <div className="px-4 py-2 rounded-lg bg-primary/5 border border-primary/10">
-                    <span className="font-medium text-primary">Philox:</span>
-                    <span className="ml-2 text-foreground">0688103733</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ) : (
-          <div
-            className={`grid gap-4 sm:gap-8 ${
-              filteredSchedules.length === 1
-                ? "grid-cols-1 max-w-4xl mx-auto"
-                : "grid-cols-1 md:grid-cols-2"
-            }`}
-          >
-            {filteredSchedules.map((schedule, index) => {
-              // Format departure time
-              const departureTime = new Date(schedule.date);
-              const [hours, minutes] = schedule.departure
-                .split(":")
-                .map(Number);
-              departureTime.setHours(hours, minutes);
-              const localTime = `${format(
-                departureTime,
-                "h:mm a"
-              )} (${getTimeOfDay(hours)})`;
+        </motion.div>
 
-              return (
+        {/* --- SCHEDULE LIST --- */}
+        <div className="flex flex-col gap-5">
+          <AnimatePresence mode="wait">
+            {isLoading ? (
+              <div className="flex flex-col items-center py-20 opacity-50">
+                <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
+              </div>
+            ) : filteredSchedules?.length > 0 ? (
+              filteredSchedules.map((item, idx) => (
                 <motion.div
-                  key={schedule.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.2 }}
-                  className={`relative group ${
-                    filteredSchedules.length === 1
-                      ? "max-w-4xl mx-auto w-full"
-                      : ""
-                  }`}
+                  key={item.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="group relative flex flex-col lg:flex-row items-center gap-6 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 p-6 rounded-[2rem] transition-all duration-500 backdrop-blur-md"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl sm:rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300" />
-                  <div
-                    className={`relative rounded-xl sm:rounded-2xl border bg-card/50 backdrop-blur-sm overflow-hidden ${
-                      filteredSchedules.length === 1 ? "p-6 sm:p-8" : ""
-                    }`}
-                  >
-                    <div
-                      className={`px-4 sm:px-6 py-3 sm:py-4 bg-primary/5 border-b ${
-                        filteredSchedules.length === 1 ? "mb-6" : ""
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <h3
-                          className={`font-semibold ${
-                            filteredSchedules.length === 1
-                              ? "text-2xl sm:text-3xl"
-                              : "text-lg sm:text-xl"
-                          }`}
-                        >
-                          {schedule.ship_name}
-                        </h3>
-                      </div>
+                  {/* Vessel & Route Info */}
+                  <div className="flex items-center gap-4 min-w-[220px]">
+                    <div className="p-4 bg-amber-500/10 rounded-2xl">
+                      <Ship className="w-6 h-6 text-amber-500" />
                     </div>
-                    <div
-                      className={`p-4 sm:p-6 space-y-4 ${
-                        filteredSchedules.length === 1
-                          ? "sm:space-y-6"
-                          : "space-y-3 sm:space-y-4"
-                      }`}
-                    >
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1">
-                            <p className="text-xs text-muted-foreground">
-                              Njia
-                            </p>
-                            <h4
-                              className={`font-medium ${
-                                filteredSchedules.length === 1
-                                  ? "text-lg sm:text-xl"
-                                  : "text-sm sm:text-base"
-                              }`}
-                            >
-                              {schedule.route}
-                            </h4>
-                          </div>
-                          <div className="text-right space-y-1">
-                            <p className="text-xs text-muted-foreground">
-                              Muda wa Safari
-                            </p>
-                            <span
-                              className={`${
-                                filteredSchedules.length === 1
-                                  ? "text-sm sm:text-base"
-                                  : "text-xs sm:text-sm"
-                              }`}
-                            >
-                              {translateDuration(schedule.duration)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div
-                        className={`grid ${
-                          filteredSchedules.length === 1
-                            ? "grid-cols-1 md:grid-cols-2 gap-6"
-                            : "grid-cols-2 gap-3 sm:gap-4"
-                        }`}
-                      >
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <p className="text-xs text-muted-foreground">
-                              Siku ya Safari
-                            </p>
-                            <div className="flex items-center gap-1.5 sm:gap-2">
-                              <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
-                              <span
-                                className={`${
-                                  filteredSchedules.length === 1
-                                    ? "text-sm sm:text-base"
-                                    : "text-xs sm:text-sm"
-                                }`}
-                              >
-                                {formatSwahiliDate(new Date(schedule.date))}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <p className="text-xs text-muted-foreground">
-                              Kuondoka Kijijini
-                            </p>
-                            <div className="flex flex-col gap-1">
-                              <div className="flex items-center gap-1.5 sm:gap-2">
-                                <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
-                                <span
-                                  className={`${
-                                    filteredSchedules.length === 1
-                                      ? "text-sm sm:text-base"
-                                      : "text-xs sm:text-sm"
-                                  }`}
-                                >
-                                  {localTime}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-muted-foreground">
-                                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span>
-                                  {formatSwahiliDate(new Date(schedule.date))}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-xs text-muted-foreground">
-                            Taarifa za Ziada
-                          </p>
-                          <div className="rounded-lg border border-red-200/20 bg-red-50/10 p-3">
-                            <div className="flex items-start gap-1.5 sm:gap-2">
-                              <Info className="w-3 h-3 sm:w-4 sm:h-4 text-red-500/70 mt-0.5" />
-                              <span
-                                className={`${
-                                  filteredSchedules.length === 1
-                                    ? "text-sm sm:text-base"
-                                    : "text-xs sm:text-sm"
-                                } text-red-900/70 dark:text-red-300/90`}
-                              >
-                                {schedule.notes || "Hakuna maelezo ya ziada"}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mt-2">
-                            <CurrentMafiaTime />
-                          </div>
-                        </div>
-                      </div>{" "}
-                      {/* Booking Button */}{" "}
-                      <div className="mt-4 sm:mt-6">
-                        <button
-                          onClick={() =>
-                            (window.location.href = `https://wa.me/255776986840?text=Habari, naomba kujua kuhusu tiketi ya ${
-                              schedule.ship_name
-                            } kwa tarehe ${formatSwahiliDate(
-                              new Date(schedule.date)
-                            )}`)
-                          }
-                          className="relative  cursor-not-allowed w-full flex items-center justify-center gap-2 px-4 py-3.5 text-base font-semibold text-white rounded-xl transition-all duration-300 overflow-hidden group"
-                          style={{
-                            backgroundColor: "#25D366",
-                            boxShadow: "0 4px 15px rgba(37, 211, 102, 0.4)",
-                            transform: "translateZ(0)",
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-[#25D366] via-[#20BD5C] to-[#25D366]  group-hover:opacity-100 transition-opacity duration-300" />
-                          <MessageCircle className="w-5 h-5 relative z-10" />
-                          <span className="relative z-10">Nunua Tiketi</span>
-                          <div
-                            className="absolute inset-0 rounded-xl"
-                            style={{
-                              boxShadow:
-                                "inset 0 1px 1px rgba(255, 255, 255, 0.3)",
-                            }}
-                          />
-                        </button>
+                    <div>
+                      <h3 className="font-black text-lg leading-none mb-1">{item.ship_name}</h3>
+                      <div className="flex items-center gap-2 text-[10px] font-bold text-white/40 uppercase">
+                        <span>{item.route.split('-')[0]}</span>
+                        <ChevronRight className="w-3 h-3 text-amber-500" />
+                        <span>{item.route.split('-')[1] || "Mafia"}</span>
                       </div>
                     </div>
                   </div>
+
+                  {/* Departure & Duration */}
+                  <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-6 w-full text-center lg:text-left">
+                    <div>
+                      <p className="text-[10px] uppercase text-white/30 font-black mb-1">Muda wa Kuondoka</p>
+                      <p className="text-base font-black flex items-center justify-center lg:justify-start gap-2">
+                        <Clock className="w-4 h-4 text-amber-500" /> {item.departure}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase text-white/30 font-black mb-1">Muda wa Safari</p>
+                      <p className="text-base font-black">{item.duration.replace('hours', 'Masaa')}</p>
+                    </div>
+                    <div className="hidden lg:block">
+                      <p className="text-[10px] uppercase text-white/30 font-black mb-1">Ziada</p>
+                      <p className="text-[11px] text-white/50 leading-tight italic">{item.notes || "Ratiba imethibitishwa"}</p>
+                    </div>
+                  </div>
+
+                  {/* Nunua Tiketi Button */}
+                  <button 
+                    onClick={() => window.open(`https://wa.me/255776986840?text=Habari, naomba tiketi ya ${item.ship_name}`, '_blank')}
+                    className="w-full lg:w-auto px-10 py-4 bg-amber-500 hover:bg-amber-400 text-black font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95"
+                  >
+                    <ShoppingCart className="w-4 h-4" /> Nunua Tiketi
+                  </button>
                 </motion.div>
-              );
-            })}
-          </div>
-        )}
+              ))
+            ) : (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20 bg-black/20 rounded-[2rem] border border-white/5">
+                <AlertCircle className="w-12 h-12 text-white/10 mx-auto mb-4" />
+                <p className="text-white/40 font-bold uppercase tracking-widest text-sm">Hakuna ratiba iliyopatikana kwa siku hii.</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );
