@@ -64,7 +64,7 @@
     --shadow-btn: 0 2px 8px 0 rgba(44,32,56,0.16), 0 0 0 2px hsl(var(--primary)/0.12);
     --shadow-btn-glow: 0 0 24px 4px hsl(var(--accent)/0.22), 0 0 0 2px hsl(var(--primary)/0.22);
     font-family: 'Outfit', 'Poppins', Arial, sans-serif;
-    --gradient-main: linear-gradient(135deg, hsl(265,32%,16%) 0%, hsl(265,32%,22%) 100%);
+    --gradient-main: linear-gradient(135deg, #271c36 0%, hsl(265,32%,22%) 100%);
     --gradient-accent: linear-gradient(90deg, hsl(var(--primary)/0.22), hsl(var(--accent)/0.22));
   }
   body {
