@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast"
 import { Navbar } from "./components/navbar"
 import { Hero } from "./components/hero"
 import { Schedule } from "./components/schedule"
-// import { NewsUpdates } from "./components/news-updates"
+import { NewsUpdates } from "./components/news-updates"
 import { Contact } from "./components/contact"
 import { Footer } from "./components/footer"
 import { ScrollToTop } from "./components/scroll-to-top"
@@ -50,7 +50,7 @@ export function MainContent() {
       <main>
         <Hero />
         <Schedule />
-        {/* <NewsUpdates /> */}
+        <NewsUpdates />
         <Contact />
       </main>
       <Footer />

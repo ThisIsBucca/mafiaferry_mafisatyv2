@@ -6,38 +6,60 @@ import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet'
 import BlogPost from './blog-post'
 
-export const staticArticles = [
-  {
+export const staticArticles = [{
     id: 'static-mafia-ferry-guide',
     slug: 'mafia-ferry-guide',
-    title: 'Complete Guide to Mafia Island Ferries',
+    title: 'Complete Guide: Journey from Dar es Salaam to Mafia Island',
     created_at: '2024-03-15',
     content: `
-      <p>Planning your trip to Mafia Island? Here's everything you need to know about ferry services between Mafia Island and Nyamisati.</p>
-      <h2>Available Services</h2>
-      <p>Currently, there are two main ferry services operating between Mafia Island and Nyamisati:</p>
+      <p>Planning your trip to Mafia Island? While the island feels worlds away, getting there from Dar es Salaam is a straightforward adventure whether you choose to fly or take the scenic sea route.</p>
+      
+      <h2>Option 1: The Quick Route (Flights)</h2>
+      <p>If you prefer to save time, several boutique airlines operate daily flights from Dar es Salaam (DAR) to Mafia Island (MFA). The flight is approximately 30 minutes long.</p>
       <ul>
-        <li>MV. Songosongo - Faster service with cargo focus</li>
-        <li>MV. Kilindoni - More passenger-friendly with larger capacity</li>
+        <li><strong>Airlines:</strong> Coastal Aviation and Auric Air are the primary operators.</li>
+        <li><strong>Terminals:</strong> Most flights depart from <strong>Terminal 1</strong> at JNIA.</li>
       </ul>
-      <h2>Schedule Information</h2>
-      <p>Both ferries operate on specific days of the week, with schedules designed to accommodate both passenger and cargo needs. Check our main schedule page for detailed timings.</p>
-      <h2>Booking Tips</h2>
+
+      <div style="margin: 25px 0; text-align: center;">
+        <a href="https://wa.me/255776986840?text=Hello!%20I%20would%20like%20to%20book%20a%20flight%20from%20Dar%20es%20Salaam%20to%20Mafia%20Island." 
+           style="background-color: #128C7E; color: #FFFFFF; padding: 16px 32px; text-decoration: none; font-weight: 800; font-family: sans-serif; border-radius: 50px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.2); text-shadow: 1px 1px 2px rgba(0,0,0,0.3); font-size: 16px;">
+           BOOK FLIGHT TICKET
+        </a>
+      </div>
+
+      <h2>Option 2: The Adventure Route (Step-by-Step)</h2>
+      <p>For budget travelers, the journey via Nyamisati is the most authentic way to travel. Please note that currently, only the <strong>MV Kilindoni</strong> is operational for this route.</p>
+      
+      <h3>Step 1: Dar es Salaam to Nyamisati</h3>
+      <p>Your journey begins at the <strong>Mbagala Rangitatu</strong> bus stand in Dar es Salaam. You should arrive by 4:00 AM to catch the early transport to Nyamisati village. The road trip takes approximately 3–4 hours.</p>
+
+      <h3>Step 2: Boarding the MV Kilindoni</h3>
+      <p>Upon arrival at Nyamisati, head to the docks to board the <strong>MV Kilindoni</strong>. This is currently the only active ferry serving the island. The vessel is designed for both passengers and cargo.</p>
+
+      <h3>Step 3: The Sea Crossing</h3>
+      <p>The ferry crossing takes about 4–5 hours depending on sea conditions. It is highly recommended to check tide schedules in advance as departure times can shift based on the water level at the Nyamisati channel.</p>
+
+      <div style="margin: 25px 0; text-align: center;">
+        <a href="https://wa.me/255776986840?text=Hello!%20I%20would%20like%20to%20book%20a%20ferry%20ticket%20on%20MV%20Kilindoni%20to%20Mafia%20Island." 
+           style="background-color: #128C7E; color: #FFFFFF; padding: 16px 32px; text-decoration: none; font-weight: 800; font-family: sans-serif; border-radius: 50px; display: inline-block; box-shadow: 0 4px 12px rgba(0,0,0,0.2); text-shadow: 1px 1px 2px rgba(0,0,0,0.3); font-size: 16px;">
+           BOOK FERRY TICKET
+        </a>
+      </div>
+
+      <h2>Important Tips</h2>
       <ul>
-        <li>Book in advance during peak season</li>
-        <li>Arrive at least 30 minutes before departure</li>
-        <li>Check weather conditions before travel</li>
-        <li>Consider cargo ferry for larger items</li>
+        <li><strong>Arrival:</strong> All ferry passengers arrive at Kilindoni Harbor on Mafia Island.</li>
+        <li><strong>Baggage:</strong> Flights have a strict 15kg limit in soft bags, whereas the ferry allows for more luggage.</li>
+        <li><strong>Marine Park Fees:</strong> Payable upon arrival at the park gate if your accommodation is within the protected area.</li>
       </ul>
-      <h2>What to Expect</h2>
-      <p>The journey typically takes 4-5 hours, depending on the vessel and conditions. Both ferries offer basic amenities and comfortable seating arrangements.</p>
     `,
     category: 'Travel Guide',
-    read_time: '5 min read',
-    excerpt: "Planning your trip to Mafia Island? Here's everything you need to know about ferry services between Mafia Island and Nyamisati.",
-    image_url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
+    read_time: '8 min read',
+    excerpt: "The complete step-by-step guide from Mbagala to Mafia Island via the MV Kilindoni, plus daily flight information.",
+    image_url: 'https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images/guide.png',
     author: 'Mafia Ferry Team',
-  },
+}
 ]
 
 export default function Blog() {

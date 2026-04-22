@@ -9,9 +9,12 @@ export function NewsUpdates() {
   const { articles, isLoading, error } = useArticles()
   // Merge static and dynamic articles, static first
   const allArticles = [
-    ...staticArticles,
-    ...(articles || [])
+    ...staticArticles
   ];
+  // const allArticles = [
+  //   ...staticArticles,
+  //   ...(articles || [])
+  // ];
 
   // Handle errors gracefully
   if (error) {
