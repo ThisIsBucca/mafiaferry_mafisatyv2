@@ -9,7 +9,8 @@ import { Schedule } from "./components/schedule"
 import { NewsUpdates } from "./components/news-updates"
 import { Contact } from "./components/contact"
 import { Footer } from "./components/footer"
-import { ScrollToTop } from "./components/scroll-to-top"
+// import { ScrollToTop } from "./components/scroll-to-top"
+import { WhatsAppFloat } from "./components/whatsAppFloat"
 import { SupportBanner } from "./components/support-banner"
 import { ScrollingBanner } from "./components/ScrollingBanner"
 import { AnalyticsProvider } from './components/AnalyticsProvider'
@@ -54,7 +55,8 @@ export function MainContent() {
         <Contact />
       </main>
       <Footer />
-      <ScrollToTop />
+      <WhatsAppFloat />  
+      {/* <ScrollToTop /> */}
     </>
   )
 }
