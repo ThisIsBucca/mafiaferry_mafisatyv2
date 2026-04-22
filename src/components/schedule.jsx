@@ -24,7 +24,7 @@ export function Schedule() {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 });
 
   const getTargetDate = () => {
-    const now = new Date();
+    const now = new Date();   
     if (selectedDate === "tomorrow") return addDays(now, 1);
     if (selectedDate === "dayAfterTomorrow") return addDays(now, 2);
     return now;
@@ -39,7 +39,10 @@ export function Schedule() {
     },
   });
 
-  const filteredSchedules = schedules?.filter(s => s.date === format(getTargetDate(), "yyyy-MM-dd"));
+  const filteredSchedules = schedules?.filter(s => {
+    const targetDay = format(getTargetDate(), "EEEE");
+    return s.days === targetDay;
+  });
 
   return (
     <section 
@@ -115,6 +118,7 @@ export function Schedule() {
                   transition={{ delay: idx * 0.1 }}
                   className="group relative flex flex-col lg:flex-row items-center gap-6 bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 p-6 rounded-[2rem] transition-all duration-500 backdrop-blur-md"
                 >
+                  {console.log(item)}
                   {/* Vessel & Route Info */}
                   <div className="flex items-center gap-4 min-w-[220px]">
                     <div className="p-4 bg-amber-500/10 rounded-2xl">
@@ -129,6 +133,8 @@ export function Schedule() {
                       </div>
                     </div>
                   </div>
+
+
 
                   {/* Departure & Duration */}
                   <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-6 w-full text-center lg:text-left">
