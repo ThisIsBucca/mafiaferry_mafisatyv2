@@ -71,6 +71,7 @@ export function Hero() {
     },
     {
       id: 3,
+
       category: "Teknolojia",
       title: "Nordix Tech | Suluhisho za Teknolojia za Kisasa",
       description: "Tunatengeza tovuti(website) za utalii, mifumo ya taasisi na watumishi e.g sms-school management system, programu za simu (mobile apps). Suluhisho kamili za dijitali kwa biashara yako.",
@@ -248,159 +249,86 @@ export function Hero() {
           </div>
         </motion.div> */}
 
-        {/* Modern Premium Ad Cards */}
-        <motion.div 
-          className="w-full mt-auto pt-8"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          viewport={{ once: true }}
+       {/* Modern Premium Ad Cards */}
+<motion.div 
+  className="w-full mt-auto pt-12"
+  initial={{ opacity: 0 }}
+  whileInView={{ opacity: 1 }}
+  viewport={{ once: true }}
+>
+  <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 px-4 md:px-0">
+    <div className="space-y-1">
+      <p className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">
+        Matangazo Maarufu
+      </p>
+      <h2 className="text-3xl font-bold text-white tracking-tight">Our Premium Picks</h2>
+    </div>
+    {/* Subtle Progress Bar for Mobile (Optional replacement for dots) */}
+    <div className="hidden md:block h-[2px] w-32 bg-white/10 overflow-hidden">
+      <div className="h-full bg-primary w-1/3 animate-progress-slide" />
+    </div>
+  </div>
+
+  {/* Snap-Scroll Container: Pure CSS Scrolling for Mobile, Grid for Desktop */}
+  <div className="relative w-full">
+    <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-x-auto md:overflow-x-visible pb-8 snap-x snap-mandatory scrollbar-hide px-4 md:px-0">
+      {adCards.map((card) => (
+        <motion.div
+          key={card.id}
+          className="group relative flex-none w-[85%] md:w-auto snap-center bg-white/[0.03] rounded-3xl overflow-hidden border border-white/[0.08] backdrop-blur-md transition-all duration-500 hover:border-primary/50"
+          whileHover={{ y: -10 }}
         >
-          <div className="mb-6">
-            <p className="text-sm font-bold tracking-[0.2em] uppercase text-white/60 mb-2">
-              Matangazo Maarufu
-            </p>
-            <div className="h-1 w-20 bg-gradient-to-r from-primary via-secondary to-accent rounded-full" />
+          {/* Image Area - Clean & No Overlay */}
+          <div className="relative h-64 overflow-hidden">
+            <img
+              src={card.image}
+              alt={card.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+            {/* Category Pill - Minimalist style */}
+            <div className="absolute top-4 left-4">
+              <span className="px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-[10px] font-bold uppercase tracking-widest text-white">
+                {card.category}
+              </span>
+            </div>
           </div>
 
-          {/* Responsive Carousel Container */}
-          <div className="relative w-full">
-            {/* Carousel Wrapper */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[500px]">
-              {adCards.map((card, index) => {
-                // On desktop, always show all cards. On mobile, show based on carousel position
-                const isVisible = isMobile
-                  ? (index === currentAdIndex) 
-                  : true;
-
-                return (
-                  <motion.div
-                    key={card.id}
-                    initial={{ opacity: 0, x: 100 }}
-                    animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: 100 }}
-                    exit={{ opacity: 0, x: -100 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    className={`group relative bg-gradient-to-br from-white/20 via-white/10 to-white/5 rounded-2xl overflow-hidden border border-white/20 backdrop-blur-xl shadow-2xl hover:shadow-2xl transition-all duration-300 h-full ${
-                      isVisible ? "block" : "hidden md:block lg:block"
-                    }`}
-                    whileHover={{ y: -8, scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {/* Image Container */}
-                    <div className="relative h-56 overflow-hidden">
-                      <img
-                        src={card.image}
-                        alt={card.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-120 brightness-75 group-hover:brightness-60"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-transparent" />
-                      <motion.div
-                        className={`absolute top-4 right-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-widest rounded-full bg-gradient-to-r text-${card.theme} backdrop-blur-md border shadow-xl`}
-                        style={{
-                          backgroundImage: `linear-gradient(to right, hsl(var(--${card.theme})) / 0.3, hsl(var(--${card.theme})) / 0.1)`,
-                          borderColor: `hsl(var(--${card.theme}) / 0.4)`,
-                          color: `hsl(var(--${card.theme}))`,
-                        }}
-                        initial={{ opacity: 0, scale: 0.7 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-                      >
-                        <span 
-                          className="w-2 h-2 rounded-full animate-pulse" 
-                          style={{ backgroundColor: `hsl(var(--${card.theme}))` }}
-                        />
-                        {card.category}
-                      </motion.div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-6 space-y-4 flex flex-col flex-grow">
-                      <div className="space-y-2">
-                        <h3 className="text-2xl font-bold text-accent transition-colors duration-300">
-                          {card.title}
-                        </h3>
-                        <p className="text-base text-white/80 leading-relaxed line-clamp-3">
-                          {card.description}
-                        </p>
-                      </div>
-
-                      <a
-                        href={card.link}
-                        target={card.isExternal ? "_blank" : undefined}
-                        rel={card.isExternal ? "noopener noreferrer" : undefined}
-                        className="inline-flex items-center justify-center border-2 border-accent gap-3 px-6 py-3.5 text-base font-bold text-white rounded-xl shadow-lg transition-all duration-300 group/btn mt-auto hover:shadow-lg"
-                        style={{
-                          background: `linear-gradient(to right, hsl(var(--${card.theme})) / 0.9, hsl(var(--${card.theme})) / 0.8, hsl(var(--${card.theme})) / 0.7))`,
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.background = `linear-gradient(to right, hsl(var(--${card.theme})), hsl(var(--${card.theme})) / 0.9), hsl(var(--${card.theme})) / 0.8))`;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.background = `linear-gradient(to right, hsl(var(--${card.theme})) / 0.9, hsl(var(--${card.theme})) / 0.8, hsl(var(--${card.theme})) / 0.7))`;
-                        }}
-                      >
-                        {card.linkText}
-                        <span className="transition-transform duration-300 group-hover/btn:translate-x-2">→</span>
-                      </a>
-                    </div>
-
-                    {/* Decorative blur elements */}
-                    <div 
-                      className="absolute -bottom-12 -right-12 w-24 h-24 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
-                      style={{ backgroundColor: `hsl(var(--${card.theme}) / 0.3)` }}
-                    />
-                    <div 
-                      className="absolute -top-8 -left-8 w-20 h-20 rounded-full blur-2xl opacity-30 group-hover:opacity-60 transition-opacity duration-500" 
-                      style={{ backgroundColor: `hsl(var(--${card.theme}) / 0.2)` }}
-                    />
-                  </motion.div>
-                );
-              })}
+          {/* Content Area */}
+          <div className="p-8 flex flex-col h-full space-y-4">
+            <div className="min-h-[100px]">
+              <h3 className="text-2xl font-semibold text-white group-hover:text-primary transition-colors">
+                {card.title}
+              </h3>
+              <p className="text-sm text-white/50 leading-relaxed line-clamp-2 mt-2">
+                {card.description}
+              </p>
             </div>
 
-            {/* Navigation Arrows - Only visible on mobile */}
-            {isMobile && (
-              <>
-                <motion.button
-                  onClick={prevAdCard}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-20 p-3 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 backdrop-blur-md text-white transition-all duration-300"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </motion.button>
-
-                <motion.button
-                  onClick={nextAdCard}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-20 p-3 rounded-full bg-white/15 hover:bg-white/25 border border-white/20 backdrop-blur-md text-white transition-all duration-300"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </motion.button>
-              </>
-            )}
-
-            {/* Carousel Indicators - Only visible on mobile */}
-            {isMobile && (
-              <div className="flex items-center justify-center gap-3 mt-6">
-                {adCards.map((_, index) => (
-                  <motion.button
-                    key={index}
-                    onClick={() => setCurrentAdIndex(index)}
-                    className={`h-2.5 rounded-full transition-all duration-300 ${
-                      index === currentAdIndex
-                        ? "bg-white w-8"
-                        : "bg-white/40 w-2.5 hover:bg-white/60"
-                    }`}
-                    whileHover={{ scale: 1.2 }}
-                    whileTap={{ scale: 0.9 }}
-                  />
-                ))}
-              </div>
-            )}
+            {/* Dynamic Button - Uses the card theme color for the border/text */}
+            <a
+              href={card.link}
+              target={card.isExternal ? "_blank" : undefined}
+              className="relative inline-flex items-center justify-between px-6 py-4 rounded-2xl bg-white/5 text-white font-bold group/btn overflow-hidden transition-all hover:bg-primary"
+            >
+              <span className="z-10 group-hover/btn:text-black transition-colors">
+                {card.linkText}
+              </span>
+              <span className="z-10 transform transition-transform group-hover/btn:translate-x-1 group-hover/btn:text-black">
+                →
+              </span>
+            </a>
           </div>
+
+          {/* Background Glow Effect */}
+          <div 
+            className="absolute -bottom-12 -right-12 w-32 h-32 rounded-full blur-[80px] opacity-0 group-hover:opacity-40 transition-opacity duration-500"
+            style={{ backgroundColor: `hsl(var(--${card.theme}))` }}
+          />
         </motion.div>
+      ))}
+    </div>
+  </div>
+</motion.div>
         {/* Advertisement Card with Carousel (dynamic) */}
 
         {/* {isLoading ? (
