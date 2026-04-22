@@ -61,7 +61,7 @@ export function Hero() {
     {
       id: 2,
       category: "Usafirishaji",
-      title: "Sharosa Cargo | usafirishaji wa mizigo Mafia - Dar",
+      title: "Sharosa Logistics | usafirishaji wa mizigo Mafia - Dar",
       description: "Usafirishaji wa mizigo salama, haraka na amanini kutoka bara hadi Kisiwa cha Mafia na kurudi kwa bei ya haki.",
       image: "https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images/sharosa.jpg",
       link: "https://wa.me/255776986840",
