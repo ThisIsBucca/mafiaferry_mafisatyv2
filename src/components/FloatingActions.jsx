@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Sparkles, X, Send, Loader2 } from "lucide-react";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { MessageCircle, Sparkles, X, Send, Loader2, Phone } from "lucide-react";
+import { SYSTEM_PROMPT, INITIAL_MESSAGE, BOT_NAME, BOT_TAGLINE } from "../data/systemPrompt";
 
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY ?? "");
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY ?? "";
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent`;
 
 const INITIAL_MESSAGES = [
-  { role: "assistant", content: "Habari! Mimi ni Gemini AI, naweza kukusaidia nini leo? ✨" },
+  { role: "assistant", content: INITIAL_MESSAGE },
 ];
 
 const chatWindowVariants = {
@@ -31,6 +32,33 @@ const dialItemVariants = {
   visible: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: 8 },
 };
+
+// Build Gemini API request body with conversation history
+function buildRequestBody(history, userMessage) {
+  const contents = [
+    // System prompt as first message
+    {
+      role: "user",
+      parts: [{ text: "System Instructions (follow these at all times): " + SYSTEM_PROMPT }],
+    },
+    {
+      role: "model",
+      parts: [{ text: "Sawa kabisa! Mimi ni Kapteni Kilindoni, tayari kusaidia. ⛴️🏝️" }],
+    },
+    // Conversation history
+    ...history.map((msg) => ({
+      role: msg.role === "user" ? "user" : "model",
+      parts: [{ text: msg.content }],
+    })),
+    // New user message
+    {
+      role: "user",
+      parts: [{ text: userMessage }],
+    },
+  ];
+
+  return { contents };
+}
 
 export function FloatingActions() {
   const [dialOpen, setDialOpen] = useState(false);
@@ -76,13 +104,12 @@ export function FloatingActions() {
     const text = input.trim();
     if (!text || isLoading) return;
 
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || apiKey === "your_real_api_key_here") {
+    if (!API_KEY || API_KEY === "your_real_api_key_here") {
       appendMessage("user", text);
       setInput("");
       appendMessage(
         "assistant",
-        "⚠️ API key haijawekwa. Tafadhali weka VITE_GEMINI_API_KEY halisi kwenye faili la .env kisha uanzishe upya seva."
+        "⚠️ Samahani mkuu! Wasiliana na ofisi moja kwa moja: 0755 123 456"
       );
       return;
     }
@@ -92,31 +119,45 @@ export function FloatingActions() {
     setIsLoading(true);
 
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-      const result = await model.generateContent(text);
-      appendMessage("assistant", result.response.text());
-    } catch (err) {
-      const msg = err?.message || "";
-      if (msg.includes("429") || msg.includes("Too Many Requests")) {
-        appendMessage(
-          "assistant",
-          "⏳ Maombi mengi yamefanywa. Tafadhali subiri sekunde chache kisha ujaribu tena."
-        );
-      } else if (msg.includes("403") || msg.includes("API key")) {
-        appendMessage(
-          "assistant",
-          "🔑 API key si sahihi. Tafadhali angalia VITE_GEMINI_API_KEY kwenye faili la .env."
-        );
+      // Build history from past messages (skip the initial greeting)
+      const history = messages.slice(1);
+      const body = buildRequestBody(history, text);
+
+      const res = await fetch(`${API_URL}?key=${API_KEY}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error("Gemini API Error:", res.status, errData);
+        throw new Error(`${res.status} ${errData?.error?.message || res.statusText}`);
+      }
+
+      const data = await res.json();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (reply) {
+        appendMessage("assistant", reply);
       } else {
-        appendMessage(
-          "assistant",
-          "Samahani, kuna tatizo la mtandao. Jaribu tena baadaye."
-        );
+        console.error("Gemini unexpected response:", data);
+        appendMessage("assistant", "Samahani mkuu, sikusikia vizuri. Uliza tena? ⛴️");
+      }
+    } catch (err) {
+      console.error("Gemini Error:", err);
+      const msg = String(err?.message || "");
+      if (msg.includes("429") || msg.includes("RESOURCE_EXHAUSTED")) {
+        appendMessage("assistant", "⏳ Pole mkuu, subiri sekunde chache ujibu tena. 🙏");
+      } else if (msg.includes("SAFETY") || msg.includes("blocked")) {
+        appendMessage("assistant", "Samahani mkuu, siwezi kujibu swali hilo. Uliza kingine? ⛴️");
+      } else {
+        appendMessage("assistant", "Samahani mkuu, kuna tatizo la mtandao. Jaribu tena. ⛴️");
       }
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading]);
+  }, [input, isLoading, messages]);
 
   const isActive = dialOpen || chatOpen;
 
@@ -132,7 +173,7 @@ export function FloatingActions() {
             exit="exit"
             className="mb-2 flex w-[360px] flex-col overflow-hidden"
             style={{
-              height: 500,
+              height: 520,
               borderRadius: "var(--radius)",
               background: "var(--glass)",
               backdropFilter: "var(--glass-blur)",
@@ -150,21 +191,19 @@ export function FloatingActions() {
             >
               <div className="flex items-center gap-2.5">
                 <div
-                  className="flex h-8 w-8 items-center justify-center rounded-full"
-                  style={{
-                    background: "var(--gradient-accent)",
-                  }}
+                  className="flex h-9 w-9 items-center justify-center rounded-full"
+                  style={{ background: "var(--gradient-accent)" }}
                 >
-                  <Sparkles size={14} className="text-white" />
+                  <Sparkles size={16} className="text-white" />
                 </div>
                 <div>
                   <span className="text-sm font-semibold text-foreground">
-                    Gemini AI
+                    {BOT_NAME}
                   </span>
                   <div className="flex items-center gap-1.5">
                     <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400 pulse-dot" />
                     <span className="text-[10px] text-muted-foreground">
-                      Online
+                      {BOT_TAGLINE}
                     </span>
                   </div>
                 </div>
@@ -250,7 +289,7 @@ export function FloatingActions() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Uliza chochote..."
+                placeholder="Habari mkuu, nikusaidie nini..."
                 className="flex-1 rounded-full px-4 py-2.5 text-sm text-foreground outline-none transition-all"
                 style={{
                   background: "hsl(var(--secondary))",
@@ -304,7 +343,7 @@ export function FloatingActions() {
                   boxShadow: "0 2px 8px hsl(var(--border) / 0.15)",
                 }}
               >
-                AI Assistant
+                {BOT_NAME} ⛴️
               </span>
               <button
                 onClick={openChat}
@@ -340,12 +379,12 @@ export function FloatingActions() {
               </span>
               <button
                 onClick={() =>
-                  window.open("https://wa.me/255776986840", "_blank")
+                  window.open("https://wa.me/255776986840?text=Habari%20Kapteni!%20Nataka%20msaada", "_blank")
                 }
                 className="flex h-12 w-12 items-center justify-center rounded-full border-none bg-[#25D366] text-white shadow-md transition-transform hover:scale-110 hover:bg-[#1ebe5d]"
                 style={{ minHeight: "unset", minWidth: "unset", boxShadow: "0 4px 16px rgba(37,211,102,0.3)" }}
               >
-                <MessageCircle size={20} className="fill-white" />
+                <Phone size={20} />
               </button>
             </motion.div>
           </motion.div>
