@@ -10,7 +10,7 @@ import { NewsUpdates } from "./components/news-updates"
 import { Contact } from "./components/contact"
 import { Footer } from "./components/footer"
 // import { ScrollToTop } from "./components/scroll-to-top"
-import { WhatsAppFloat } from "./components/whatsAppFloat"
+import { FloatingActions } from "./components/FloatingActions"
 import { SupportBanner } from "./components/support-banner"
 import { ScrollingBanner } from "./components/ScrollingBanner"
 import { AnalyticsProvider } from './components/AnalyticsProvider'
@@ -55,7 +55,7 @@ export function MainContent() {
         <Contact />
       </main>
       <Footer />
-      <WhatsAppFloat />  
+      <FloatingActions />  
       {/* <ScrollToTop /> */}
     </>
   )
