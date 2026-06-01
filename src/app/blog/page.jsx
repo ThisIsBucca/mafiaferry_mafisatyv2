@@ -160,7 +160,7 @@ export default function BlogListing() {
             </div>
             <div
               ref={scrollRef}
-              className="flex gap-2 sm:gap-3 flex-wrap"
+              className="flex gap-2 sm:gap-3 flex-wrap w-full py-2 px-1 sm:px-0"
             >
               <button
                 onClick={() => setActiveCategory(null)}
