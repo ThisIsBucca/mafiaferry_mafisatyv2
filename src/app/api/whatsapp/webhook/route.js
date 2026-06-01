@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '../../../../lib/supabaseAdmin'
+import { getSupabaseAdmin } from '../../../../lib/supabaseAdmin'
 import { parseScheduleMessages } from '../../../../lib/parseScheduleMessage'
 import { parseWithAI } from '../../../../lib/parseWithAI'
 import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendImageMessage, sendTypingIndicator } from '../../../../lib/whatsappService'
@@ -76,6 +76,11 @@ They'll be happy to help you! 😊`)
       for (const parsed of parsedSchedules) {
         console.log('✅ Parsed schedule:', JSON.stringify(parsed, null, 2))
 
+        const supabaseAdmin = getSupabaseAdmin()
+        if (!supabaseAdmin) {
+          console.error('❌ Supabase admin not initialized')
+          continue
+        }
         const { data: existing } = await supabaseAdmin
           .from('schedules')
           .select('id')
