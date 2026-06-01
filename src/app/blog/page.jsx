@@ -153,16 +153,14 @@ export default function BlogListing() {
           </div>
 
           {/* Categories */}
-          <div className="mt-10"
-          >
-            <div className="flex items-center gap-2 mb-4">
+          <div className="mt-6 sm:mt-10">
+            <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <Tag className="w-4 h-4 text-muted-foreground/50" />
               <span className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-wider">{t("blog.categories")}</span>
             </div>
             <div
               ref={scrollRef}
-              className="flex gap-2 overflow-x-auto pb-2 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="flex gap-2 sm:gap-3 flex-wrap"
             >
               <button
                 onClick={() => setActiveCategory(null)}
