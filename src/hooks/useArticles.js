@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase, publicSupabase } from '../lib/supabase'
+import { getSupabase, getPublicSupabase } from '../lib/supabase'
 
 export function useArticles() {
   const queryClient = useQueryClient()
@@ -7,7 +7,7 @@ export function useArticles() {
   const articlesQuery = useQuery({
     queryKey: ['articles'],
     queryFn: async () => {
-      const { data, error } = await publicSupabase
+      const { data, error } = await getPublicSupabase()
         .from('articles')
         .select('*')
         .order('created_at', { ascending: false })
@@ -26,7 +26,7 @@ export function useArticles() {
       console.log('New article data:', newArticle)
       
       // Check authentication
-      const { data: { session }, error: authError } = await supabase.auth.getSession()
+      const { data: { session }, error: authError } = await getSupabase().auth.getSession()
       if (authError) throw authError
       if (!session) throw new Error('No active session')
 
@@ -63,7 +63,7 @@ export function useArticles() {
 
       console.log('Article data to insert:', articleData)
 
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from('articles')
         .insert(articleData)
         .select()
@@ -89,12 +89,12 @@ export function useArticles() {
       console.log('Updates:', updates)
       
       // Check authentication
-      const { data: { session }, error: authError } = await supabase.auth.getSession()
+      const { data: { session }, error: authError } = await getSupabase().auth.getSession()
       if (authError) throw authError
       if (!session) throw new Error('No active session')
 
       // Get current article to preserve slug if not being updated
-      const { data: currentArticle, error: fetchError } = await supabase
+      const { data: currentArticle, error: fetchError } = await getSupabase()
         .from('articles')
         .select('*')
         .eq('id', id)
@@ -117,7 +117,7 @@ export function useArticles() {
 
       console.log('Article data to update:', articleData)
 
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from('articles')
         .update(articleData)
         .eq('id', id)

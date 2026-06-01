@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 import { trackPageView, trackEvent, trackSession } from '../lib/analytics'
 
 export function AnalyticsProvider({ children }) {
@@ -16,7 +16,7 @@ export function AnalyticsProvider({ children }) {
     // Track session
     const trackUserSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
+        const { data: { session } } = await getSupabase().auth.getSession()
         if (session) {
           trackSession(session.user.id)
         }

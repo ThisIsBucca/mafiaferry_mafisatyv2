@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase } from '../lib/supabase'
+import { getSupabase } from '../lib/supabase'
 
 export function useSchedules() {
   const queryClient = useQueryClient()
@@ -7,7 +7,7 @@ export function useSchedules() {
   const schedulesQuery = useQuery({
     queryKey: ['schedules'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from('schedules')
         .select('*')
         .order('created_at', { ascending: false })
@@ -19,7 +19,7 @@ export function useSchedules() {
 
   const createSchedule = useMutation({
     mutationFn: async (newSchedule) => {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from('schedules')
         .insert(newSchedule)
         .select()

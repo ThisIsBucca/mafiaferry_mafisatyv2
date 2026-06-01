@@ -1,55 +1,77 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error('Missing Supabase environment variables')
-  throw new Error('Missing Supabase environment variables')
-}
-
-// Common options for all requests
-const commonOptions = {
-  global: {
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation',
-      'apikey': supabaseKey
+function getCommonOptions(key) {
+  return {
+    global: {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+        'apikey': key || ''
+      }
     }
   }
 }
 
-// Create a single instance of the Supabase client for authenticated operations
-export const supabase = createClient(supabaseUrl, supabaseKey, {
-  ...commonOptions,
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    storageKey: 'supabase.auth.token'
-  }
-})
+let supabaseInstance = null
+let publicSupabaseInstance = null
 
-// Set up auth state change listener
-supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_OUT') {
-    // Clear any cached data when user signs out
-    console.log('User signed out, clearing cached data')
-  } else if (event === 'TOKEN_REFRESHED') {
-    console.log('Auth token refreshed')
-  }
-})
+function getSupabaseUrl() {
+  return process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+}
 
-// Create a read-only client for public data
-export const publicSupabase = createClient(
-  supabaseUrl,
-  supabaseKey,
-  {
-    ...commonOptions,
+function getSupabaseKey() {
+  return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+}
+
+export function getSupabase() {
+  if (supabaseInstance) return supabaseInstance
+
+  const url = getSupabaseUrl()
+  const key = getSupabaseKey()
+
+  if (!url || !key) {
+    console.warn('Supabase env vars not set — creating dummy client')
+  }
+
+  supabaseInstance = createClient(url, key, {
+    ...getCommonOptions(key),
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: 'supabase.auth.token'
+    }
+  })
+
+  supabaseInstance.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT') {
+      console.log('User signed out, clearing cached data')
+    } else if (event === 'TOKEN_REFRESHED') {
+      console.log('Auth token refreshed')
+    }
+  })
+
+  return supabaseInstance
+}
+
+export function getPublicSupabase() {
+  if (publicSupabaseInstance) return publicSupabaseInstance
+
+  const url = getSupabaseUrl()
+  const key = getSupabaseKey()
+
+  if (!url || !key) {
+    console.warn('Supabase env vars not set — creating dummy client')
+  }
+
+  publicSupabaseInstance = createClient(url, key, {
+    ...getCommonOptions(key),
     auth: {
       persistSession: false,
       autoRefreshToken: false
     }
-  }
-)
+  })
+
+  return publicSupabaseInstance
+}
