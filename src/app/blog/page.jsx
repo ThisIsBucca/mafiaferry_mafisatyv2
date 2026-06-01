@@ -287,7 +287,6 @@ export default function BlogListing() {
               </div>
             )}
           </div>
-        </div>
       </section>
     </PublicLayout>
   )

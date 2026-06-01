@@ -1,7 +1,5 @@
 'use client'
 
-'use client'
-
 import Image from "next/image"
 import { Calendar, Clock, ArrowLeft } from "lucide-react"
 import Link from "next/link"

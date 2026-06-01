@@ -261,7 +261,7 @@ export default function BlogPost({ params }) {
                   <ShareButton />
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Related articles */}
             {related.length > 0 && (
@@ -281,7 +281,7 @@ export default function BlogPost({ params }) {
                     <RelatedCard key={rel.id} article={rel} />
                   ))}
                 </div>
-              </motion.div>
+              </div>
             )}
           </div>
         </div>
