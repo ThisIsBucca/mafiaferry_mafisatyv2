@@ -75,3 +75,30 @@ export function getPublicSupabase() {
 
   return publicSupabaseInstance
 }
+
+function createLazyProxy(getInstance) {
+  return new Proxy({}, {
+    get(_, prop) {
+      return getInstance()[prop]
+    },
+    set(_, prop, value) {
+      getInstance()[prop] = value
+      return true
+    },
+    apply(_, _this, args) {
+      return getInstance()(...args)
+    },
+    has(_, prop) {
+      return prop in getInstance()
+    },
+    ownKeys() {
+      return Reflect.ownKeys(getInstance())
+    },
+    getOwnPropertyDescriptor(_, prop) {
+      return Object.getOwnPropertyDescriptor(getInstance(), prop)
+    }
+  })
+}
+
+export const supabase = createLazyProxy(getSupabase)
+export const publicSupabase = createLazyProxy(getPublicSupabase)
