@@ -24,6 +24,21 @@ function getSupabaseKey() {
   return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 }
 
+function createStubClient() {
+  const stub = () => Promise.resolve({ data: [], error: null })
+  return new Proxy(stub, {
+    get(_, prop) {
+      if (prop === 'then' || prop === Symbol.toPrimitive || prop === 'toJSON') return
+      if (prop === 'auth') return createStubClient()
+      if (prop === 'storage') return createStubClient()
+      return createStubClient()
+    },
+    apply() {
+      return createStubClient()
+    }
+  })
+}
+
 export function getSupabase() {
   if (supabaseInstance) return supabaseInstance
 
@@ -31,7 +46,8 @@ export function getSupabase() {
   const key = getSupabaseKey()
 
   if (!url || !key) {
-    console.warn('Supabase env vars not set — creating dummy client')
+    console.warn('Supabase env vars not set — returning stub')
+    return createStubClient()
   }
 
   supabaseInstance = createClient(url, key, {
@@ -62,7 +78,8 @@ export function getPublicSupabase() {
   const key = getSupabaseKey()
 
   if (!url || !key) {
-    console.warn('Supabase env vars not set — creating dummy client')
+    console.warn('Supabase env vars not set — returning stub')
+    return createStubClient()
   }
 
   publicSupabaseInstance = createClient(url, key, {
