@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, AnimatePresence } from "framer-motion"
+import Image from "next/image"
 import Link from "next/link"
 import { Search, Rss, Home, Calendar, Sparkles, TrendingUp, Tag, ArrowRight, Clock, BookOpen, ChevronRight } from "lucide-react"
 import { useState, useRef, useMemo } from 'react'
@@ -12,15 +12,10 @@ import { PublicLayout } from '../../components/PublicLayout'
 
 const categories = ['Travel Guide', 'Wildlife', 'Marine Park', 'Travel Tips', 'Destination Guide', 'Ferry Guide']
 
-function ArticleGridCard({ article, index }) {
+function ArticleGridCard({ article }) {
   const { t, locale } = useI18n()
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.45, delay: Math.min(index * 0.06, 0.35) }}
-    >
+    <div>
       <Link href={`/blog/${article.slug}`} className="group block h-full">
         <div className="relative h-full rounded-3xl overflow-hidden bg-card border border-border/10 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1.5">
           {/* Gradient border glow */}
@@ -28,10 +23,12 @@ function ArticleGridCard({ article, index }) {
           
           {/* Image */}
           <div className="relative aspect-[16/10] overflow-hidden">
-            <img
+            <Image
               src={article.image_url}
               alt={article.title}
-              className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
+              fill
+              className="object-cover transition-all duration-700 group-hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent" />
             
@@ -82,7 +79,7 @@ function ArticleGridCard({ article, index }) {
           </div>
         </div>
       </Link>
-    </motion.div>
+    </div>
   )
 }
 
@@ -119,11 +116,7 @@ export default function BlogListing() {
         <div className="absolute inset-0 bg-grid-primary/3 [mask-image:radial-gradient(ellipse_at_center,transparent_30%,black)]" />
         
         <div className="container relative px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <div>
             {/* Breadcrumb */}
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
               <Link href="/" className="hover:text-primary transition-colors">{t("blog.home")}</Link>
@@ -157,14 +150,10 @@ export default function BlogListing() {
                 />
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Categories */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className="mt-10"
+          <div className="mt-10"
           >
             <div className="flex items-center gap-2 mb-4">
               <Tag className="w-4 h-4 text-muted-foreground/50" />
@@ -200,46 +189,39 @@ export default function BlogListing() {
                 </button>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Articles Grid */}
       <section className="pb-20">
         <div className="container px-4 sm:px-6 lg:px-8">
-          <AnimatePresence mode="wait">
-            {filteredArticles?.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center py-24"
+          {filteredArticles?.length === 0 ? (
+            <div className="text-center py-24"
               >
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
                   <Search className="w-7 h-7 text-primary" />
                 </div>
                 <h3 className="text-lg font-bold text-foreground mb-2">{t("news.no_articles")}</h3>
                 <p className="text-muted-foreground/70 text-sm max-w-sm mx-auto">{t("news.no_articles_desc")}</p>
-              </motion.div>
+              </div>
             ) : (
               <div className="space-y-12">
                 {/* Featured Article */}
                 {featured && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 24 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
+                  <div>
                     <Link href={`/blog/${featured.slug}`} className="group block">
                       <div className="relative rounded-3xl overflow-hidden bg-card border border-border/10 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
                         <div className="absolute -inset-[1px] bg-gradient-to-br from-primary/30 via-accent/20 to-primary/30 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700 -z-10" />
                         <div className="grid sm:grid-cols-2">
                           {/* Image */}
                           <div className="relative overflow-hidden min-h-[260px] sm:min-h-full">
-                            <img
+                            <Image
                               src={featured.image_url}
                               alt={featured.title}
-                              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              fill
+                              className="object-cover transition-transform duration-700 group-hover:scale-105"
+                              sizes="(max-width: 640px) 100vw, 50vw"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent sm:bg-gradient-to-r sm:from-background/90 sm:via-background/10 sm:to-transparent" />
                             
@@ -293,18 +275,18 @@ export default function BlogListing() {
                         </div>
                       </div>
                     </Link>
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Article Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                  {rest.map((article, i) => (
-                    <ArticleGridCard key={article.id} article={article} index={i} />
+                  {rest.map((article) => (
+                    <ArticleGridCard key={article.id} article={article} />
                   ))}
                 </div>
               </div>
             )}
-          </AnimatePresence>
+          </div>
         </div>
       </section>
     </PublicLayout>

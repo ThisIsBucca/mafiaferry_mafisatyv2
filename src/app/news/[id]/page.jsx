@@ -2,8 +2,7 @@
 
 'use client'
 
-import { motion } from "framer-motion"
-import { useInView } from "react-intersection-observer"
+import Image from "next/image"
 import { Calendar, Clock, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
@@ -14,7 +13,6 @@ import { useI18n } from "../../../lib/i18n"
 export default function ArticlePage({ params }) {
   const { t } = useI18n()
   const { id } = params
-  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
 
   const { data: article, isLoading, isError } = useQuery({
     queryKey: ['article', id],
@@ -60,15 +58,10 @@ export default function ArticlePage({ params }) {
             {t("blog.back")}
           </Link>
 
-          <motion.div
-            ref={ref}
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
-          >
+          <div>
             {article.image_url && (
               <div className="relative aspect-video rounded-xl overflow-hidden mb-8">
-                <img src={article.image_url} alt={article.title} className="object-cover w-full h-full" />
+                <Image src={article.image_url} alt={article.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
               </div>
             )}
 
@@ -91,7 +84,7 @@ export default function ArticlePage({ params }) {
                 </p>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </article>

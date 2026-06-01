@@ -3,7 +3,6 @@
 import { useArticles } from "../hooks/useArticles"
 import { Newspaper, AlertCircle, Sparkles } from "lucide-react"
 import Link from "next/link"
-import { motion } from "framer-motion"
 import { staticArticles } from '../data/staticArticles';
 import { ArticleCard } from './ArticleCard';
 import { useI18n } from "../lib/i18n";
@@ -99,12 +98,7 @@ export function NewsUpdates() {
       <div className="absolute inset-0 bg-grid-primary/5 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
       <div className="container relative">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12 sm:mb-16"
+        <div className="text-center mb-12 sm:mb-16"
         >
           {/* <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-primary mb-6">
             <Sparkles className="w-4 h-4" />
@@ -116,43 +110,27 @@ export function NewsUpdates() {
           <p className="text-muted-foreground/80 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed">
             {t("news.subtitle")}
           </p>
-        </motion.div>
+        </div>
 
         {/* Featured article */}
         {featured && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="mb-8 lg:mb-12"
+          <div className="mb-8 lg:mb-12"
           >
             <ArticleCard article={featured} featured />
-          </motion.div>
+          </div>
         )}
 
         {/* Bento grid for rest */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {rest.map((article, i) => (
-            <motion.div
-              key={article.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.4, delay: 0.05 * i }}
-            >
+          {rest.map((article) => (
+            <div key={article.id}>
               <ArticleCard article={article} />
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* View all link */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          className="text-center mt-12"
+        <div className="text-center mt-12"
         >
           <Link
             href="/blog"
@@ -163,7 +141,7 @@ export function NewsUpdates() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

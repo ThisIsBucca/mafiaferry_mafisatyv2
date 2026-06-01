@@ -1,5 +1,6 @@
 'use client'
 
+import Image from "next/image"
 import Link from "next/link"
 import { Calendar, Clock, ArrowRight } from "lucide-react"
 import { useI18n } from "../lib/i18n"
@@ -17,10 +18,12 @@ export function ArticleCard({ article, featured }) {
 
         {/* Image */}
         <div className={`relative overflow-hidden ${featured ? 'lg:w-1/2 lg:min-h-full' : 'aspect-[16/10]'} ${!featured && 'shrink-0'}`}>
-          <img
+          <Image
             src={article.image_url}
             alt={article.title}
-            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
+            fill
+            className="object-cover transition-all duration-700 group-hover:scale-105"
+            sizes={featured ? "(max-width: 1024px) 100vw, 50vw" : "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent" />
 

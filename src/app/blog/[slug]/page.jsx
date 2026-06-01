@@ -7,7 +7,7 @@ import { useI18n } from '../../../lib/i18n'
 import { staticArticles } from '../../../data/staticArticles'
 import { getLocalizedArticle, getLocalizedArticles } from '../../../lib/localizeArticle'
 import { useEffect, useState, useRef, useMemo } from 'react'
-import { motion } from "framer-motion"
+import Image from "next/image"
 import { PublicLayout } from '../../../components/PublicLayout'
 
 function ReadingProgress() {
@@ -94,10 +94,12 @@ function RelatedCard({ article }) {
     <Link href={`/blog/${article.slug}`} className="group block">
       <div className="rounded-2xl overflow-hidden border border-border/10 shadow-sm transition-all duration-400 hover:shadow-lg hover:-translate-y-1 bg-card">
         <div className="aspect-[16/9] relative overflow-hidden">
-          <img
+          <Image
             src={article.image_url}
             alt={article.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/10 to-transparent" />
           <div className="absolute bottom-3 left-3">
@@ -181,12 +183,7 @@ export default function BlogPost({ params }) {
       <article className="py-8 sm:py-12">
         <div className="container px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              ref={contentRef}
-            >
+            <div ref={contentRef}>
               {/* Header */}
               <header className="mb-8 sm:mb-10">
                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-5">
@@ -231,19 +228,16 @@ export default function BlogPost({ params }) {
 
               {/* Featured image */}
               {article.image_url && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, delay: 0.15 }}
-                  className="relative rounded-3xl overflow-hidden mb-10 shadow-lg"
-                >
-                  <img
+                <div className="relative rounded-3xl overflow-hidden mb-10 shadow-lg h-[260px] sm:h-[380px] lg:h-[460px]">
+                  <Image
                     src={article.image_url}
                     alt={article.title}
-                    className="w-full h-[260px] sm:h-[380px] lg:h-[460px] object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 768px"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-transparent" />
-                </motion.div>
+                </div>
               )}
 
               {/* Content */}
@@ -271,12 +265,7 @@ export default function BlogPost({ params }) {
 
             {/* Related articles */}
             {related.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="mt-16 sm:mt-20"
+            <div className="mt-16 sm:mt-20"
               >
                 <div className="flex items-center justify-between mb-8">
                   <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
