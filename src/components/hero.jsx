@@ -1,3 +1,5 @@
+'use client'
+
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { Calendar, Clock, MapPin, Ship, ChevronLeft, ChevronRight } from "lucide-react";
@@ -5,8 +7,10 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import AdCarouselCard from "./AdCarouselCard";
 import { supabase } from "../lib/supabase";
+import { useI18n } from "../lib/i18n";
 
 export function Hero() {
+  const { t } = useI18n()
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -18,15 +22,15 @@ export function Hero() {
   const images = [
     {
       url: "https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//ferrydaw.jpg",
-      caption: "Pwani ya Utende",
+      caption: t("hero.caption_coast"),
     },
     {
       url: "https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//openart-image_qq2r6JCc_1743214522482_raw.jpg",
-      caption: "Mto wa Rufiji",
+      caption: t("hero.caption_river"),
     },
     {
       url: "https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images//image%20(6).jpg",
-      caption: "Meli ya Kisasa",
+      caption: t("hero.caption_ferry"),
     },
   ];
 
@@ -49,42 +53,66 @@ export function Hero() {
   const adCards = [
     {
       id: 1,
-      category: "Utalii",
-      title: "Tembelea Kisiwa cha Mafia na Uzuri wa Asili",
-      description: "Karibu na uzuri wa bahari, matumbawe ya asili, na utamaduni wa enzi za kale. Tunakualika kutembelea kisiwa kilovu cha ajabu.",
+      category: t("hero.ad_category_tourism"),
+      title: t("hero.ad1_title"),
+      description: t("hero.ad1_desc"),
       image: "https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images/utalii1.jpg",
       link: "https://www.mafiaislandauthentic.com/tours",
-      linkText: "Tembelea Sasa",
+      linkText: t("hero.ad1_link"),
       theme: "primary",
       isExternal: true,
     },
+         {
+      id: 5,
+      category: t("hero.ad_category_eco_tourism"),
+      title: t("hero.ad5_title"),
+      description: t("hero.ad5_desc"),
+      image: "/mafiaecotourism.png",
+      link: "https://www.mafiaislandecotourism.com/",
+      linkText: t("hero.ad5_link"),
+      theme: "accent",
+      isExternal: true,
+    },
+    //   {
+    //   id: 4,
+    //   category: t("hero.ad_category_food"),
+    //   title: t("hero.ad4_title"),
+    //   description: t("hero.ad4_desc"),
+    //   image: "/kaizen_productx.jpeg",
+    //   link: "https://wa.me/255776986840",
+    //   linkText: t("hero.ad4_link"),
+    //   theme: "primary",
+    //   isExternal: true,
+    // },
+  
     {
       id: 2,
-      category: "Usafirishaji",
-      title: "Sharosa Logistics | usafirishaji wa mizigo Mafia - Dar",
-      description: "Usafirishaji wa mizigo salama, haraka na amanini kutoka bara hadi Kisiwa cha Mafia na kurudi kwa bei ya haki.",
+      category: t("hero.ad_category_logistics"),
+      title: t("hero.ad2_title"),
+      description: t("hero.ad2_desc"),
       image: "https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images/sharosa.jpg",
       link: "https://wa.me/255776986840",
-      linkText: "Wasiliana Nasi",
+      linkText: t("hero.ad2_link"),
       theme: "primary",
-      isExternal: true,
-    },
-    {
-      id: 3,
-
-      category: "Teknolojia",
-      title: "Nordix Tech | Suluhisho za Teknolojia za Kisasa",
-      description: "Tunatengeza tovuti(website) za utalii, mifumo ya taasisi na watumishi e.g sms-school management system, programu za simu (mobile apps). Suluhisho kamili za dijitali kwa biashara yako.",
-      image: "https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images/nordixLogo.jpg",
-      link: "https://wa.me/255776986840",
-      linkText: "Jenga Suluhisho",
-      theme: "accent",
       isExternal: true,
     },
   ];
 
+  //  {
+  //     id: 3,
+
+  //     category: t("hero.ad_category_technology"),
+  //     title: t("hero.ad3_title"),
+  //     description: t("hero.ad3_desc"),
+  //     image: "https://rmqggozcsfdvemvulmoy.supabase.co/storage/v1/object/public/images/nordixLogo.jpg",
+  //     link: "https://wa.me/255776986840",
+  //     linkText: t("hero.ad3_link"),
+  //     theme: "accent",
+  //     isExternal: true,
+  //   },
+
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(false);
 
    // Auto-advance ad carousel (only on mobile)
   useEffect(() => {
@@ -98,6 +126,7 @@ export function Hero() {
 
   // Handle window resize
   useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
@@ -259,9 +288,9 @@ export function Hero() {
   <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 px-4 md:px-0">
     <div className="space-y-1">
       <p className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">
-        Matangazo Maarufu
+        {t("hero.ads_title")}
       </p>
-      <h2 className="text-3xl font-bold text-white tracking-tight">Our Premium Picks</h2>
+      <h2 className="text-3xl font-bold text-white tracking-tight">{t("hero.premium_picks")}</h2>
     </div>
     {/* Subtle Progress Bar for Mobile (Optional replacement for dots) */}
     <div className="hidden md:block h-[2px] w-32 bg-white/10 overflow-hidden">

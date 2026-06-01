@@ -1,7 +1,11 @@
-import { Link } from "react-router-dom"
+'use client'
+
+import Link from "next/link"
 import { Facebook, Twitter, Instagram, Coffee, ExternalLink, Briefcase, Phone, Mail, MapPin } from "lucide-react"
+import { useI18n } from "../lib/i18n"
 
 export function Footer() {
+  const { t } = useI18n()
   return (
     <footer className="relative bg-gradient-to-b from-background to-primary/5 pt-16 pb-8 overflow-hidden">
       {/* Decorative elements */}
@@ -14,13 +18,14 @@ export function Footer() {
           {/* About Section */}
           <div className="space-y-6">
             <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-              About Us
+              {t("footer.about")}
             </h3>
             <p className="text-sm text-muted-foreground/80 leading-relaxed">
-              We provide reliable ferry services between Mafia Island and the mainland, ensuring safe and comfortable journeys for all our passengers.
+              {t("footer.about_desc")}
             </p>
             {/* Support Buttons */}
             <div className="flex flex-col gap-3 pt-4">
+              {/*
               <a
                 href="https://www.buymeacoffee.com/buccadev"
                 target="_blank"
@@ -31,6 +36,8 @@ export function Footer() {
                 <span className="font-medium">Buy me a coffee</span>
                 <ExternalLink className="h-4 w-4 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300" />
               </a>
+              */}
+              {/*
               <a
                 href="https://buccaportfolio.vercel.app"
                 target="_blank"
@@ -38,40 +45,59 @@ export function Footer() {
                 className="group inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-xl hover:bg-primary/20 transition-all duration-300"
               >
                 <Briefcase className="h-5 w-5" />
-                <span className="font-medium">View Portfolio</span>
+                <span className="font-medium">{t("footer.view_portfolio")}</span>
                 <ExternalLink className="h-4 w-4 opacity-0 -translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300" />
               </a>
+              */}
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-6">
             <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-              Quick Links
+              {t("footer.quick_links")}
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/schedule" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/#schedule" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                   <span className="h-1 w-1 rounded-full bg-primary/50 group-hover:w-2 transition-all duration-300"></span>
-                  Schedule
+                  {t("footer.schedule")}
                 </Link>
               </li>
               <li>
-                <Link to="/book" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/blog/how-to-get-to-mafia-island" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                   <span className="h-1 w-1 rounded-full bg-primary/50 group-hover:w-2 transition-all duration-300"></span>
-                  Book Now
+                  {t("guide.title")}
                 </Link>
               </li>
               <li>
-                <Link to="/faq" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/faq" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                   <span className="h-1 w-1 rounded-full bg-primary/50 group-hover:w-2 transition-all duration-300"></span>
-                  FAQ
+                  {t("footer.faq")}
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/whale-shark-tours" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                   <span className="h-1 w-1 rounded-full bg-primary/50 group-hover:w-2 transition-all duration-300"></span>
-                  Contact Us
+                  {t("whaleshark.title")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/mafia-island-marine-park" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <span className="h-1 w-1 rounded-full bg-primary/50 group-hover:w-2 transition-all duration-300"></span>
+                  {t("marine.title")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/nyamisati-ferry" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <span className="h-1 w-1 rounded-full bg-primary/50 group-hover:w-2 transition-all duration-300"></span>
+                  {t("nyamisati.title")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/#contact" className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <span className="h-1 w-1 rounded-full bg-primary/50 group-hover:w-2 transition-all duration-300"></span>
+                  {t("footer.contact_us")}
                 </Link>
               </li>
             </ul>
@@ -80,7 +106,7 @@ export function Footer() {
           {/* Contact Info */}
           <div className="space-y-6">
             <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-              Contact Info
+              {t("footer.contact_info")}
             </h3>
             <ul className="space-y-4">
               <li className="group flex items-start gap-3 text-sm text-muted-foreground">
@@ -105,7 +131,7 @@ export function Footer() {
           {/* Social Links */}
           <div className="space-y-6">
             <h3 className="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/50">
-              Follow Us
+              {t("footer.follow_us")}
             </h3>
             <div className="flex gap-4">
               <a
@@ -134,10 +160,10 @@ export function Footer() {
         <div className="mt-16 pt-8 border-t border-border/20">
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Mafia Ferry Service. All rights reserved.
+              © {new Date().getFullYear()} Mafia Ferry Service. {t("footer.rights")}
             </p>
             <p className="text-xs text-muted-foreground/60 mt-2">
-              Designed & Developed by{" "}
+              {t("footer.designed_by")}{" "}
               <a
                href="https://thisisbucca.github.io/"
                 target="_blank"

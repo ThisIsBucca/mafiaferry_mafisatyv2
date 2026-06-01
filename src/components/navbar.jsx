@@ -1,15 +1,19 @@
+'use client'
+
 import { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { Menu, X, Sun, Moon, Anchor, Ship, Phone, MessageSquare } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Menu, X, Sun, Moon, Anchor, Ship, Phone, MessageSquare, Languages } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import mafiaFerryIcon from '../../public/favicon-32x32.png';
+import { useI18n } from "../lib/i18n"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isDark, setIsDark] = useState(true)
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState("/")
-  const location = useLocation()
+  const pathname = usePathname()
+  const { t, locale, setLocale } = useI18n()
 
   // Theme and scroll handling
   useEffect(() => {
@@ -68,11 +72,12 @@ export function Navbar() {
     document.documentElement.classList.toggle("dark")
   }
   const navItems = [
-    { href: "/", label: "Home", icon: <Anchor className="w-4 h-4" /> },
-    { href: "/#schedule", label: "Schedule", icon: <Ship className="w-4 h-4" /> },
-    { href: "/#news", label: "News", icon: <MessageSquare className="w-4 h-4" /> },
-    { href: "/#contact", label: "Contact", icon: <Phone className="w-4 h-4" /> },
-    { href: "/blog", label: "Blog", icon: <MessageSquare className="w-4 h-4" /> }, // Added Blog button
+    { href: "/", label: t("nav.home"), icon: <Anchor className="w-4 h-4" /> },
+    { href: "/#schedule", label: t("nav.schedule"), icon: <Ship className="w-4 h-4" /> },
+    { href: "/blog/how-to-get-to-mafia-island", label: t("nav.guide"), icon: <Ship className="w-4 h-4" /> },
+    { href: "/#news", label: t("nav.news"), icon: <MessageSquare className="w-4 h-4" /> },
+    { href: "/#contact", label: t("nav.contact"), icon: <Phone className="w-4 h-4" /> },
+    { href: "/blog", label: t("nav.blog"), icon: <MessageSquare className="w-4 h-4" /> },
   ]
   const scrollToSection = (elementId) => {
     const element = document.getElementById(elementId)
@@ -107,17 +112,21 @@ export function Navbar() {
   }
 
   const isActive = (path) => {
+    // Guide page
+    if (path === "/blog/how-to-get-to-mafia-island") {
+      return pathname === "/blog/how-to-get-to-mafia-island";
+    }
     // Blog page and subpages
     if (path === "/blog") {
-      return location.pathname === "/blog" || location.pathname.startsWith("/blog/");
+      return pathname === "/blog" || pathname.startsWith("/blog/");
     }
     // Home page (only when exactly on '/')
     if (path === "/") {
-      return location.pathname === "/";
+      return pathname === "/";
     }
     // Section tabs (Schedule, News, Contact) only active on home page and when their section is active
     if (["/#schedule", "/#news", "/#contact"].includes(path)) {
-      return location.pathname === "/" && activeSection === path;
+      return pathname === "/" && activeSection === path;
     }
     return false;
   }
@@ -141,12 +150,12 @@ export function Navbar() {
     }`}>
       <div className="container flex h-16 items-center justify-between px-4">
         <Link 
-          to="/" 
+          href="/" 
           className="flex items-center gap-2 transition-transform hover:scale-105"
         >
           <div className="relative">
             {/* <Anchor className="w-8 h-8 text-primary" /> */}
-            <img src={mafiaFerryIcon} alt="Mafia Ferry Logo" className="w-10 h-10 rounded-full" />
+            <img src="/favicon-32x32.png" alt="Mafia Ferry Logo" className="w-10 h-10 rounded-full" />
             <div className="absolute inset-0 bg-primary/20 blur-lg -z-10" />
           </div>
           <span className="font-bold text-xl bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
@@ -159,7 +168,7 @@ export function Navbar() {
               item.href.startsWith('/#') ? (
                 <Link
                   key={item.href}
-                  to={item.href}
+                  href={item.href}
                   onClick={(e) => handleNavClick(e, item.href)}
                   className="relative flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-full group"
                 >
@@ -189,7 +198,7 @@ export function Navbar() {
               ) : (
                 <Link
                   key={item.href}
-                  to={item.href}
+                  href={item.href}
                   className="relative flex items-center gap-2 px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-full group"
                 >
                   <span className={`flex items-center justify-center gap-2 relative z-10 transition-colors duration-200 ${
@@ -219,8 +228,7 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="w-px h-6 bg-border mx-2" />
-            <motion.button
+          <motion.button
             onClick={toggleTheme}
             className="w-9 h-9 flex items-center justify-center rounded-full bg-muted/50 hover:bg-primary/10 transition-colors relative overflow-hidden"
             whileTap={{ scale: 0.95 }}
@@ -279,7 +287,7 @@ export function Navbar() {
                 >
                   {item.href.startsWith('/#') ? (
                     <Link
-                      to={item.href}
+                      href={item.href}
                       className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                         isActive(item.href)
                           ? (["/#schedule", "/#news", "/#contact"].includes(item.href) ? "text-primary bg-primary/10" : "bg-primary text-white")
@@ -296,7 +304,7 @@ export function Navbar() {
                     </Link>
                   ) : (
                     <Link
-                      to={item.href}
+                      href={item.href}
                       className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                         isActive(item.href)
                           ? "bg-primary text-white"
@@ -318,7 +326,9 @@ export function Navbar() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: navItems.length * 0.1 }}
-              >                <button
+                className="space-y-2"
+              >
+                <button
                   onClick={() => {
                     toggleTheme()
                     setIsOpen(false)
@@ -328,7 +338,7 @@ export function Navbar() {
                   <span className="flex items-center justify-center w-5 h-5 text-primary dark:text-primary">
                     {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
                   </span>
-                  {isDark ? "Light Mode" : "Dark Mode"}
+                  {isDark ? t("nav.light_mode") : t("nav.dark_mode")}
                 </button>
               </motion.div>
             </nav>

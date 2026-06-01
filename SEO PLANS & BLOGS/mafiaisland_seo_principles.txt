@@ -1,0 +1,99 @@
+SEO PRINCIPLES 
+
+VISION Become the most authoritative Mafia Island travel resource on
+Google through: - Topic authority - Fast website performance - Excellent
+user experience - High trust (EEAT) - Strong internal linking -
+Consistent publishing
+
+1.  SITE STRUCTURE Use clear silo architecture:
+
+/mafia-island-travel-guide/ /mafia-island-hotels/ /mafia-island-diving/
+/mafia-island-whale-sharks/ /mafia-island-restaurants/
+/mafia-island-beaches/ /mafia-island-itinerary/
+
+2.  CONTENT STRATEGY Every article should:
+
+-   Be 1,500–4,000 words
+-   Answer user intent completely
+-   Include FAQs
+-   Use original photos
+-   Be updated yearly
+-   Include local expertise
+
+3.  KEYWORD STRATEGY Target:
+
+-   Informational keywords
+-   Commercial keywords
+-   Transactional keywords
+
+Examples: - Mafia Island travel guide - Best hotels in Mafia Island -
+Whale shark tours Mafia Island
+
+4.  TECHNICAL SEO Requirements:
+
+-   HTTPS enabled
+-   Mobile optimized
+-   Fast loading (<2s)
+-   XML sitemap
+-   Clean URLs
+-   Image compression
+-   Lazy loading
+
+5.  INTERNAL LINKING Every article should link to:
+
+-   Related guides
+-   Booking pages
+-   Category pages
+-   Destination pages
+
+6.  SCHEMA MARKUP Implement:
+
+-   Article schema
+-   FAQ schema
+-   Breadcrumb schema
+-   Local business schema
+
+7.  IMAGE SEO Use:
+
+-   WebP/AVIF images
+-   Alt text
+-   Compressed images
+-   Original photography
+
+8.  BACKLINK STRATEGY Get links from:
+
+-   Travel blogs
+-   Tourism websites
+-   Diving communities
+-   Tanzania travel directories
+-   Hotels and resorts
+
+9.  USER EXPERIENCE Improve:
+
+-   Navigation
+-   Mobile design
+-   Readability
+-   Booking flow
+-   CTA buttons
+-   Page speed
+
+10. CONTENT CLUSTERS Create topic clusters:
+
+-   Diving
+-   Whale sharks
+-   Hotels
+-   Beaches
+-   Weather
+-   Fishing
+-   Honeymoon
+-   Budget travel
+
+11. SEO GOALS Year 1:
+
+-   100 indexed pages
+-   10,000 monthly visitors
+
+Year 2: - 100,000 monthly visitors - Strong domain authority
+
+FINAL PRINCIPLE Do not just publish blogs. Build the definitive
+authority website about Mafia Island.

@@ -1,37 +1,46 @@
-import * as React from "react"
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-import { Check } from "lucide-react"
+import { forwardRef, useId } from "react"
 import { cn } from "../../lib/utils"
 
-const Checkbox = React.forwardRef(({ className, ...props }, ref) => (
-  <CheckboxPrimitive.Root
-    ref={ref}
-    className={cn(
-      "peer h-4 w-4 shrink-0 rounded-sm border border-gray-300 dark:border-gray-600",
-      "ring-offset-background transition-all duration-200",
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-      "disabled:cursor-not-allowed disabled:opacity-50",
-      "data-[state=checked]:bg-primary data-[state=checked]:border-primary",
-      "data-[state=checked]:text-white dark:data-[state=checked]:text-white",
-      "hover:border-primary/50 dark:hover:border-primary/50",
-      "dark:bg-background/5 dark:hover:bg-background/10",
-      className
-    )}
-    {...props}
-  >
-    <CheckboxPrimitive.Indicator
+const Checkbox = forwardRef(({ className, checked, onCheckedChange, ...props }, ref) => {
+  const id = useId()
+
+  return (
+    <label
+      htmlFor={props.id || id}
       className={cn(
-        "flex items-center justify-center",
-        "text-white", // Explicitly set text color for the check mark
-        "data-[state=checked]:animate-in data-[state=checked]:zoom-in-50",
-        "data-[state=unchecked]:animate-out data-[state=unchecked]:zoom-out-50",
-        "duration-200"
+        "relative inline-flex items-center justify-center cursor-pointer",
+        "h-5 w-5 shrink-0 rounded-md border-2 transition-all duration-200",
+        "focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 focus-within:ring-offset-background",
+        checked
+          ? "bg-primary border-primary"
+          : "border-gray-300 dark:border-gray-600 hover:border-primary/50 dark:hover:border-primary/50",
+        className
       )}
     >
-      <Check className="h-3.5 w-3.5" />
-    </CheckboxPrimitive.Indicator>
-  </CheckboxPrimitive.Root>
-))
-Checkbox.displayName = CheckboxPrimitive.Root.displayName
+      <input
+        ref={ref}
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onCheckedChange?.(e.target.checked)}
+        className="absolute inset-0 opacity-0 cursor-pointer"
+        {...props}
+      />
+      {checked && (
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ stroke: "white", strokeWidth: 3 }}
+        >
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      )}
+    </label>
+  )
+})
+Checkbox.displayName = "Checkbox"
 
 export { Checkbox }

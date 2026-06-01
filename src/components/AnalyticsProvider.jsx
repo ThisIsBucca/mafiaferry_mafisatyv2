@@ -1,15 +1,16 @@
+'use client'
+
 import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { usePathname } from 'next/navigation'
 import { supabase } from '../lib/supabase'
 import { trackPageView, trackEvent, trackSession } from '../lib/analytics'
 
 export function AnalyticsProvider({ children }) {
-  const location = useLocation()
+  const pathname = usePathname()
 
   useEffect(() => {
-    // Track page view
-    if (location) {
-      trackPageView(location.pathname)
+    if (pathname) {
+      trackPageView(pathname)
     }
 
     // Track session
@@ -38,7 +39,7 @@ export function AnalyticsProvider({ children }) {
 
     document.addEventListener('click', handleClick)
     return () => document.removeEventListener('click', handleClick)
-  }, [location?.pathname])
+  }, [pathname])
 
   return children
 } 
