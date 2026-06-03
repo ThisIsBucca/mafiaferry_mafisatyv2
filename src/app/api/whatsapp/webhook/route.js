@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '../../../../lib/supabaseAdmin'
 import { parseScheduleMessages } from '../../../../lib/parseScheduleMessage'
 import { parseWithAI } from '../../../../lib/parseWithAI'
+import { parseAnnouncementMessage, getDefaultAnnouncementImage } from '../../../../lib/parseAnnouncementMessage'
 import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendImageMessage, sendTypingIndicator } from '../../../../lib/whatsappService'
 
 export async function GET(request) {
@@ -46,6 +47,66 @@ export async function POST(request) {
       }
 
       const isGroup = !!(msg.groupId)
+
+      const announcement = parseAnnouncementMessage(msg.text)
+      if (announcement) {
+        console.log('📢 Detected TANGAZO announcement:', JSON.stringify(announcement, null, 2))
+
+        const supabaseAdmin = getSupabaseAdmin()
+        if (!supabaseAdmin) {
+          console.error('❌ Supabase admin not initialized')
+          if (isGroup) await sendGroupTextMessage(msg.groupId, '❌ Samahani, kuna tatizo la kiufundi. Tafadhali jaribu tena baadaye.')
+          continue
+        }
+
+        const { data: existing } = await supabaseAdmin
+          .from('announcements')
+          .select('id, short_id')
+          .eq('title', announcement.title)
+          .maybeSingle()
+
+        let shortId
+        if (existing) {
+          const { error } = await supabaseAdmin
+            .from('announcements')
+            .update({
+              title: announcement.title,
+              image_url: getDefaultAnnouncementImage(),
+              date: announcement.date,
+            })
+            .eq('id', existing.id)
+
+          if (error) {
+            console.error('❌ Failed to update announcement:', error)
+            if (isGroup) await sendGroupTextMessage(msg.groupId, '❌ Hitilafu wakati wa kusasisha tangazo.')
+            continue
+          }
+          shortId = existing.short_id
+        } else {
+          const { data: inserted, error } = await supabaseAdmin
+            .from('announcements')
+            .insert({
+              title: announcement.title,
+              image_url: getDefaultAnnouncementImage(),
+              date: announcement.date,
+            })
+            .select('short_id')
+            .single()
+
+          if (error) {
+            console.error('❌ Failed to insert announcement:', error)
+            if (isGroup) await sendGroupTextMessage(msg.groupId, '❌ Hitilafu wakati wa kuhifadhi tangazo.')
+            continue
+          }
+          shortId = inserted.short_id
+        }
+
+        const reply = `✅ Tangazo limehifadhiwa!\n\n📢 #${shortId}\n📅 ${announcement.date}\n\n_Tangazo litaonekana kwenye tovuti._`
+        console.log('📤 Reply:', reply)
+        if (isGroup) await sendGroupTextMessage(msg.groupId, reply)
+        else await sendTextMessage(msg.from, reply)
+        continue
+      }
 
       let parsedSchedules = await parseWithAI(msg.text)
 
