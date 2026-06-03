@@ -116,6 +116,9 @@ export function Schedule() {
     },
   });
 
+  const todayStr = new Date().toISOString().split('T')[0]
+  const activeAnnouncements = announcements?.filter((a) => a.date >= todayStr) || []
+
   const filteredSchedules = schedules?.filter((s) => {
     const targetDate = getTargetDate();
     const targetDayEn = format(targetDate, "EEEE");
@@ -137,7 +140,7 @@ export function Schedule() {
       </div>
 
       <div className="container relative z-10 px-4 mx-auto max-w-6xl">
-        {announcements && announcements.length > 0 && (
+        {activeAnnouncements.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -152,12 +155,12 @@ export function Schedule() {
                 </h3>
               <div className="flex-1 h-px bg-border" />
               <span className="text-[10px] text-muted-foreground font-bold">
-                    {announcements.length} {t("schedule.announcements")}
+                    {activeAnnouncements.length} {t("schedule.announcements")}
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {announcements.map((item, idx) => (
+              {activeAnnouncements.map((item, idx) => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, y: 20 }}

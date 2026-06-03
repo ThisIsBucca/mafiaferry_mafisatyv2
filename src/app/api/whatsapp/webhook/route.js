@@ -40,6 +40,21 @@ export async function POST(request) {
       })
     }
 
+    const supabaseAdmin = getSupabaseAdmin()
+    if (supabaseAdmin) {
+      const today = new Date().toISOString().split('T')[0]
+      const { data: deleted, error: delErr } = await supabaseAdmin
+        .from('announcements')
+        .delete()
+        .lt('date', today)
+
+      if (delErr) {
+        console.error('❌ Failed to cleanup expired announcements:', delErr)
+      } else if (deleted && deleted.length > 0) {
+        console.log(`🗑️ Cleaned up ${deleted.length} expired announcement(s)`)
+      }
+    }
+
     for (const msg of allMessages) {
       if (msg.type !== 'text' || !msg.text) {
         console.log(`⏭️ Skipping non-text message: ${msg.type}`)
