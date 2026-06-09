@@ -335,7 +335,7 @@ export function FloatingActions() {
             transition={{ type: "spring", stiffness: 350, damping: 30 }}
             className="fixed z-50 flex flex-col overflow-hidden rounded-t-2xl shadow-2xl sm:mb-4 sm:left-auto sm:right-6 sm:w-[400px] sm:max-h-[600px] sm:rounded-2xl sm:bottom-6"
             style={{
-              ...(window.innerWidth < 640 ? {
+              ...(typeof window !== 'undefined' && window.innerWidth < 640 ? {
                 left: 0,
                 right: 0,
                 bottom: 0,
