@@ -9,10 +9,13 @@ export function parseAnnouncementMessage(text) {
   if (!firstLine.startsWith('*TANGAZO')) return null
 
   const dateMatch = text.match(/(\d{2})[\/-](\d{2})[\/-](\d{4})/)
-  if (!dateMatch) return null
-
-  const [, day, month, year] = dateMatch
-  const parsedDate = `${year}-${month}-${day}`
+  let parsedDate
+  if (dateMatch) {
+    const [, day, month, year] = dateMatch
+    parsedDate = `${year}-${month}-${day}`
+  } else {
+    parsedDate = new Date().toISOString().split('T')[0]
+  }
 
   const title = text
     .replace(/\*{1,2}/g, '')

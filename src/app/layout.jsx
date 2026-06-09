@@ -2,6 +2,7 @@ import "../index.css"
 import { Providers } from "./providers"
 import { StructuredData } from "../components/StructuredData"
 import { GoogleAnalyticsScript } from "../components/GoogleAnalyticsScript"
+import SplashWrapper from "../components/SplashWrapper"
 
 export const metadata = {
   title: {
@@ -78,7 +79,7 @@ export default function RootLayout({ children }) {
         <StructuredData />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <Providers>{children}</Providers>
+        <Providers><SplashWrapper>{children}</SplashWrapper></Providers>
       </body>
     </html>
   )
