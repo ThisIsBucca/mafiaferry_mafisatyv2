@@ -6,10 +6,7 @@ import StarterLoader from './StarterLoader'
 export default function SplashWrapper({ children }) {
   const [showLoader, setShowLoader] = useState(true)
 
-  return (
-    <>
-      {showLoader && <StarterLoader onFinish={() => setShowLoader(false)} />}
-      {children}
-    </>
-  )
+  if (showLoader) return <StarterLoader onFinish={() => setShowLoader(false)} />
+
+  return children
 }
