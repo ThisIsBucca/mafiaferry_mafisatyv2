@@ -9,6 +9,7 @@ import { Contact } from "../components/contact"
 import { Footer } from "../components/footer"
 import { FloatingActions } from "../components/FloatingActions"
 import { SupportBanner } from "../components/support-banner"
+import { FeaturedVideos } from "../components/FeaturedVideos"
 import { ScrollingBanner } from "../components/ScrollingBanner"
 import { AnalyticsProvider } from "../components/AnalyticsProvider"
 import { LanguageToggle } from "../components/LanguageToggle"
@@ -23,6 +24,7 @@ export default function HomePage() {
       <main>
         <Hero />
         <Schedule />
+        <FeaturedVideos />
         <NewsUpdates />
         <FaqSection />
         <Contact />

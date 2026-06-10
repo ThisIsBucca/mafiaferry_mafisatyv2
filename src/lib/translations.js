@@ -240,6 +240,12 @@ const translations = {
     "nyamisati.tip3": "Keep valuables in a waterproof bag",
     "nyamisati.tip4": "Contact 0776986840 for schedule updates",
 
+    // Featured Videos
+    "videos.badge": "Watch & Explore",
+    "videos.title": "Featured Videos",
+    "videos.subtitle": "Experience the beauty of Mafia Island through videos — from ferry crossings to whale shark encounters.",
+    "videos.view_more": "View More on Facebook",
+
     // Language names
     "lang.en": "English",
     "lang.sw": "Kiswahili",
@@ -483,6 +489,12 @@ const translations = {
     "nyamisati.tip2": "Nunua tiketi mapema wakati wa msimu wa juu",
     "nyamisati.tip3": "Weka vitu vya thamani kwenye mfuko usiopitisha maji",
     "nyamisati.tip4": "Wasiliana 0776986840 kwa sasisho za ratiba",
+
+    // Featured Videos
+    "videos.badge": "Tazama na Chunguza",
+    "videos.title": "Video Zilizochaguliwa",
+    "videos.subtitle": "Pata uzoefu wa uzuri wa Kisiwa cha Mafia kupitia video — kutoka safari za feri hadi kukutana na whale shark.",
+    "videos.view_more": "Tazama Zaidi Facebook",
 
     // Language names
     "lang.en": "English",
