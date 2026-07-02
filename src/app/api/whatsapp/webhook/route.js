@@ -90,7 +90,7 @@ export async function POST(request) {
             rows: schedules.filter(s => s.route === route).map(s => ({
               id: `schedule_${s.id}`,
               title: `${dayMap[s.days]} ${s.departure}`,
-              description: `${s.date} - ${s.arrival} (${s.duration})`,
+              description: `${s.date} - Kuondoka ${s.departure} (${s.duration})`,
             })),
           }))
 
@@ -117,7 +117,7 @@ export async function POST(request) {
             Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
           }[schedule.days]
 
-          await sendTextMessage(msg.from, `${schedule.ship_name}\n${daySw} ${schedule.date}\n${schedule.route}\n${schedule.departure} - ${schedule.arrival} (${schedule.duration})`)
+          await sendTextMessage(msg.from, `${schedule.ship_name}\n${daySw} ${schedule.date}\n${schedule.route}\nInaondoka: ${schedule.departure}\nMuda: ${schedule.duration}`)
         } else if (buttonId === 'contact_us') {
           await sendTextMessage(msg.from, `Wasiliana Nasi\n\n1. Philox\n   Tel: 255688883219\n   wa.me/255688883219\n\n2. Bucca\n   Tel: 255776986840\n   wa.me/255776986840`)
         }
@@ -265,7 +265,7 @@ export async function POST(request) {
           Sunday: 'Jumapili',
         }[parsed.days]
 
-        const reply = `Ratiba imesasishwa\n\n${parsed.ship_name}\n${daySw} ${parsed.date}\n${parsed.route}\n${parsed.departure} - ${parsed.arrival} (${parsed.duration})`
+        const reply = `Ratiba imesasishwa\n\n${parsed.ship_name}\n${daySw} ${parsed.date}\n${parsed.route}\nInaondoka: ${parsed.departure}\nMuda: ${parsed.duration}`
         console.log('📤 Reply:', reply)
         if (isGroup) await sendGroupTextMessage(msg.groupId, reply)
         else await sendTextMessage(msg.from, reply)
