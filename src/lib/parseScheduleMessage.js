@@ -112,7 +112,7 @@ function parseDayFromText(text) {
 
 function parseOriginFromText(text) {
   const lower = text.toLowerCase()
-  const match = lower.match(/(?:kuondoka|kutoka|tokana)\s+(\w+)/)
+  const match = lower.match(/(?:kuondoka|kutoka|tokana)(?:\s+bandari\s+ya)?\s+(\w+)/)
   if (!match) return null
 
   const word = match[1]
@@ -141,6 +141,15 @@ function parseDepartureTime(text) {
   if (parenMatch) {
     const h = parseInt(parenMatch[1])
     const m = parseInt(parenMatch[2])
+    if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+    }
+  }
+
+  const saaHhmmMatch = lower.match(/saa\s*(\d{1,2}):(\d{2})(?!\d)/)
+  if (saaHhmmMatch) {
+    const h = parseInt(saaHhmmMatch[1])
+    const m = parseInt(saaHhmmMatch[2])
     if (h >= 0 && h <= 23 && m >= 0 && m <= 59) {
       return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
     }

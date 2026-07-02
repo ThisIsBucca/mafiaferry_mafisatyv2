@@ -65,6 +65,28 @@ export async function sendImageMessage(to, imageUrl, caption) {
   })
 }
 
+export async function sendInteractiveButtons(to, bodyText, buttons) {
+  return sendWhatsAppRequest('messages', {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to,
+    type: 'interactive',
+    interactive: {
+      type: 'button',
+      body: { text: bodyText },
+      action: {
+        buttons: buttons.map((b) => ({
+          type: 'reply',
+          reply: {
+            id: b.id,
+            title: b.title.slice(0, 20),
+          },
+        })),
+      },
+    },
+  })
+}
+
 export async function sendGroupTextMessage(groupId, text) {
   return sendWhatsAppRequest('messages', {
     messaging_product: 'whatsapp',
@@ -114,12 +136,22 @@ export function extractAllMessagesDebug(body) {
       if (!value || value.messaging_product !== 'whatsapp') continue
       for (const msg of value.messages || []) {
         const context = msg.context || {}
+        const interactive = msg.interactive
+          ? {
+              type: msg.interactive.type,
+              button_reply: msg.interactive.button_reply
+                ? { id: msg.interactive.button_reply.id, title: msg.interactive.button_reply.title }
+                : null,
+            }
+          : null
+
         messages.push({
           id: msg.id,
           from: msg.from,
           timestamp: msg.timestamp,
           type: msg.type,
           text: msg.text?.body || '',
+          interactive,
           groupId: msg.group_id || context.group_id || null,
           groupSubject: context.subject || null,
           rawKeys: Object.keys(msg),

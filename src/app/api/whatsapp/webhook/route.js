@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '../../../../lib/supabaseAdmin'
 import { parseScheduleMessages } from '../../../../lib/parseScheduleMessage'
 import { parseWithAI } from '../../../../lib/parseWithAI'
 import { parseAnnouncementMessage, getDefaultAnnouncementImage } from '../../../../lib/parseAnnouncementMessage'
-import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendImageMessage, sendTypingIndicator } from '../../../../lib/whatsappService'
+import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendTypingIndicator, sendInteractiveButtons } from '../../../../lib/whatsappService'
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams
@@ -56,12 +56,45 @@ export async function POST(request) {
     }
 
     for (const msg of allMessages) {
+      const isGroup = !!(msg.groupId)
+
+      if (msg.type === 'interactive' && msg.interactive?.button_reply) {
+        const buttonId = msg.interactive.button_reply.id
+        console.log(`🔘 Interactive button reply: ${buttonId}`)
+
+        if (buttonId === 'view_schedule') {
+          const supabaseAdmin = getSupabaseAdmin()
+          if (supabaseAdmin) {
+            const { data: schedules } = await supabaseAdmin
+              .from('schedules')
+              .select('*')
+              .order('created_at', { ascending: true })
+
+            if (schedules && schedules.length > 0) {
+              const lines = schedules.map(s => {
+                const daySw = {
+                  Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
+                  Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
+                }[s.days]
+                return `🚢 ${s.ship_name}\n📅 ${daySw} ${s.date}\n📍 ${s.route}\n⏰ ${s.departure} - ${s.arrival}\n⌛ ${s.duration}`
+              })
+              await sendTextMessage(msg.from, `📋 *Ratiba za Safari*\n\n${lines.join('\n\n---\n\n')}`)
+            } else {
+              await sendTextMessage(msg.from, '❌ Hakuna ratiba kwa sasa.')
+            }
+          } else {
+            await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
+          }
+        } else if (buttonId === 'contact_us') {
+          await sendTextMessage(msg.from, `📞 *Wasiliana Nasi*\n\n1️⃣ *Philox*\n📱 255688883219\n➡️ https://wa.me/255688883219\n\n2️⃣ *Bucca*\n📱 255776986840\n➡️ https://wa.me/255776986840`)
+        }
+        continue
+      }
+
       if (msg.type !== 'text' || !msg.text) {
         console.log(`⏭️ Skipping non-text message: ${msg.type}`)
         continue
       }
-
-      const isGroup = !!(msg.groupId)
 
       const announcement = parseAnnouncementMessage(msg.text)
       if (announcement) {
@@ -135,16 +168,11 @@ export async function POST(request) {
         if (isGroup) {
           await sendGroupTextMessage(msg.groupId, '❌ Samahani, siwezi kuchambua ujumbe huu. Tumia muundo: siku tarehe kuondoka mahali saa (ratiba moja kwa mstari)')
         } else {
-          const baseUrl = (process.env.CALLBACK_URL || '').replace('/api/whatsapp/webhook', '')
           await sendTypingIndicator(msg.from, msg.id)
-          await sendTextMessage(msg.from, `Hi there! 👋
-
-I'm a virtual assistant for *MafiaFerry* only. I can't respond to general chat or handle other requests.`)
-          await sendImageMessage(msg.from, `${baseUrl}/images/thisisbucca.png`, `For any inquiries or assistance, please contact our human agent *thisisbucca*:
-
-➡️ https://wa.me/255776986840
-
-They'll be happy to help you! 😊`)
+          await sendInteractiveButtons(msg.from, '👋 Habari! Mimi ni msaidizi wa *MafiaFerry*. Chagua moja kati ya huduma zifuatazo:', [
+            { id: 'view_schedule', title: 'Angalia Ratiba' },
+            { id: 'contact_us', title: 'Wasiliana Nasi' },
+          ])
         }
         continue
       }
