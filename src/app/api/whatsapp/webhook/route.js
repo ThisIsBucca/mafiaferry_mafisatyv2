@@ -4,6 +4,74 @@ import { parseScheduleMessages } from '../../../../lib/parseScheduleMessage'
 import { parseWithAI } from '../../../../lib/parseWithAI'
 import { parseAnnouncementMessage, getDefaultAnnouncementImage } from '../../../../lib/parseAnnouncementMessage'
 import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendImageMessage, sendTypingIndicator, sendInteractiveButtons, sendInteractiveList } from '../../../../lib/whatsappService'
+import { createOrder, pendingOrders } from '../../../../lib/vibepay'
+
+const ticketConversations = new Map()
+
+const FERRY_FARE = 16000
+const FERRY_SHIP = 'MV Kilindoni'
+const FERRY_ROUTE = 'Nyamisati → Kilindoni'
+
+async function handleTicketFlow(msg) {
+  const conv = ticketConversations.get(msg.from)
+
+  if (!conv) {
+    ticketConversations.set(msg.from, { step: 'passengers' })
+    await sendTextMessage(msg.from, 'Idadi ya abiria? (Tuma namba 1-20)')
+    return
+  }
+
+  if (conv.step === 'passengers') {
+    const count = parseInt(msg.text)
+    if (isNaN(count) || count < 1 || count > 20) {
+      await sendTextMessage(msg.from, 'Tafadhali tumia namba halali (1-20). Idadi ya abiria?')
+      return
+    }
+    const total = count * FERRY_FARE
+    ticketConversations.set(msg.from, { step: 'phone', passengers: count, total })
+    await sendTextMessage(msg.from, `Jumla: TZS ${total.toLocaleString()} (${count} × ${FERRY_FARE.toLocaleString()})\nTuma namba yako ya simu kwa malipo.\nMfano: 0712345678`)
+    return
+  }
+
+  if (conv.step === 'phone') {
+    let phone = msg.text.replace(/[^0-9]/g, '')
+    if (phone.startsWith('0')) phone = '255' + phone.slice(1)
+    else if (phone.startsWith('7')) phone = '255' + phone
+    if (!phone.startsWith('255') || phone.length < 10) {
+      await sendTextMessage(msg.from, 'Namba si sahihi. Tuma namba halali ya Tanzania.\nMfano: 0712345678')
+      return
+    }
+
+    const reference = `wa_${phone}_${Date.now()}`
+    const amount = conv.total
+
+    try {
+      const result = await createOrder({
+        buyer_phone: phone,
+        amount,
+        reference,
+      })
+
+      if (result.status === 'success' && result.data?.order_id) {
+        pendingOrders.set(result.data.order_id, {
+          phone: msg.from,
+          amount,
+          reference,
+          passengers: conv.passengers,
+        })
+        ticketConversations.delete(msg.from)
+        await sendTextMessage(msg.from, `✓ Ombi la malipo limetumwa kwa ${msg.text}.\nAngalia skrini ya simu yako na fuata maagizo ya USSD.`)
+      } else {
+        await sendTextMessage(msg.from, '❌ Hitilafu wakati wa kutuma ombi la malipo. Tafadhali jaribu tena.')
+        ticketConversations.delete(msg.from)
+      }
+    } catch (err) {
+      console.error('Payment error:', err)
+      await sendTextMessage(msg.from, '❌ Hitilafu ya kiufundi. Tafadhali jaribu tena baadaye.')
+      ticketConversations.delete(msg.from)
+    }
+  }
+}
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams
@@ -125,12 +193,20 @@ export async function POST(request) {
           await sendTextMessage(msg.from, `${schedule.ship_name}\n${daySw} ${schedule.date}\n${schedule.route}\nInaondoka: ${schedule.departure}\nMuda: ${schedule.duration}`)
         } else if (buttonId === 'contact_us') {
           await sendTextMessage(msg.from, `Wasiliana Nasi\n\n1. Philox\n   Tel: 255688883219\n   wa.me/255688883219\n\n2. Bucca\n   Tel: 255776986840\n   wa.me/255776986840`)
+        } else if (buttonId === 'buy_ticket') {
+          ticketConversations.set(msg.from, { step: 'passengers' })
+          await sendTextMessage(msg.from, 'Idadi ya abiria? (Tuma namba 1-20)')
         }
         continue
       }
 
       if (msg.type !== 'text' || !msg.text) {
         console.log(`⏭️ Skipping non-text message: ${msg.type}`)
+        continue
+      }
+
+      if (!isGroup && ticketConversations.has(msg.from)) {
+        await handleTicketFlow(msg)
         continue
       }
 
@@ -211,6 +287,7 @@ export async function POST(request) {
           await new Promise(r => setTimeout(r, 500))
           await sendInteractiveButtons(msg.from, 'Habari! Mimi ni msaidizi wa MafiaFerry. Chagua moja kati ya huduma zifuatazo:', [
             { id: 'view_schedule', title: 'Angalia Ratiba' },
+            { id: 'buy_ticket', title: 'Nunua Tiketi' },
             { id: 'contact_us', title: 'Wasiliana Nasi' },
           ])
         }
