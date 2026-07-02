@@ -15,9 +15,18 @@ export async function POST(request) {
     if (payment_status === 'SUCCESS' && order_id) {
       const pending = pendingOrders.get(order_id)
       if (pending) {
+        const daySw = pending.schedule ? {
+          Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
+          Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
+        }[pending.schedule.days] : ''
+
+        const scheduleInfo = pending.schedule
+          ? `\n${pending.schedule.ship}\n${daySw} ${pending.schedule.date}\n${pending.schedule.route}`
+          : ''
+
         await sendTextMessage(
           pending.phone,
-          `✓ Malipo ya TZS ${(pending.amount || amount).toLocaleString()} yamethibitishwa! Tiketi ya MV Kilindoni imehifadhiwa. Asante!`
+          `✓ Malipo ya TZS ${(pending.amount || amount).toLocaleString()} yamethibitishwa!${scheduleInfo}\n\nTiketi imehifadhiwa. Asante!`
         )
         pendingOrders.delete(order_id)
       }

@@ -15,12 +15,6 @@ const FERRY_ROUTE = 'Nyamisati → Kilindoni'
 async function handleTicketFlow(msg) {
   const conv = ticketConversations.get(msg.from)
 
-  if (!conv) {
-    ticketConversations.set(msg.from, { step: 'passengers' })
-    await sendTextMessage(msg.from, 'Idadi ya abiria? (Tuma namba 1-20)')
-    return
-  }
-
   if (conv.step === 'passengers') {
     const count = parseInt(msg.text)
     if (isNaN(count) || count < 1 || count > 20) {
@@ -28,7 +22,7 @@ async function handleTicketFlow(msg) {
       return
     }
     const total = count * FERRY_FARE
-    ticketConversations.set(msg.from, { step: 'phone', passengers: count, total })
+    ticketConversations.set(msg.from, { step: 'phone', passengers: count, total, schedule: conv.schedule })
     await sendTextMessage(msg.from, `Jumla: TZS ${total.toLocaleString()} (${count} × ${FERRY_FARE.toLocaleString()})\nTuma namba yako ya simu kwa malipo.\nMfano: 0712345678`)
     return
   }
@@ -60,9 +54,20 @@ async function handleTicketFlow(msg) {
           amount,
           reference,
           passengers: conv.passengers,
+          schedule: conv.schedule,
         })
         ticketConversations.delete(msg.from)
-        await sendTextMessage(msg.from, `✓ Ombi la malipo limetumwa kwa ${msg.text}.\nAngalia skrini ya simu yako na fuata maagizo ya USSD.`)
+
+        const daySw = conv.schedule ? {
+          Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
+          Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
+        }[conv.schedule.days] : ''
+
+        const scheduleInfo = conv.schedule
+          ? `\n${conv.schedule.ship}\n${daySw} ${conv.schedule.date}\n${conv.schedule.route}`
+          : ''
+
+        await sendTextMessage(msg.from, `✓ Ombi la malipo limetumwa kwa ${msg.text}.${scheduleInfo}\nAngalia skrini ya simu yako na fuata maagizo ya USSD.`)
       } else {
         await sendTextMessage(msg.from, '❌ Hitilafu wakati wa kutuma ombi la malipo. Tafadhali jaribu tena.')
         ticketConversations.delete(msg.from)
@@ -196,8 +201,70 @@ export async function POST(request) {
         } else if (buttonId === 'contact_us') {
           await sendTextMessage(msg.from, `Wasiliana Nasi\n\n1. Philox\n   Tel: 255688883219\n   wa.me/255688883219\n\n2. Bucca\n   Tel: 255776986840\n   wa.me/255776986840`)
         } else if (buttonId === 'buy_ticket') {
-          ticketConversations.set(msg.from, { step: 'passengers' })
-          await sendTextMessage(msg.from, 'Idadi ya abiria? (Tuma namba 1-20)')
+          if (!supabaseAdmin) {
+            await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
+            continue
+          }
+          const { data: schedules } = await supabaseAdmin
+            .from('schedules')
+            .select('*')
+            .order('created_at', { ascending: true })
+
+          if (!schedules || schedules.length === 0) {
+            await sendTextMessage(msg.from, '❌ Hakuna ratiba kwa sasa.')
+            continue
+          }
+
+          const dayMap = {
+            Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
+            Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
+          }
+          const routes = [...new Set(schedules.map(s => s.route))]
+          const sections = routes.map(route => ({
+            title: route,
+            rows: schedules.filter(s => s.route === route).map(s => ({
+              id: `buy_schedule_${s.id}`,
+              title: `${dayMap[s.days]} ${s.departure}`,
+              description: `${s.date} - Kuondoka ${s.departure} (${s.duration})`,
+            })),
+          }))
+
+          await sendInteractiveList(msg.from, 'Chagua siku ya safari:', 'Chagua', sections)
+        } else if (buttonId.startsWith('buy_schedule_')) {
+          const scheduleId = buttonId.replace('buy_schedule_', '')
+          if (!supabaseAdmin) {
+            await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
+            continue
+          }
+          const { data: schedule } = await supabaseAdmin
+            .from('schedules')
+            .select('*')
+            .eq('id', scheduleId)
+            .single()
+
+          if (!schedule) {
+            await sendTextMessage(msg.from, '❌ Ratiba haijapatikana.')
+            continue
+          }
+
+          ticketConversations.set(msg.from, {
+            step: 'passengers',
+            schedule: {
+              id: schedule.id,
+              ship: schedule.ship_name,
+              route: schedule.route,
+              date: schedule.date,
+              days: schedule.days,
+              departure: schedule.departure,
+            },
+          })
+
+          const daySw = {
+            Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
+            Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
+          }[schedule.days]
+
+          await sendTextMessage(msg.from, `Umechagua:\n${schedule.ship_name}\n${daySw} ${schedule.date}\n${schedule.route}\nInaondoka: ${schedule.departure}\n\nIdadi ya abiria? (Tuma namba 1-20)`)
         }
         continue
       }
