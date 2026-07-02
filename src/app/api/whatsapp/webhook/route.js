@@ -120,6 +120,7 @@ export async function POST(request) {
           const baseUrl = (process.env.CALLBACK_URL || 'https://mafiaferry.vercel.app').replace('/api/whatsapp/webhook', '')
           if (schedule.ship_name.toLowerCase().includes('kilindoni')) {
             await sendImageMessage(msg.from, `${baseUrl}/images/mvkilindoni.jpg`, 'MV Kilindoni')
+            await new Promise(r => setTimeout(r, 500))
           }
           await sendTextMessage(msg.from, `${schedule.ship_name}\n${daySw} ${schedule.date}\n${schedule.route}\nInaondoka: ${schedule.departure}\nMuda: ${schedule.duration}`)
         } else if (buttonId === 'contact_us') {
@@ -207,6 +208,7 @@ export async function POST(request) {
         } else {
           const baseUrl = (process.env.CALLBACK_URL || 'https://mafiaferry.vercel.app').replace('/api/whatsapp/webhook', '')
           await sendImageMessage(msg.from, `${baseUrl}/mafia_ferry.png`, 'MafiaFerry')
+          await new Promise(r => setTimeout(r, 500))
           await sendInteractiveButtons(msg.from, 'Habari! Mimi ni msaidizi wa MafiaFerry. Chagua moja kati ya huduma zifuatazo:', [
             { id: 'view_schedule', title: 'Angalia Ratiba' },
             { id: 'contact_us', title: 'Wasiliana Nasi' },
