@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '../../../../lib/supabaseAdmin'
 import { parseScheduleMessages } from '../../../../lib/parseScheduleMessage'
 import { parseWithAI } from '../../../../lib/parseWithAI'
 import { parseAnnouncementMessage, getDefaultAnnouncementImage } from '../../../../lib/parseAnnouncementMessage'
-import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendTypingIndicator, sendInteractiveButtons } from '../../../../lib/whatsappService'
+import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendTypingIndicator, sendInteractiveButtons, sendInteractiveList } from '../../../../lib/whatsappService'
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams
@@ -58,35 +58,68 @@ export async function POST(request) {
     for (const msg of allMessages) {
       const isGroup = !!(msg.groupId)
 
-      if (msg.type === 'interactive' && msg.interactive?.button_reply) {
-        const buttonId = msg.interactive.button_reply.id
-        console.log(`🔘 Interactive button reply: ${buttonId}`)
+      if (msg.type === 'interactive' && (msg.interactive?.button_reply || msg.interactive?.list_reply)) {
+        const reply = msg.interactive.button_reply || msg.interactive.list_reply
+        const buttonId = reply.id
+        console.log(`🔘 Interactive reply: ${buttonId}`)
+
+        const supabaseAdmin = getSupabaseAdmin()
 
         if (buttonId === 'view_schedule') {
-          const supabaseAdmin = getSupabaseAdmin()
-          if (supabaseAdmin) {
-            const { data: schedules } = await supabaseAdmin
-              .from('schedules')
-              .select('*')
-              .order('created_at', { ascending: true })
-
-            if (schedules && schedules.length > 0) {
-              const lines = schedules.map(s => {
-                const daySw = {
-                  Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
-                  Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
-                }[s.days]
-                return `🚢 ${s.ship_name}\n📅 ${daySw} ${s.date}\n📍 ${s.route}\n⏰ ${s.departure} - ${s.arrival}\n⌛ ${s.duration}`
-              })
-              await sendTextMessage(msg.from, `📋 *Ratiba za Safari*\n\n${lines.join('\n\n---\n\n')}`)
-            } else {
-              await sendTextMessage(msg.from, '❌ Hakuna ratiba kwa sasa.')
-            }
-          } else {
+          if (!supabaseAdmin) {
             await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
+            continue
           }
+          const { data: schedules } = await supabaseAdmin
+            .from('schedules')
+            .select('*')
+            .order('created_at', { ascending: true })
+
+          if (!schedules || schedules.length === 0) {
+            await sendTextMessage(msg.from, '❌ Hakuna ratiba kwa sasa.')
+            continue
+          }
+
+          const dayMap = {
+            Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
+            Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
+          }
+          const routes = [...new Set(schedules.map(s => s.route))]
+          const sections = routes.map(route => ({
+            title: route,
+            rows: schedules.filter(s => s.route === route).map(s => ({
+              id: `schedule_${s.id}`,
+              title: `${dayMap[s.days]} ${s.departure}`,
+              description: `${s.date} - ${s.arrival} (${s.duration})`,
+            })),
+          }))
+
+          await sendInteractiveList(msg.from, 'Chagua ratiba unayotaka kuona:', 'Chagua', sections)
+        } else if (buttonId.startsWith('schedule_')) {
+          const id = buttonId.replace('schedule_', '')
+          if (!supabaseAdmin) {
+            await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
+            continue
+          }
+          const { data: schedule } = await supabaseAdmin
+            .from('schedules')
+            .select('*')
+            .eq('id', id)
+            .single()
+
+          if (!schedule) {
+            await sendTextMessage(msg.from, '❌ Ratiba haijapatikana.')
+            continue
+          }
+
+          const daySw = {
+            Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
+            Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
+          }[schedule.days]
+
+          await sendTextMessage(msg.from, `${schedule.ship_name}\n${daySw} ${schedule.date}\n${schedule.route}\n${schedule.departure} - ${schedule.arrival} (${schedule.duration})`)
         } else if (buttonId === 'contact_us') {
-          await sendTextMessage(msg.from, `📞 *Wasiliana Nasi*\n\n1️⃣ *Philox*\n📱 255688883219\n➡️ https://wa.me/255688883219\n\n2️⃣ *Bucca*\n📱 255776986840\n➡️ https://wa.me/255776986840`)
+          await sendTextMessage(msg.from, `Wasiliana Nasi\n\n1. Philox\n   Tel: 255688883219\n   wa.me/255688883219\n\n2. Bucca\n   Tel: 255776986840\n   wa.me/255776986840`)
         }
         continue
       }
@@ -149,7 +182,7 @@ export async function POST(request) {
           shortId = inserted.short_id
         }
 
-        const reply = `✅ Tangazo limehifadhiwa!\n\n📢 #${shortId}\n📅 ${announcement.date}\n\n_Tangazo litaonekana kwenye tovuti._`
+        const reply = `Tangazo limehifadhiwa\n\n#${shortId}\n${announcement.date}\n\n_Tangazo litaonekana kwenye tovuti._`
         console.log('📤 Reply:', reply)
         if (isGroup) await sendGroupTextMessage(msg.groupId, reply)
         else await sendTextMessage(msg.from, reply)
@@ -169,7 +202,7 @@ export async function POST(request) {
           await sendGroupTextMessage(msg.groupId, '❌ Samahani, siwezi kuchambua ujumbe huu. Tumia muundo: siku tarehe kuondoka mahali saa (ratiba moja kwa mstari)')
         } else {
           await sendTypingIndicator(msg.from, msg.id)
-          await sendInteractiveButtons(msg.from, '👋 Habari! Mimi ni msaidizi wa *MafiaFerry*. Chagua moja kati ya huduma zifuatazo:', [
+          await sendInteractiveButtons(msg.from, 'Habari! Mimi ni msaidizi wa MafiaFerry. Chagua moja kati ya huduma zifuatazo:', [
             { id: 'view_schedule', title: 'Angalia Ratiba' },
             { id: 'contact_us', title: 'Wasiliana Nasi' },
           ])
@@ -232,7 +265,7 @@ export async function POST(request) {
           Sunday: 'Jumapili',
         }[parsed.days]
 
-        const reply = `✅ Ratiba imesasishwa!\n\n🚢 ${parsed.ship_name}\n📅 ${daySw} ${parsed.date}\n📍 ${parsed.route}\n⏰ ${parsed.departure} - ${parsed.arrival}\n⌛ ${parsed.duration}`
+        const reply = `Ratiba imesasishwa\n\n${parsed.ship_name}\n${daySw} ${parsed.date}\n${parsed.route}\n${parsed.departure} - ${parsed.arrival} (${parsed.duration})`
         console.log('📤 Reply:', reply)
         if (isGroup) await sendGroupTextMessage(msg.groupId, reply)
         else await sendTextMessage(msg.from, reply)

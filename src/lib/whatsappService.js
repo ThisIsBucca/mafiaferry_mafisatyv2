@@ -65,6 +65,30 @@ export async function sendImageMessage(to, imageUrl, caption) {
   })
 }
 
+export async function sendInteractiveList(to, bodyText, buttonLabel, sections) {
+  return sendWhatsAppRequest('messages', {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to,
+    type: 'interactive',
+    interactive: {
+      type: 'list',
+      body: { text: bodyText },
+      action: {
+        button: buttonLabel.slice(0, 20),
+        sections: sections.map(s => ({
+          title: s.title.slice(0, 24),
+          rows: s.rows.map(r => ({
+            id: r.id,
+            title: r.title.slice(0, 24),
+            description: r.description ? r.description.slice(0, 72) : undefined,
+          })),
+        })),
+      },
+    },
+  })
+}
+
 export async function sendInteractiveButtons(to, bodyText, buttons) {
   return sendWhatsAppRequest('messages', {
     messaging_product: 'whatsapp',
@@ -141,6 +165,9 @@ export function extractAllMessagesDebug(body) {
               type: msg.interactive.type,
               button_reply: msg.interactive.button_reply
                 ? { id: msg.interactive.button_reply.id, title: msg.interactive.button_reply.title }
+                : null,
+              list_reply: msg.interactive.list_reply
+                ? { id: msg.interactive.list_reply.id, title: msg.interactive.list_reply.title, description: msg.interactive.list_reply.description }
                 : null,
             }
           : null
