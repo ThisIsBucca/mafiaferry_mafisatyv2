@@ -3,14 +3,76 @@ import { getSupabaseAdmin } from '../../../../lib/supabaseAdmin'
 import { parseScheduleMessages } from '../../../../lib/parseScheduleMessage'
 import { parseWithAI } from '../../../../lib/parseWithAI'
 import { parseAnnouncementMessage, getDefaultAnnouncementImage } from '../../../../lib/parseAnnouncementMessage'
-import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendImageMessage, sendTypingIndicator, sendInteractiveButtons, sendInteractiveList } from '../../../../lib/whatsappService'
+import {
+  extractAllMessagesDebug,
+  sendGroupTextMessage,
+  sendTextMessage,
+  sendImageMessage,
+  sendInteractiveButtons,
+  sendInteractiveList,
+} from '../../../../lib/whatsappService'
 import { createOrder, pendingOrders } from '../../../../lib/vibepay'
 
 const ticketConversations = new Map()
 
 const FERRY_FARE = 16000
-const FERRY_SHIP = 'MV Kilindoni'
-const FERRY_ROUTE = 'Nyamisati → Kilindoni'
+
+// Single source of truth for day-name translation (was duplicated 6x before)
+const DAY_SW = {
+  Monday: 'Jumatatu',
+  Tuesday: 'Jumanne',
+  Wednesday: 'Jumatano',
+  Thursday: 'Alhamisi',
+  Friday: 'Ijumaa',
+  Saturday: 'Jumamosi',
+  Sunday: 'Jumapili',
+}
+
+function translateDay(days) {
+  return DAY_SW[days] || ''
+}
+
+function getBaseUrl() {
+  return (process.env.CALLBACK_URL || 'https://mafiaferry.vercel.app').replace('/api/whatsapp/webhook', '')
+}
+
+// Sends a reply either to a group or a DM, whichever applies
+async function sendReply({ isGroup, groupId, from }, text) {
+  if (isGroup) return sendGroupTextMessage(groupId, text)
+  return sendTextMessage(from, text)
+}
+
+// Normalizes a Tanzanian phone number to the 255XXXXXXXXX format
+function normalizePhone(rawText) {
+  let phone = rawText.replace(/[^0-9]/g, '')
+  if (phone.startsWith('0')) phone = '255' + phone.slice(1)
+  else if (phone.startsWith('7')) phone = '255' + phone
+  return phone
+}
+
+// Builds WhatsApp interactive-list sections grouped by route (was duplicated
+// for both "view schedule" and "buy ticket" flows before)
+function buildScheduleSections(schedules, idPrefix) {
+  const routes = [...new Set(schedules.map((s) => s.route))]
+  return routes.map((route) => ({
+    title: route,
+    rows: schedules
+      .filter((s) => s.route === route)
+      .map((s) => ({
+        id: `${idPrefix}${s.id}`,
+        title: `${translateDay(s.days)} ${s.departure}`,
+        description: `${s.date} - Kuondoka ${s.departure} (${s.duration})`,
+      })),
+  }))
+}
+
+async function fetchAllSchedules(supabaseAdmin) {
+  const { data: schedules } = await supabaseAdmin
+    .from('schedules')
+    .select('*')
+    .order('created_at', { ascending: true })
+  return schedules || []
+}
 
 async function handleTicketFlow(msg) {
   const conv = ticketConversations.get(msg.from)
@@ -23,14 +85,15 @@ async function handleTicketFlow(msg) {
     }
     const total = count * FERRY_FARE
     ticketConversations.set(msg.from, { step: 'phone', passengers: count, total, schedule: conv.schedule })
-    await sendTextMessage(msg.from, `Jumla: TZS ${total.toLocaleString()} (${count} × ${FERRY_FARE.toLocaleString()})\nTuma namba yako ya simu kwa malipo.\nMfano: 0712345678`)
+    await sendTextMessage(
+      msg.from,
+      `Jumla: TZS ${total.toLocaleString()} (${count} × ${FERRY_FARE.toLocaleString()})\nTuma namba yako ya simu kwa malipo.\nMfano: 0712345678`
+    )
     return
   }
 
   if (conv.step === 'phone') {
-    let phone = msg.text.replace(/[^0-9]/g, '')
-    if (phone.startsWith('0')) phone = '255' + phone.slice(1)
-    else if (phone.startsWith('7')) phone = '255' + phone
+    const phone = normalizePhone(msg.text)
     if (!phone.startsWith('255') || phone.length < 10) {
       await sendTextMessage(msg.from, 'Namba si sahihi. Tuma namba halali ya Tanzania.\nMfano: 0712345678')
       return
@@ -58,16 +121,14 @@ async function handleTicketFlow(msg) {
         })
         ticketConversations.delete(msg.from)
 
-        const daySw = conv.schedule ? {
-          Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
-          Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
-        }[conv.schedule.days] : ''
-
         const scheduleInfo = conv.schedule
-          ? `\n${conv.schedule.ship}\n${daySw} ${conv.schedule.date}\n${conv.schedule.route}`
+          ? `\n${conv.schedule.ship}\n${translateDay(conv.schedule.days)} ${conv.schedule.date}\n${conv.schedule.route}`
           : ''
 
-        await sendTextMessage(msg.from, `✓ Ombi la malipo limetumwa kwa ${msg.text}.${scheduleInfo}\nAngalia skrini ya simu yako na fuata maagizo ya USSD.`)
+        await sendTextMessage(
+          msg.from,
+          `✓ Ombi la malipo limetumwa kwa ${msg.text}.${scheduleInfo}\nAngalia skrini ya simu yako na fuata maagizo ya USSD.`
+        )
       } else {
         await sendTextMessage(msg.from, '❌ Hitilafu wakati wa kutuma ombi la malipo. Tafadhali jaribu tena.')
         ticketConversations.delete(msg.from)
@@ -115,7 +176,10 @@ export async function POST(request) {
       })
     }
 
+    // Fetched once and reused for the whole request (previously re-fetched
+    // 2 more times inside the loop below, shadowing this variable)
     const supabaseAdmin = getSupabaseAdmin()
+
     if (supabaseAdmin) {
       const today = new Date().toISOString().split('T')[0]
       const { data: deleted, error: delErr } = await supabaseAdmin
@@ -131,51 +195,29 @@ export async function POST(request) {
     }
 
     for (const msg of allMessages) {
-      const isGroup = !!(msg.groupId)
+      const isGroup = !!msg.groupId
+      const replyCtx = { isGroup, groupId: msg.groupId, from: msg.from }
 
       if (msg.type === 'interactive' && (msg.interactive?.button_reply || msg.interactive?.list_reply)) {
         const reply = msg.interactive.button_reply || msg.interactive.list_reply
         const buttonId = reply.id
         console.log(`🔘 Interactive reply: ${buttonId}`)
 
-        const supabaseAdmin = getSupabaseAdmin()
+        if (!supabaseAdmin) {
+          await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
+          continue
+        }
 
         if (buttonId === 'view_schedule') {
-          if (!supabaseAdmin) {
-            await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
-            continue
-          }
-          const { data: schedules } = await supabaseAdmin
-            .from('schedules')
-            .select('*')
-            .order('created_at', { ascending: true })
-
-          if (!schedules || schedules.length === 0) {
+          const schedules = await fetchAllSchedules(supabaseAdmin)
+          if (schedules.length === 0) {
             await sendTextMessage(msg.from, '❌ Hakuna ratiba kwa sasa.')
             continue
           }
-
-          const dayMap = {
-            Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
-            Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
-          }
-          const routes = [...new Set(schedules.map(s => s.route))]
-          const sections = routes.map(route => ({
-            title: route,
-            rows: schedules.filter(s => s.route === route).map(s => ({
-              id: `schedule_${s.id}`,
-              title: `${dayMap[s.days]} ${s.departure}`,
-              description: `${s.date} - Kuondoka ${s.departure} (${s.duration})`,
-            })),
-          }))
-
+          const sections = buildScheduleSections(schedules, 'schedule_')
           await sendInteractiveList(msg.from, 'Chagua ratiba unayotaka kuona:', 'Chagua', sections)
         } else if (buttonId.startsWith('schedule_')) {
           const id = buttonId.replace('schedule_', '')
-          if (!supabaseAdmin) {
-            await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
-            continue
-          }
           const { data: schedule } = await supabaseAdmin
             .from('schedules')
             .select('*')
@@ -187,55 +229,29 @@ export async function POST(request) {
             continue
           }
 
-          const daySw = {
-            Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
-            Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
-          }[schedule.days]
-
-          const baseUrl = (process.env.CALLBACK_URL || 'https://mafiaferry.vercel.app').replace('/api/whatsapp/webhook', '')
           if (schedule.ship_name.toLowerCase().includes('kilindoni')) {
-            await sendImageMessage(msg.from, `${baseUrl}/images/mvkilindoni.jpg`, 'MV Kilindoni')
-            await new Promise(r => setTimeout(r, 500))
+            await sendImageMessage(msg.from, `${getBaseUrl()}/images/mvkilindoni.jpg`, 'MV Kilindoni')
+            await new Promise((r) => setTimeout(r, 500))
           }
-          await sendTextMessage(msg.from, `${schedule.ship_name}\n${daySw} ${schedule.date}\n${schedule.route}\nInaondoka: ${schedule.departure}\nMuda: ${schedule.duration}`)
+          await sendTextMessage(
+            msg.from,
+            `${schedule.ship_name}\n${translateDay(schedule.days)} ${schedule.date}\n${schedule.route}\nInaondoka: ${schedule.departure}\nMuda: ${schedule.duration}`
+          )
         } else if (buttonId === 'contact_us') {
-          await sendTextMessage(msg.from, `Wasiliana Nasi\n\n1. Philox\n   Tel: 255688883219\n   wa.me/255688883219\n\n2. Bucca\n   Tel: 255776986840\n   wa.me/255776986840`)
+          await sendTextMessage(
+            msg.from,
+            `Wasiliana Nasi\n\n1. Philox\n   Tel: 255688883219\n   wa.me/255688883219\n\n2. Bucca\n   Tel: 255776986840\n   wa.me/255776986840`
+          )
         } else if (buttonId === 'buy_ticket') {
-          if (!supabaseAdmin) {
-            await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
-            continue
-          }
-          const { data: schedules } = await supabaseAdmin
-            .from('schedules')
-            .select('*')
-            .order('created_at', { ascending: true })
-
-          if (!schedules || schedules.length === 0) {
+          const schedules = await fetchAllSchedules(supabaseAdmin)
+          if (schedules.length === 0) {
             await sendTextMessage(msg.from, '❌ Hakuna ratiba kwa sasa.')
             continue
           }
-
-          const dayMap = {
-            Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
-            Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
-          }
-          const routes = [...new Set(schedules.map(s => s.route))]
-          const sections = routes.map(route => ({
-            title: route,
-            rows: schedules.filter(s => s.route === route).map(s => ({
-              id: `buy_schedule_${s.id}`,
-              title: `${dayMap[s.days]} ${s.departure}`,
-              description: `${s.date} - Kuondoka ${s.departure} (${s.duration})`,
-            })),
-          }))
-
+          const sections = buildScheduleSections(schedules, 'buy_schedule_')
           await sendInteractiveList(msg.from, 'Chagua siku ya safari:', 'Chagua', sections)
         } else if (buttonId.startsWith('buy_schedule_')) {
           const scheduleId = buttonId.replace('buy_schedule_', '')
-          if (!supabaseAdmin) {
-            await sendTextMessage(msg.from, '❌ Samahani, kuna tatizo la kiufundi.')
-            continue
-          }
           const { data: schedule } = await supabaseAdmin
             .from('schedules')
             .select('*')
@@ -259,12 +275,12 @@ export async function POST(request) {
             },
           })
 
-          const daySw = {
-            Monday: 'Jumatatu', Tuesday: 'Jumanne', Wednesday: 'Jumatano',
-            Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
-          }[schedule.days]
-
-          await sendTextMessage(msg.from, `Umechagua:\n${schedule.ship_name}\n${daySw} ${schedule.date}\n${schedule.route}\nInaondoka: ${schedule.departure}\n\nIdadi ya abiria? (Tuma namba 1-20)`)
+          await sendTextMessage(
+            msg.from,
+            `Umechagua:\n${schedule.ship_name}\n${translateDay(schedule.days)} ${schedule.date}\n${schedule.route}\nInaondoka: ${schedule.departure}\n\nIdadi ya abiria? (Tuma namba 1-20)`
+          )
+        } else {
+          console.log(`⚠️ Unhandled interactive buttonId: ${buttonId}`)
         }
         continue
       }
@@ -283,10 +299,9 @@ export async function POST(request) {
       if (announcement) {
         console.log('📢 Detected TANGAZO announcement:', JSON.stringify(announcement, null, 2))
 
-        const supabaseAdmin = getSupabaseAdmin()
         if (!supabaseAdmin) {
           console.error('❌ Supabase admin not initialized')
-          if (isGroup) await sendGroupTextMessage(msg.groupId, '❌ Samahani, kuna tatizo la kiufundi. Tafadhali jaribu tena baadaye.')
+          if (isGroup) await sendReply(replyCtx, '❌ Samahani, kuna tatizo la kiufundi. Tafadhali jaribu tena baadaye.')
           continue
         }
 
@@ -309,7 +324,7 @@ export async function POST(request) {
 
           if (error) {
             console.error('❌ Failed to update announcement:', error)
-            if (isGroup) await sendGroupTextMessage(msg.groupId, '❌ Hitilafu wakati wa kusasisha tangazo.')
+            if (isGroup) await sendReply(replyCtx, '❌ Hitilafu wakati wa kusasisha tangazo.')
             continue
           }
           shortId = existing.short_id
@@ -326,7 +341,7 @@ export async function POST(request) {
 
           if (error) {
             console.error('❌ Failed to insert announcement:', error)
-            if (isGroup) await sendGroupTextMessage(msg.groupId, '❌ Hitilafu wakati wa kuhifadhi tangazo.')
+            if (isGroup) await sendReply(replyCtx, '❌ Hitilafu wakati wa kuhifadhi tangazo.')
             continue
           }
           shortId = inserted.short_id
@@ -334,8 +349,7 @@ export async function POST(request) {
 
         const reply = `Tangazo limehifadhiwa\n\n#${shortId}\n${announcement.date}\n\n_Tangazo litaonekana kwenye tovuti._`
         console.log('📤 Reply:', reply)
-        if (isGroup) await sendGroupTextMessage(msg.groupId, reply)
-        else await sendTextMessage(msg.from, reply)
+        await sendReply(replyCtx, reply)
         continue
       }
 
@@ -349,11 +363,13 @@ export async function POST(request) {
       if (parsedSchedules.length === 0) {
         console.log('❌ Failed to parse any schedule from message:', msg.text)
         if (isGroup) {
-          await sendGroupTextMessage(msg.groupId, '❌ Samahani, siwezi kuchambua ujumbe huu. Tumia muundo: siku tarehe kuondoka mahali saa (ratiba moja kwa mstari)')
+          await sendGroupTextMessage(
+            msg.groupId,
+            '❌ Samahani, siwezi kuchambua ujumbe huu. Tumia muundo: siku tarehe kuondoka mahali saa (ratiba moja kwa mstari)'
+          )
         } else {
-          const baseUrl = (process.env.CALLBACK_URL || 'https://mafiaferry.vercel.app').replace('/api/whatsapp/webhook', '')
-          await sendImageMessage(msg.from, `${baseUrl}/mafia_ferry.png`, 'MafiaFerry')
-          await new Promise(r => setTimeout(r, 500))
+          await sendImageMessage(msg.from, `${getBaseUrl()}/mafia_ferry.png`, 'MafiaFerry')
+          await new Promise((r) => setTimeout(r, 500))
           await sendInteractiveButtons(msg.from, 'Habari! Mimi ni msaidizi wa MafiaFerry. Chagua moja kati ya huduma zifuatazo:', [
             { id: 'view_schedule', title: 'Angalia Ratiba' },
             { id: 'buy_ticket', title: 'Nunua Tiketi' },
@@ -363,14 +379,14 @@ export async function POST(request) {
         continue
       }
 
+      if (!supabaseAdmin) {
+        console.error('❌ Supabase admin not initialized')
+        continue
+      }
+
       for (const parsed of parsedSchedules) {
         console.log('✅ Parsed schedule:', JSON.stringify(parsed, null, 2))
 
-        const supabaseAdmin = getSupabaseAdmin()
-        if (!supabaseAdmin) {
-          console.error('❌ Supabase admin not initialized')
-          continue
-        }
         const { data: existing } = await supabaseAdmin
           .from('schedules')
           .select('id')
@@ -388,40 +404,23 @@ export async function POST(request) {
 
           if (error) {
             console.error('Update error:', error)
-            const errMsg = '❌ Hitilafu wakati wa kusasisha ratiba.'
-            if (isGroup) await sendGroupTextMessage(msg.groupId, errMsg)
-            else await sendTextMessage(msg.from, errMsg)
+            await sendReply(replyCtx, '❌ Hitilafu wakati wa kusasisha ratiba.')
             continue
           }
         } else {
           console.log('➕ Inserting new schedule')
-          const { error } = await supabaseAdmin
-            .from('schedules')
-            .insert(parsed)
+          const { error } = await supabaseAdmin.from('schedules').insert(parsed)
 
           if (error) {
             console.error('Insert error:', error)
-            const errMsg = '❌ Hitilafu wakati wa kuongeza ratiba.'
-            if (isGroup) await sendGroupTextMessage(msg.groupId, errMsg)
-            else await sendTextMessage(msg.from, errMsg)
+            await sendReply(replyCtx, '❌ Hitilafu wakati wa kuongeza ratiba.')
             continue
           }
         }
 
-        const daySw = {
-          Monday: 'Jumatatu',
-          Tuesday: 'Jumanne',
-          Wednesday: 'Jumatano',
-          Thursday: 'Alhamisi',
-          Friday: 'Ijumaa',
-          Saturday: 'Jumamosi',
-          Sunday: 'Jumapili',
-        }[parsed.days]
-
-        const reply = `Ratiba imesasishwa\n\n${parsed.ship_name}\n${daySw} ${parsed.date}\n${parsed.route}\nInaondoka: ${parsed.departure}\nMuda: ${parsed.duration}`
+        const reply = `Ratiba imesasishwa\n\n${parsed.ship_name}\n${translateDay(parsed.days)} ${parsed.date}\n${parsed.route}\nInaondoka: ${parsed.departure}\nMuda: ${parsed.duration}`
         console.log('📤 Reply:', reply)
-        if (isGroup) await sendGroupTextMessage(msg.groupId, reply)
-        else await sendTextMessage(msg.from, reply)
+        await sendReply(replyCtx, reply)
       }
     }
 
