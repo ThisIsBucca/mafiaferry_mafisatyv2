@@ -48,9 +48,11 @@ async function handleTicketFlow(msg) {
     try {
       const result = await createOrder({
         buyer_phone: phone,
+        buyer_name: msg.from,
         amount,
         reference,
       })
+      console.log('VibePay createOrder response:', JSON.stringify(result))
 
       if (result.status === 'success' && result.data?.order_id) {
         pendingOrders.set(result.data.order_id, {

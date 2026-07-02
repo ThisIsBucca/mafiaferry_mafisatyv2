@@ -1,11 +1,11 @@
 const BASE_URL = process.env.VIBEPAY_BASE_URL || 'https://xinvo.online/v1'
-const API_KEY = process.env.VIBEPAY_API_KEY
+const SECRET_KEY = process.env.VIBEPAY_SECRET_KEY
 
 async function vibepayRequest(endpoint, body) {
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     method: 'POST',
     headers: {
-      'X-API-KEY': API_KEY,
+      'Authorization': `Bearer ${SECRET_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
