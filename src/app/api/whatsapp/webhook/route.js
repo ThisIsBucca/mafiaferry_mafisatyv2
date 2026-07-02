@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '../../../../lib/supabaseAdmin'
 import { parseScheduleMessages } from '../../../../lib/parseScheduleMessage'
 import { parseWithAI } from '../../../../lib/parseWithAI'
 import { parseAnnouncementMessage, getDefaultAnnouncementImage } from '../../../../lib/parseAnnouncementMessage'
-import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendTypingIndicator, sendInteractiveButtons, sendInteractiveList } from '../../../../lib/whatsappService'
+import { extractGroupMessages, extractAllMessagesDebug, sendGroupTextMessage, sendTextMessage, sendImageMessage, sendTypingIndicator, sendInteractiveButtons, sendInteractiveList } from '../../../../lib/whatsappService'
 
 export async function GET(request) {
   const searchParams = request.nextUrl.searchParams
@@ -117,6 +117,10 @@ export async function POST(request) {
             Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
           }[schedule.days]
 
+          const baseUrl = (process.env.CALLBACK_URL || '').replace('/api/whatsapp/webhook', '')
+          if (schedule.ship_name.toLowerCase().includes('kilindoni')) {
+            await sendImageMessage(msg.from, `${baseUrl}/images/mvkilindoni.jpg`, 'MV Kilindoni')
+          }
           await sendTextMessage(msg.from, `${schedule.ship_name}\n${daySw} ${schedule.date}\n${schedule.route}\nInaondoka: ${schedule.departure}\nMuda: ${schedule.duration}`)
         } else if (buttonId === 'contact_us') {
           await sendTextMessage(msg.from, `Wasiliana Nasi\n\n1. Philox\n   Tel: 255688883219\n   wa.me/255688883219\n\n2. Bucca\n   Tel: 255776986840\n   wa.me/255776986840`)
@@ -201,7 +205,8 @@ export async function POST(request) {
         if (isGroup) {
           await sendGroupTextMessage(msg.groupId, '❌ Samahani, siwezi kuchambua ujumbe huu. Tumia muundo: siku tarehe kuondoka mahali saa (ratiba moja kwa mstari)')
         } else {
-          await sendTypingIndicator(msg.from, msg.id)
+          const baseUrl = (process.env.CALLBACK_URL || '').replace('/api/whatsapp/webhook', '')
+          await sendImageMessage(msg.from, `${baseUrl}/mafia_ferry.png`, 'MafiaFerry')
           await sendInteractiveButtons(msg.from, 'Habari! Mimi ni msaidizi wa MafiaFerry. Chagua moja kati ya huduma zifuatazo:', [
             { id: 'view_schedule', title: 'Angalia Ratiba' },
             { id: 'contact_us', title: 'Wasiliana Nasi' },
