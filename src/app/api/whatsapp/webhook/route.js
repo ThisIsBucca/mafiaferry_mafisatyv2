@@ -117,7 +117,7 @@ export async function POST(request) {
             Thursday: 'Alhamisi', Friday: 'Ijumaa', Saturday: 'Jumamosi', Sunday: 'Jumapili',
           }[schedule.days]
 
-          const baseUrl = (process.env.CALLBACK_URL || '').replace('/api/whatsapp/webhook', '')
+          const baseUrl = (process.env.CALLBACK_URL || 'https://mafiaferry.vercel.app').replace('/api/whatsapp/webhook', '')
           if (schedule.ship_name.toLowerCase().includes('kilindoni')) {
             await sendImageMessage(msg.from, `${baseUrl}/images/mvkilindoni.jpg`, 'MV Kilindoni')
           }
@@ -205,7 +205,7 @@ export async function POST(request) {
         if (isGroup) {
           await sendGroupTextMessage(msg.groupId, '❌ Samahani, siwezi kuchambua ujumbe huu. Tumia muundo: siku tarehe kuondoka mahali saa (ratiba moja kwa mstari)')
         } else {
-          const baseUrl = (process.env.CALLBACK_URL || '').replace('/api/whatsapp/webhook', '')
+          const baseUrl = (process.env.CALLBACK_URL || 'https://mafiaferry.vercel.app').replace('/api/whatsapp/webhook', '')
           await sendImageMessage(msg.from, `${baseUrl}/mafia_ferry.png`, 'MafiaFerry')
           await sendInteractiveButtons(msg.from, 'Habari! Mimi ni msaidizi wa MafiaFerry. Chagua moja kati ya huduma zifuatazo:', [
             { id: 'view_schedule', title: 'Angalia Ratiba' },
